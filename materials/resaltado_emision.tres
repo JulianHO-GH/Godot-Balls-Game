@@ -1,0 +1,8 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://im4lteji5b0x"]
+
+[ext_resource type="Shader" path="res://shaders/resaltado.gdshader" id="1_1fck0"]
+
+[resource]
+shader = ExtResource("1_1fck0")
+shader_parameter/seleccionado = false
+shader_parameter/color_emision = Color(0.5, 1, 0.5, 1)

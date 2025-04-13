@@ -1,0 +1,17 @@
+[gd_scene load_steps=4 format=3 uid="uid://ch1kf3dwhrur6"]
+
+[ext_resource type="Texture2D" uid="uid://coos76w8hqlwf" path="res://Texturas/x.png" id="1_xnyf6"]
+[ext_resource type="Script" path="res://punto_teletransporte.gd" id="2_xv1yy"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_dq1yr"]
+radius = 162.077
+
+[node name="Node2D" type="Area2D"]
+script = ExtResource("2_xv1yy")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("1_xnyf6")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_dq1yr")

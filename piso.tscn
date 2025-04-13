@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=3 uid="uid://biceamej75vpi"]
+
+[ext_resource type="Texture2D" uid="uid://dhesdvjpjrd81" path="res://Texturas/negro (1).png" id="1_hpe5s"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_327ba"]
+size = Vector2(250, 144)
+
+[node name="StaticBody2D" type="StaticBody2D"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_327ba")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(-8.34465e-07, -2.38419e-07)
+texture = ExtResource("1_hpe5s")

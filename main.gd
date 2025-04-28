@@ -465,81 +465,92 @@ func _input(event):
 				# Usar una consulta de física para detectar qué objeto está en la posición tocada
 				var space_state = get_world_2d().direct_space_state
 				var query = PhysicsPointQueryParameters2D.new()
-				query.collision_mask = (1 << 0) | (1 << 1)  # Detectar layer 1 (físico) y layer 2 (selección)
 				query.position = posicion_mundo
-				query.collision_mask = 0xFFFFFFFF  # Detectar todas las capas de colisión
+				query.collision_mask = (1 << 0) | (1 << 1)  # Detectar layer 1 (físico) y layer 2 (puntos de teletransporte)
 				query.collide_with_bodies = true  # Detectar RigidBody2D y StaticBody2D
 				query.collide_with_areas = true   # Detectar Area2D
+				query.canvas_instance_id = get_canvas_item()  # Asegurar que la consulta respeta el canvas actual
 				var results = space_state.intersect_point(query)
 
 				if results.size() > 0:
 					var collider = results[0].collider
-					# Calcular el tile correspondiente a la posición del objeto
-					var tile_size = 250
-					var tile_pos = Vector2(floor(collider.position.x / tile_size), floor(collider.position.y / tile_size))
-					var tile_key = Vector2(tile_pos.x, tile_pos.y)
-					
-					# Manejar eliminación de teleportadores y sus puntos asociados
-					if collider is Area2D and collider.get_script() and collider.get_script().resource_path == "res://teleportador.gd":
-						# Eliminar el punto de teletransporte asociado
-						if collider.teleport_target and is_instance_valid(collider.teleport_target):
-							var punto_tile_pos = Vector2(floor(collider.teleport_target.position.x / tile_size), floor(collider.teleport_target.position.y / tile_size))
-							var punto_tile_key = Vector2(punto_tile_pos.x, punto_tile_pos.y)
-							if ocupados.has(punto_tile_key):
-								ocupados.erase(punto_tile_key)
-							collider.teleport_target.queue_free()
-					# Manejar eliminación de puntos de teletransporte y desvincular del teleportador
-					elif collider is Area2D and collider.get_script() and collider.get_script().resource_path == "res://punto_teletransporte.gd":
-						# Buscar el teleportador que usa este punto como destino
-						for teleportador in get_tree().get_nodes_in_group("teleportadores"):
-							if teleportador.teleport_target == collider:
-								teleportador.teleport_target = null
-								break
-					
-					# Si el objeto es una bola, eliminarla del diccionario y del grupo
-					if collider is RigidBody2D and collider in bola_initial_positions:
-						bola_initial_positions.erase(collider)
-						collider.remove_from_group("bolas")
-					
-					# Liberar el tile en el diccionario ocupados
-					if ocupados.has(tile_key):
-						ocupados.erase(tile_key)
-					
-					# Eliminar el objeto de la escena
-					collider.queue_free()
+					# Verificar si el collider es válido y no está pendiente de eliminación
+					if is_instance_valid(collider) and not collider.is_queued_for_deletion():
+						# Calcular el tile correspondiente a la posición del objeto
+						var tile_size = 250
+						var tile_pos = Vector2(floor(collider.position.x / tile_size), floor(collider.position.y / tile_size))
+						var tile_key = Vector2(tile_pos.x, tile_pos.y)
+						
+						# Manejar eliminación de teleportadores y sus puntos asociados
+						if collider is Area2D and collider.get_script() and collider.get_script().resource_path == "res://teleportador.gd":
+							# Eliminar el punto de teletransporte asociado
+							if collider.teleport_target and is_instance_valid(collider.teleport_target):
+								var punto_tile_pos = Vector2(floor(collider.teleport_target.position.x / tile_size), floor(collider.teleport_target.position.y / tile_size))
+								var punto_tile_key = Vector2(punto_tile_pos.x, punto_tile_pos.y)
+								if ocupados.has(punto_tile_key):
+									ocupados.erase(punto_tile_key)
+								collider.teleport_target.queue_free()
+						# Manejar eliminación de puntos de teletransporte y su teleportador asociado
+						elif collider is Area2D and collider.get_script() and collider.get_script().resource_path == "res://punto_teletransporte.gd":
+							# Buscar el teleportador que usa este punto como destino
+							for teleportador in get_tree().get_nodes_in_group("teleportadores"):
+								if teleportador.teleport_target == collider:
+									# Liberar el tile del teleportador
+									var tele_tile_pos = Vector2(floor(teleportador.position.x / tile_size), floor(teleportador.position.y / tile_size))
+									var tele_tile_key = Vector2(tele_tile_pos.x, tele_tile_pos.y)
+									if ocupados.has(tele_tile_key):
+										ocupados.erase(tele_tile_key)
+									# Eliminar el teleportador
+									teleportador.queue_free()
+									break
+						
+						# Si el objeto es una bola, eliminarla del diccionario y del grupo
+						if collider is RigidBody2D and collider in bola_initial_positions:
+							bola_initial_positions.erase(collider)
+							collider.remove_from_group("bolas")
+						
+						# Liberar el tile en el diccionario ocupados
+						if ocupados.has(tile_key):
+							ocupados.erase(tile_key)
+						
+						# Eliminar el objeto de la escena
+						collider.queue_free()
 			
 			elif seleccionando:
+				
 				var space_state = get_world_2d().direct_space_state
 				var query = PhysicsPointQueryParameters2D.new()
-				query.collision_mask = (1 << 0) | (1 << 1)  # Detectar layer 1 (físico) y layer 2 (selección)
 				query.position = posicion_mundo
-				query.collision_mask = 0xFFFFFFFF
-				query.collide_with_bodies = true
-				query.collide_with_areas = true
+				query.collision_mask = (1 << 0) | (1 << 1)  # Detectar layer 1 (físico) y layer 2 (puntos de teletransporte)
+				query.collide_with_bodies = true  # Detectar RigidBody2D y StaticBody2D
+				query.collide_with_areas = true   # Detectar Area2D
+				query.canvas_instance_id = get_canvas_item()  # Asegurar que la consulta respeta el canvas actual
 				var results = space_state.intersect_point(query)
 
 				if results.size() > 0:
 					var collider = results[0].collider
-					# Verificar si el collider es un nodo válido (RigidBody2D, StaticBody2D, Area2D para teleportadores o puntos)
-					if collider is RigidBody2D or collider is StaticBody2D or (collider is Area2D and collider.get_script() and (collider.get_script().resource_path == "res://teleportador.gd" or collider.get_script().resource_path == "res://punto_teletransporte.gd")):
-						var sprite = collider.get_node_or_null("Sprite2D")
-						if sprite and sprite.material:
-							# Desactivar el resaltado del objeto anterior
-							if ultimo_objeto_seleccionado and ultimo_objeto_seleccionado != collider:
-								var sprite_anterior = ultimo_objeto_seleccionado.get_node_or_null("Sprite2D")
-								if sprite_anterior and sprite_anterior.material:
-									sprite_anterior.material.set_shader_parameter("seleccionado", false)
-							# Activar el resaltado del objeto actual
-							sprite.material.set_shader_parameter("seleccionado", true)
-							ultimo_objeto_seleccionado = collider
-							
-							# Mostrar u ocultar BotonLink según si es un teleportador
-							if collider.get_script() and collider.get_script().resource_path == "res://teleportador.gd":
-								$UI/Opciones/BotonLink.visible = true
-								is_boton_link_visible = true
-							else:
-								$UI/Opciones/BotonLink.visible = false
-								is_boton_link_visible = false
+					# Verificar si el collider es válido y no está pendiente de eliminación
+					if is_instance_valid(collider) and not collider.is_queued_for_deletion():
+						# Verificar si es un nodo seleccionable (RigidBody2D, StaticBody2D, Area2D para teleportadores, puntos o cubos)
+						if collider is RigidBody2D or collider is StaticBody2D or (collider is Area2D and collider.get_script() and (collider.get_script().resource_path == "res://teleportador.gd" or collider.get_script().resource_path == "res://punto_teletransporte.gd" or collider.get_script().resource_path == "res://cubo.gd")):
+							var sprite = collider.get_node_or_null("Sprite2D")
+							if sprite and sprite.material and not collider.get_node_or_null("CollisionShape2D").disabled:
+								# Desactivar el resaltado del objeto anterior
+								if ultimo_objeto_seleccionado and ultimo_objeto_seleccionado != collider:
+									var sprite_anterior = ultimo_objeto_seleccionado.get_node_or_null("Sprite2D")
+									if sprite_anterior and sprite_anterior.material:
+										sprite_anterior.material.set_shader_parameter("seleccionado", false)
+								# Activar el resaltado del objeto actual
+								sprite.material.set_shader_parameter("seleccionado", true)
+								ultimo_objeto_seleccionado = collider
+								
+								# Mostrar u ocultar BotonLink según si es un teleportador
+								if collider.get_script() and collider.get_script().resource_path == "res://teleportador.gd":
+									$UI/Opciones/BotonLink.visible = true
+									is_boton_link_visible = true
+								else:
+									$UI/Opciones/BotonLink.visible = false
+									is_boton_link_visible = false
 			
 			# Modo normal: spawnear un objeto si las bolas están congeladas
 			elif not seleccionando and not is_deleting:

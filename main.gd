@@ -32,6 +32,17 @@ const DRAG_THRESHOLD: float = 10.0  # Umbral en píxeles para considerar un arra
 var ultimo_objeto_seleccionado = null  # Referencia al último objeto seleccionado
 var is_boton_link_visible: bool = false  # Estado para rastrear si BotonLink está visible
 
+# Diccionario para almacenar la última rotación por tipo de objeto (en grados)
+var ultimas_rotaciones: Dictionary = {
+	"Bola": 0.0,
+	"Piso": 0.0,
+	"Cubo": 0.0,
+	"Teleportador": 0.0,
+	"Esquina": 0.0,
+	"EsquinaRampa": 0.0,
+	"PuntoTeletransporte": 0.0
+}
+
 # Límites de la cámara
 const CAMERA_LIMIT_LEFT: float = -5000.0   # Límite izquierdo (x mínimo)
 const CAMERA_LIMIT_TOP: float = -10000.0   # Límite superior (y mínimo)
@@ -131,27 +142,75 @@ func _zoom_out():
 func _rotar_izquierda():
 	# Verificar si estamos en modo seleccionando y hay un objeto seleccionado
 	if seleccionando and ultimo_objeto_seleccionado:
-		# Rotar 90 grados a la izquierda (antihorario)
+		# Rotar 45 grados a la izquierda (antihorario)
 		ultimo_objeto_seleccionado.rotation_degrees -= 45
-
+		
+		# Determinar el tipo de objeto
+		var tipo_objeto = ""
+		if ultimo_objeto_seleccionado is RigidBody2D:
+			tipo_objeto = "Bola"
+		elif ultimo_objeto_seleccionado is StaticBody2D:
+			# Verificar la escena instanciada para identificar Piso, Esquina o EsquinaRampa
+			var scene_path = ultimo_objeto_seleccionado.get_meta("scene_path", "") if ultimo_objeto_seleccionado.has_meta("scene_path") else ""
+			if scene_path == "res://Scenes/Esquina.tscn":
+				tipo_objeto = "Esquina"
+			elif scene_path == "res://Scenes/EsquinaRampa.tscn":
+				tipo_objeto = "EsquinaRampa"
+			else:
+				tipo_objeto = "Piso"
+		elif ultimo_objeto_seleccionado is Area2D and ultimo_objeto_seleccionado.get_script():
+			var script_path = ultimo_objeto_seleccionado.get_script().resource_path
+			if script_path == "res://cubo.gd":
+				tipo_objeto = "Cubo"
+			elif script_path == "res://teleportador.gd":
+				tipo_objeto = "Teleportador"
+			elif script_path == "res://punto_teletransporte.gd":
+				tipo_objeto = "PuntoTeletransporte"
+		
+		# Guardar la rotación en el diccionario
+		if tipo_objeto:
+			ultimas_rotaciones[tipo_objeto] = ultimo_objeto_seleccionado.rotation_degrees
+		
 		# Si el objeto es una bola (RigidBody2D), actualizar su rotación guardada
 		if ultimo_objeto_seleccionado is RigidBody2D:
-			# Actualizar saved_state.rotation en la bola (en radianes, como lo usa Bola.gd)
 			ultimo_objeto_seleccionado.saved_state.rotation = deg_to_rad(ultimo_objeto_seleccionado.rotation_degrees)
-			# Usar teleport para mantener la posición actual y aplicar la rotación
 			ultimo_objeto_seleccionado.teleport(ultimo_objeto_seleccionado.position)
 
 func _rotar_derecha():
 	# Verificar si estamos en modo seleccionando y hay un objeto seleccionado
 	if seleccionando and ultimo_objeto_seleccionado:
-		# Rotar 90 grados a la derecha (antihorario)
+		# Rotar 45 grados a la derecha (horario)
 		ultimo_objeto_seleccionado.rotation_degrees += 45
-
+		
+		# Determinar el tipo de objeto
+		var tipo_objeto = ""
+		if ultimo_objeto_seleccionado is RigidBody2D:
+			tipo_objeto = "Bola"
+		elif ultimo_objeto_seleccionado is StaticBody2D:
+			# Verificar la escena instanciada para identificar Piso, Esquina o EsquinaRampa
+			var scene_path = ultimo_objeto_seleccionado.get_meta("scene_path", "") if ultimo_objeto_seleccionado.has_meta("scene_path") else ""
+			if scene_path == "res://Scenes/Esquina.tscn":
+				tipo_objeto = "Esquina"
+			elif scene_path == "res://Scenes/EsquinaRampa.tscn":
+				tipo_objeto = "EsquinaRampa"
+			else:
+				tipo_objeto = "Piso"
+		elif ultimo_objeto_seleccionado is Area2D and ultimo_objeto_seleccionado.get_script():
+			var script_path = ultimo_objeto_seleccionado.get_script().resource_path
+			if script_path == "res://cubo.gd":
+				tipo_objeto = "Cubo"
+			elif script_path == "res://teleportador.gd":
+				tipo_objeto = "Teleportador"
+			elif script_path == "res://punto_teletransporte.gd":
+				tipo_objeto = "PuntoTeletransporte"
+		
+		# Guardar la rotación en el diccionario
+		if tipo_objeto:
+			ultimas_rotaciones[tipo_objeto] = ultimo_objeto_seleccionado.rotation_degrees
+		
 		# Si el objeto es una bola (RigidBody2D), actualizar su rotación guardada
 		if ultimo_objeto_seleccionado is RigidBody2D:
-			# Actualizar saved_state.rotation en la bola (en radianes, como lo usa Bola.gd)
 			ultimo_objeto_seleccionado.saved_state.rotation = deg_to_rad(ultimo_objeto_seleccionado.rotation_degrees)
-			# Usar teleport para mantener la posición actual y aplicar la rotación
 			ultimo_objeto_seleccionado.teleport(ultimo_objeto_seleccionado.position)
 			
 func _mover_objeto(direccion: Vector2):
@@ -640,6 +699,11 @@ func spawn_bola(pos):
 	bola.add_to_group("bolas")
 	bola_initial_positions[bola] = bola.global_transform.origin
 	add_child(bola)
+	# Aplicar la rotación guardada
+	bola.rotation_degrees = ultimas_rotaciones["Bola"]
+	if bola.rotation_degrees != 0.0:
+		bola.saved_state.rotation = deg_to_rad(bola.rotation_degrees)
+		bola.teleport(bola.position)
 
 func spawn_piso(pos):
 	var piso = piso_scene.instantiate()
@@ -647,6 +711,10 @@ func spawn_piso(pos):
 	var sprite = piso.get_node("Sprite2D")
 	if sprite:
 		sprite.material = material_base.duplicate()
+	# Aplicar la rotación guardada
+	piso.rotation_degrees = ultimas_rotaciones["Piso"]
+	# Añadir metadato para identificar la escena
+	piso.set_meta("scene_path", "res://Scenes/Piso.tscn")
 	add_child(piso)
 
 func spawn_cubo(pos):
@@ -656,9 +724,11 @@ func spawn_cubo(pos):
 	if sprite:
 		sprite.material = material_base.duplicate()
 	add_child(cubo)
-	# Asegurar configuración de colisión para selección
-	cubo.set_collision_layer_value(1, true)  # Layer 1 para detección física
-	cubo.set_collision_mask_value(1, false)  # No colisionar con otros objetos
+	# Aplicar la rotación guardada
+	cubo.rotation_degrees = ultimas_rotaciones["Cubo"]
+	# Configuración de colisión para cubos
+	cubo.set_collision_layer_value(1, true)  # Layer 1 para detección en selección/eliminación
+	cubo.set_collision_mask_value(1, true)   # Detectar bolas en layer 1
 
 func spawn_teleportador(pos):
 	var teleportador = teleportador_scene.instantiate()
@@ -684,12 +754,15 @@ func spawn_teleportador(pos):
 	
 	teleportador.add_to_group("teleportadores")
 	
-	# Asegurar configuración de colisión para selección
-	teleportador.set_collision_layer_value(1, true)  # Layer 1 para detección física
-	teleportador.set_collision_mask_value(1, false)  # No colisionar con otros objetos
+	# Configuración de colisión para teleportadores
+	teleportador.set_collision_layer_value(1, true)  # Layer 1 para detección en selección/eliminación
+	teleportador.set_collision_mask_value(1, true)   # Detectar bolas en layer 1
 	# Añadir el teleportador y el punto a la escena
 	add_child(teleportador)
 	add_child(punto)
+	# Aplicar la rotación guardada al teleportador y su punto
+	teleportador.rotation_degrees = ultimas_rotaciones["Teleportador"]
+	punto.rotation_degrees = ultimas_rotaciones["PuntoTeletransporte"]
 	
 	# Marcar el tile del punto como ocupado
 	var punto_tile_pos = Vector2(floor(punto_pos.x / tile_size), floor(punto_pos.y / tile_size))
@@ -702,6 +775,10 @@ func spawn_esquina(pos):
 	var sprite = esquina.get_node("Sprite2D")
 	if sprite:
 		sprite.material = material_base.duplicate()
+	# Aplicar la rotación guardada
+	esquina.rotation_degrees = ultimas_rotaciones["Esquina"]
+	# Añadir metadato para identificar la escena
+	esquina.set_meta("scene_path", "res://Scenes/Esquina.tscn")
 	add_child(esquina)
 
 func spawn_esquinarampa(pos):
@@ -710,4 +787,8 @@ func spawn_esquinarampa(pos):
 	var sprite = esquinarampa.get_node("Sprite2D")
 	if sprite:
 		sprite.material = material_base.duplicate()
+	# Aplicar la rotación guardada
+	esquinarampa.rotation_degrees = ultimas_rotaciones["EsquinaRampa"]
+	# Añadir metadato para identificar la escena
+	esquinarampa.set_meta("scene_path", "res://Scenes/EsquinaRampa.tscn")
 	add_child(esquinarampa)

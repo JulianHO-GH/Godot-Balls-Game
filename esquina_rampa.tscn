@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3 uid="uid://c3icifcstco4s"]
+
+[ext_resource type="Texture2D" uid="uid://bf0d7vgovj6y7" path="res://Texturas/EsquinaRampa.png" id="1_pv6pn"]
+
+[node name="EsquinaRampa" type="StaticBody2D"]
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_pv6pn")
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
+polygon = PackedVector2Array(-125, -72, -73, -72, 72, 73, 72, 125, -72, 125, -72, 72, -125, 72)

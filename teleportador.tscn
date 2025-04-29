@@ -1,0 +1,17 @@
+[gd_scene load_steps=4 format=3 uid="uid://cwl3fxenqioc1"]
+
+[ext_resource type="Script" path="res://teleportador.gd" id="1_vixt7"]
+[ext_resource type="Texture2D" uid="uid://coxud135l8ti0" path="res://Texturas/teleportador.png" id="2_63kc0"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_mm7pd"]
+radius = 52.0
+
+[node name="Teleportador" type="Area2D"]
+script = ExtResource("1_vixt7")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.4125, 0.4125)
+texture = ExtResource("2_63kc0")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_mm7pd")

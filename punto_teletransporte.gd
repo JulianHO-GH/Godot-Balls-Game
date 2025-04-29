@@ -6,7 +6,7 @@ func _ready():
 		var sprite = Sprite2D.new()
 		sprite.name = "Sprite2D"
 		sprite.texture = load("res://Texturas/punto_teletransporte.png")  # Ajusta la textura según tu proyecto
-		sprite.scale = Vector2(0.3, 0.3)  # Escala para visibilidad
+		sprite.scale = Vector2(0.5, 0.5)  # Escala para visibilidad
 		add_child(sprite)
 		sprite.owner = self
 	

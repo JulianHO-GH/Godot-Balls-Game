@@ -60,6 +60,11 @@ var ocupados: Dictionary = {}
 #Materiales/Shaders
 var material_base = load("res://materials/resaltado_emision.tres")
 
+var plugin
+var plugin_name = "GodotGetImage"
+
+@onready var image_scene = preload("res://Image.tscn")
+
 func _ready():
 	# Guardar la posición inicial de $UI/Menu
 	initial_menu_position = $UI/Menu.position
@@ -106,6 +111,16 @@ func _ready():
 	$UI/Mover/BotonDerecha.pressed.connect(_mover_derecha)
 	$UI/Mover/BotonRotarIzquierda.pressed.connect(_rotar_izquierda)
 	$UI/Mover/BotonRotarDerecha.pressed.connect(_rotar_derecha)
+	
+	if Engine.has_singleton(plugin_name):
+		plugin = Engine.get_singleton(plugin_name)
+	else:
+		print("Could not load plugin: ", plugin_name)
+
+	if plugin:
+		plugin.connect("image_request_completed", _on_image_request_completed)
+		plugin.connect("error", _on_error)
+		plugin.connect("permission_not_granted_by_user", _on_permission_not_granted_by_user)
 
 func _seleccionar_esquinarampa():
 	if not descongelado:
@@ -644,8 +659,8 @@ func _input(event):
 							sprite.material.set_shader_parameter("seleccionado", true)
 							ultimo_objeto_seleccionado = collider
 							
-							# Mostrar u ocultar BotonLink según si es un teleportador
-							if collider.get_script() and collider.get_script().resource_path == "res://teleportador.gd":
+							# Mostrar u ocultar BotonLink según si es una bola
+							if collider.get_script() and collider.get_script().resource_path == "res://bola.gd":
 								$UI/Opciones/BotonLink.visible = true
 								is_boton_link_visible = true
 							else:
@@ -681,12 +696,70 @@ func _input(event):
 						print("Este tile ya está ocupado!")
 
 func _on_boton_link_pressed():
-	if seleccionando and ultimo_objeto_seleccionado and ultimo_objeto_seleccionado.get_script() and ultimo_objeto_seleccionado.get_script().resource_path == "res://teleportador.gd":
-		# Aquí puedes implementar la lógica para "linkear" el teleportador
-		# Por ejemplo, podrías iniciar un modo para seleccionar otro teleportador como destino
-		print("BotonLink presionado para el teleportador seleccionado")
-		# Ejemplo: Cambiar el teleport_target (ajusta según tu lógica)
-		# ultimo_objeto_seleccionado.teleport_target = otro_nodo
+	""" Select single images from gallery """
+	if plugin:
+		plugin.getGalleryImage()
+	else:
+		print(plugin_name, " plugin not loaded!")
+		
+func _on_image_request_completed(dict):
+	print("Image request completed. Dictionary received: ", dict)
+	
+	# Verificar si recibimos al menos una imagen
+	if dict.values().size() > 0:
+		var img_buffer = dict.values()[0]  # Tomar solo la primera imagen
+		print("Image buffer size: ", img_buffer.size(), " bytes")
+		
+		# Crear una imagen y cargar el buffer
+		var image = Image.new()
+		var error = image.load_jpg_from_buffer(img_buffer)  # Intentar cargar como JPG
+		if error != OK:
+			_mover_abajo()
+			print("Error loading JPG buffer: ", error)
+			# Si falla JPG, intentar PNG
+			error = image.load_png_from_buffer(img_buffer)
+			if error != OK:
+				print("Error loading PNG buffer: ", error)
+				return
+			else:
+				print("Successfully loaded image as PNG")
+		else:
+			print("Successfully loaded image as JPG")
+		
+		# Verificar las dimensiones de la imagen
+		print("Image dimensions: ", image.get_size())
+		if image.get_size() == Vector2i(0, 0):
+			_mover_arriba()
+			print("Error: Image is empty (0x0)")
+			return
+		
+		var image_node = image_scene.instantiate()
+		image_node.texture = ImageTexture.new().create_from_image(image)
+		get_node("TextureRect").add_child(image_node)
+		print("Texture assigned to TextureRect")
+	else:
+		print("No image buffers received in dictionary")
+		_mover_derecha()
+			
+			
+func _on_error(e):
+	var dialog = get_node("AcceptDialog")
+	dialog.window_title = "Error!"
+	dialog.dialog_text = e
+	dialog.show()
+	
+
+func _on_permission_not_granted_by_user(permission):
+	print("User won't grant permission, explain why it's important!")
+	var dialog = get_node("AcceptDialog")
+	dialog.window_title = "Permission necessary"
+	var permission_text = permission.capitalize().split(".")[-1]
+	dialog.dialog_text = permission_text + "\n permission is necessary"
+	dialog.show()
+	
+	# Set the plugin to ask user for permission again
+	plugin.resendPermission()
+	
 		
 func spawn_bola(pos):
 	var bola = bola_scene.instantiate()

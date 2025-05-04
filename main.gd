@@ -63,7 +63,7 @@ var material_base = load("res://materials/resaltado_emision.tres")
 var plugin
 var plugin_name = "GodotGetImage"
 
-@onready var image_scene = preload("res://Image.tscn")
+@onready var image_scene = preload("res://sprite_2d.tscn")
 
 func _ready():
 	# Guardar la posición inicial de $UI/Menu
@@ -117,10 +117,20 @@ func _ready():
 	else:
 		print("Could not load plugin: ", plugin_name)
 
+#""" Set option for all following images """
+	var options = {
+		"image_height" : 250,
+		"image_width" : 250,
+		"keep_aspect" : true,
+		"image_format" : "png"
+		#"image_format" : "png"
+	}
+
 	if plugin:
 		plugin.connect("image_request_completed", _on_image_request_completed)
 		plugin.connect("error", _on_error)
 		plugin.connect("permission_not_granted_by_user", _on_permission_not_granted_by_user)
+		plugin.setOptions(options)
 
 func _seleccionar_esquinarampa():
 	if not descongelado:
@@ -709,37 +719,42 @@ func _on_image_request_completed(dict):
 	if dict.values().size() > 0:
 		var img_buffer = dict.values()[0]  # Tomar solo la primera imagen
 		print("Image buffer size: ", img_buffer.size(), " bytes")
-		
+
 		# Crear una imagen y cargar el buffer
 		var image = Image.new()
-		var error = image.load_jpg_from_buffer(img_buffer)  # Intentar cargar como JPG
+		var error = image.load_png_from_buffer(img_buffer)  # Intentar cargar como JPG
 		if error != OK:
 			_mover_abajo()
-			print("Error loading JPG buffer: ", error)
-			# Si falla JPG, intentar PNG
-			error = image.load_png_from_buffer(img_buffer)
+			print("Error loading PNG buffer: ", error)
+			# Si falla PNG, intentar JPG
+			error = image.load_jpg_from_buffer(img_buffer)
 			if error != OK:
-				print("Error loading PNG buffer: ", error)
+				print("Error loading JPG buffer: ", error)
 				return
 			else:
-				print("Successfully loaded image as PNG")
+				print("Successfully loaded image as JPG")
 		else:
-			print("Successfully loaded image as JPG")
-		
-		# Verificar las dimensiones de la imagen
-		print("Image dimensions: ", image.get_size())
-		if image.get_size() == Vector2i(0, 0):
-			_mover_arriba()
-			print("Error: Image is empty (0x0)")
-			return
+			print("Successfully loaded image as PNG")
 		
 		var image_node = image_scene.instantiate()
 		image_node.texture = ImageTexture.new().create_from_image(image)
-		get_node("TextureRect").add_child(image_node)
-		print("Texture assigned to TextureRect")
+		
+		var sprite = ultimo_objeto_seleccionado.get_node_or_null("Sprite2D")
+		sprite.texture = image_node.texture
+		
+		var texture_size = sprite.texture.get_size() if sprite.texture else Vector2(1, 1)
+		# Calcular la escala para que la textura sea 250x250 píxeles
+		var scale_x = 250.0 / texture_size.x
+		var scale_y = 250.0 / texture_size.y
+		
+		
+		var scale = min(scale_x, scale_y)
+		sprite.scale = Vector2(scale, scale)
+		
+		print("Texture assigned to Sprite2D")
 	else:
 		print("No image buffers received in dictionary")
-		_mover_derecha()
+
 			
 			
 func _on_error(e):
@@ -764,11 +779,28 @@ func _on_permission_not_granted_by_user(permission):
 func spawn_bola(pos):
 	var bola = bola_scene.instantiate()
 	bola.position = pos
-	bola.get_node("Sprite2D").scale = Vector2(0.5, 0.5)
-	bola.get_node("CollisionShape2D").scale = Vector2(0.5, 0.5)
+	
+	# Ajustar el Sprite2D a 250x250 píxeles
 	var sprite = bola.get_node("Sprite2D")
 	if sprite:
 		sprite.material = material_base.duplicate()
+		# Obtener el tamaño de la textura
+		var texture_size = sprite.texture.get_size() if sprite.texture else Vector2(1, 1)
+		# Calcular la escala para que la textura sea 250x250 píxeles
+		var scale_x = 250.0 / texture_size.x
+		var scale_y = 250.0 / texture_size.y
+		# Usar la escala más pequeña para mantener proporciones (opcional)
+		var scale = min(scale_x, scale_y)
+		sprite.scale = Vector2(scale, scale)
+	
+	# Ajustar el CollisionShape2D a 250x250 píxeles
+	var collision_shape = bola.get_node("CollisionShape2D")
+	if collision_shape and collision_shape.shape is CircleShape2D:
+		# Asegurarnos de que el CollisionShape2D no esté escalado
+		collision_shape.scale = Vector2(1.0, 1.0)
+		# Ajustar el radio para que el diámetro sea 250 píxeles (radio = 125)
+		collision_shape.shape.radius = 125.0
+	
 	bola.add_to_group("bolas")
 	bola_initial_positions[bola] = bola.global_transform.origin
 	add_child(bola)

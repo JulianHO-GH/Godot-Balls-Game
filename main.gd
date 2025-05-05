@@ -119,11 +119,10 @@ func _ready():
 
 #""" Set option for all following images """
 	var options = {
-		"image_height" : 250,
-		"image_width" : 250,
+
 		"keep_aspect" : true,
 		"image_format" : "png"
-		#"image_format" : "png"
+		#"image_format" : "jpg"
 	}
 
 	if plugin:
@@ -722,12 +721,10 @@ func _on_image_request_completed(dict):
 
 		# Crear una imagen y cargar el buffer
 		var image = Image.new()
-		var error = image.load_png_from_buffer(img_buffer)  # Intentar cargar como JPG
+		var error = image.load_png_from_buffer(img_buffer)  # Intentar cargar como PNG
 		if error != OK:
-			_mover_abajo()
 			print("Error loading PNG buffer: ", error)
-			# Si falla PNG, intentar JPG
-			error = image.load_jpg_from_buffer(img_buffer)
+			error = image.load_jpg_from_buffer(img_buffer)  # Intentar JPG
 			if error != OK:
 				print("Error loading JPG buffer: ", error)
 				return
@@ -735,23 +732,42 @@ func _on_image_request_completed(dict):
 				print("Successfully loaded image as JPG")
 		else:
 			print("Successfully loaded image as PNG")
-		
+
+		# Asegurarse de que la imagen tenga canal alfa (transparencia)
+		if image.get_format() != Image.FORMAT_RGBA8:
+			image.convert(Image.FORMAT_RGBA8)
+
+		# Hacer la imagen circular
+		var width = image.get_width()
+		var height = image.get_height()
+		var center = Vector2(width / 2.0, height / 2.0)
+		var radius = min(width, height) / 2.0  # Radio basado en el lado más pequeño
+
+		for x in range(width):
+			for y in range(height):
+				var pixel_pos = Vector2(x, y)
+				var distance = pixel_pos.distance_to(center)
+				if distance > radius:
+					# Hacer el píxel transparente si está fuera del círculo
+					image.set_pixel(x, y, Color(0, 0, 0, 0))
+
+		# Crear la textura a partir de la imagen modificada
 		var image_node = image_scene.instantiate()
-		image_node.texture = ImageTexture.new().create_from_image(image)
-		
+		image_node.texture = ImageTexture.create_from_image(image)
+
+		# Asignar la textura al Sprite2D del objeto seleccionado
 		var sprite = ultimo_objeto_seleccionado.get_node_or_null("Sprite2D")
-		sprite.texture = image_node.texture
-		
-		var texture_size = sprite.texture.get_size() if sprite.texture else Vector2(1, 1)
-		# Calcular la escala para que la textura sea 250x250 píxeles
-		var scale_x = 250.0 / texture_size.x
-		var scale_y = 250.0 / texture_size.y
-		
-		
-		var scale = min(scale_x, scale_y)
-		sprite.scale = Vector2(scale, scale)
-		
-		print("Texture assigned to Sprite2D")
+		if sprite:
+			sprite.texture = image_node.texture
+
+			# Ajustar la escala para que el círculo tenga un diámetro de 250 píxeles
+			var texture_size = sprite.texture.get_size()  # Tamaño de la imagen (por ejemplo, 250x250)
+			var circle_diameter = min(texture_size.x, texture_size.y)  # Diámetro del círculo inscrito
+			var target_diameter = 250.0  # Diámetro deseado en píxeles
+			var scale = target_diameter / circle_diameter  # Escala para mapear el círculo a 250 píxeles
+			sprite.scale = Vector2(scale, scale)
+
+			print("Circular texture assigned to Sprite2D with diameter of 250 pixels")
 	else:
 		print("No image buffers received in dictionary")
 

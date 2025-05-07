@@ -89,7 +89,10 @@ func update_object_texture(id: String, texture_path: String):
 
 # Eliminar un objeto
 func remove_object(id: String):
-	objects.erase(func(obj): return obj.id == id)
+	for i in range(objects.size() - 1, -1, -1):
+		if objects[i].id == id:
+			objects.remove_at(i)
+			break
 
 # Obtener un objeto por ID
 func get_object(id: String) -> Dictionary:

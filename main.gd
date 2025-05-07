@@ -87,6 +87,10 @@ func _ready():
 	$UI/Mover/BotonDerecha.pressed.connect(_mover_derecha)
 	$UI/Mover/BotonRotarIzquierda.pressed.connect(_rotar_izquierda)
 	$UI/Mover/BotonRotarDerecha.pressed.connect(_rotar_derecha)
+	
+	#Conectar botones de Save / Load
+	$UI/Opciones/ButtonSave.pressed.connect(_save_level)
+	$UI/Opciones/ButtonLoad.pressed.connect(_reload)
 
 	# Configurar plugin GodotGetImage
 	if Engine.has_singleton(plugin_name):
@@ -168,16 +172,13 @@ func _mover_objeto(direccion: Vector2):
 		var nueva_posicion = vieja_posicion + (direccion * tile_size)
 		ultimo_objeto_seleccionado.position = nueva_posicion
 
-		if ultimo_objeto_seleccionado is RigidBody2D:
-			ultimo_objeto_seleccionado.teleport(nueva_posicion)
-			var obj_id = ultimo_objeto_seleccionado.get_meta("id", "")
-			if obj_id:
+		var obj_id = ultimo_objeto_seleccionado.get_meta("id", "")
+		if obj_id:
+			game_state.update_object_position(obj_id, nueva_posicion)  # Actualizar posición en GameState.objects
+			if ultimo_objeto_seleccionado is RigidBody2D:
+				ultimo_objeto_seleccionado.teleport(nueva_posicion)
 				game_state.set_bola_initial_position(obj_id, nueva_posicion)
-		elif ultimo_objeto_seleccionado is Area2D or ultimo_objeto_seleccionado is StaticBody2D:
-			var obj_id = ultimo_objeto_seleccionado.get_meta("id", "")
-			if obj_id:
-				game_state.update_object_position(obj_id, nueva_posicion)
-
+		
 		var vieja_tile = Vector2(floor(vieja_posicion.x / tile_size), floor(vieja_posicion.y / tile_size))
 		var nueva_tile = Vector2(floor(nueva_posicion.x / tile_size), floor(nueva_posicion.y / tile_size))
 		game_state.set_tile_occupied(vieja_tile, false)
@@ -611,19 +612,23 @@ func _on_permission_not_granted_by_user(permission):
 	dialog.show()
 	plugin.resendPermission()
 
-func spawn_bola(pos) -> String:
+func spawn_bola(pos, rotation_degrees: float = 0.0, texture_path: String = "") -> String:
 	var bola = bola_scene.instantiate()
 	bola.position = pos
-	var obj_id = game_state.add_object("res://Bola.tscn", pos, game_state.get_rotation("Bola"))
+	var obj_id = game_state.add_object("res://Bola.tscn", pos, rotation_degrees, texture_path)
 	bola.set_meta("id", obj_id)
 
 	var sprite = bola.get_node("Sprite2D")
 	if sprite:
 		sprite.material = material_base.duplicate()
+		if texture_path != "":
+			var image = game_state.load_image(texture_path)
+			if image:
+				sprite.texture = ImageTexture.create_from_image(image)
 		var texture_size = sprite.texture.get_size() if sprite.texture else Vector2(1, 1)
-		var scale_x = 250.0 / texture_size.x
-		var scale_y = 250.0 / texture_size.y
-		var scale = min(scale_x, scale_y)
+		var circle_diameter = min(texture_size.x, texture_size.y)  # Diámetro del círculo en píxeles
+		var target_diameter = 250.0  # Diámetro deseado en píxeles
+		var scale = target_diameter / circle_diameter if circle_diameter > 0 else 1.0
 		sprite.scale = Vector2(scale, scale)
 
 	var collision_shape = bola.get_node("CollisionShape2D")
@@ -634,9 +639,9 @@ func spawn_bola(pos) -> String:
 	bola.add_to_group("bolas")
 	game_state.set_bola_initial_position(obj_id, pos)
 	add_child(bola)
-	bola.rotation_degrees = game_state.get_rotation("Bola")
-	if bola.rotation_degrees != 0.0:
-		bola.saved_state.rotation = deg_to_rad(bola.rotation_degrees)
+	bola.rotation_degrees = rotation_degrees
+	if rotation_degrees != 0.0:
+		bola.saved_state.rotation = deg_to_rad(rotation_degrees)
 		bola.teleport(bola.position)
 	return obj_id
 
@@ -653,18 +658,23 @@ func spawn_piso(pos) -> String:
 	add_child(piso)
 	return obj_id
 
-func spawn_cubo(pos) -> String:
+func spawn_cubo(pos, rotation_degrees: float = 0.0, texture_path: String = "") -> String:
 	var cubo = cubo_scene.instantiate()
 	cubo.position = pos
-	var obj_id = game_state.add_object("res://Cubo.tscn", pos, game_state.get_rotation("Cubo"))
+	var obj_id = game_state.add_object("res://Cubo.tscn", pos, rotation_degrees, texture_path)
 	cubo.set_meta("id", obj_id)
 	var sprite = cubo.get_node("Sprite2D")
 	if sprite:
 		sprite.material = material_base.duplicate()
-	add_child(cubo)
-	cubo.rotation_degrees = game_state.get_rotation("Cubo")
+		if texture_path != "":
+			var image = game_state.load_image(texture_path)
+			if image:
+				sprite.texture = ImageTexture.create_from_image(image)
+	cubo.add_to_group("cubos")
+	cubo.rotation_degrees = rotation_degrees
 	cubo.set_collision_layer_value(1, true)
 	cubo.set_collision_mask_value(1, true)
+	add_child(cubo)
 	return obj_id
 
 func spawn_teleportador(pos) -> String:
@@ -755,3 +765,68 @@ func _get_object_type(obj) -> String:
 		elif script_path == "res://punto_teletransporte.gd":
 			return "PuntoTeletransporte"
 	return ""
+
+func _save_level():
+	var level_data = []
+	var valid_object_ids = {}
+	for obj in get_tree().get_nodes_in_group("bolas") + get_tree().get_nodes_in_group("cubos"):
+		var obj_id = obj.get_meta("id", "")
+		if obj_id:
+			valid_object_ids[obj_id] = true
+	
+	for obj in game_state.objects:
+		if obj.scene_path in ["res://Bola.tscn", "res://Cubo.tscn"] and valid_object_ids.has(obj.id):
+			level_data.append({
+				"id": obj.id,
+				"scene_path": obj.scene_path,
+				"position": [obj.position.x, obj.position.y],
+				"rotation_degrees": obj.rotation_degrees,
+				"texture_path": obj.texture_path
+			})
+	
+	var level_file_path = "user://saved_level.json"
+	var level_file = FileAccess.open(level_file_path, FileAccess.WRITE)
+	if level_file:
+		level_file.store_string(JSON.stringify(level_data, "  ", false))
+		level_file.close()
+		print("Nivel guardado en: ", level_file_path)
+	else:
+		print("Error al guardar el archivo en: ", level_file_path)
+
+func _reload():
+	var file_path = "user://saved_level.json"
+	if not FileAccess.file_exists(file_path):
+		print("No se encontró el archivo de guardado: ", file_path)
+		return
+	
+	var file = FileAccess.open(file_path, FileAccess.READ)
+	if not file:
+		print("Error al abrir el archivo: ", file_path)
+		return
+	
+	var json_text = file.get_as_text()
+	file.close()
+	
+	var json = JSON.new()
+	var error = json.parse(json_text)
+	if error != OK:
+		print("Error al parsear JSON: ", json.get_error_message(), " en la línea ", json.get_error_line())
+		return
+	
+	var level_data = json.get_data()
+	if not level_data is Array:
+		print("Datos inválidos: se esperaba un array")
+		return
+	
+	for obj_data in level_data:
+		var pos = Vector2(obj_data.position[0], obj_data.position[1])
+		var rotation_degrees = obj_data.rotation_degrees
+		var texture_path = obj_data.texture_path
+		var scene_path = obj_data.scene_path
+		var new_obj_id
+		if scene_path == "res://Bola.tscn":
+			new_obj_id = spawn_bola(pos, rotation_degrees, texture_path)
+		elif scene_path == "res://Cubo.tscn":
+			new_obj_id = spawn_cubo(pos, rotation_degrees, texture_path)
+		else:
+			print("Scene path desconocido: ", scene_path)

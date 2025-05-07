@@ -1,4 +1,4 @@
-[gd_scene load_steps=34 format=3 uid="uid://cs5whshwnasdf"]
+[gd_scene load_steps=36 format=3 uid="uid://cs5whshwnasdf"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_tpxov"]
 [ext_resource type="PackedScene" uid="uid://fn1hroyr720c" path="res://bola.tscn" id="2_gxh2a"]
@@ -26,7 +26,9 @@
 [ext_resource type="Texture2D" uid="uid://cyr5udqns5hmx" path="res://Texturas/chain.png" id="21_eqbvj"]
 [ext_resource type="Texture2D" uid="uid://dbr4tkqxcb54p" path="res://Texturas/BotonAbajo.png" id="21_wd65p"]
 [ext_resource type="Texture2D" uid="uid://cxhlkf0uyg7xo" path="res://Texturas/BotonIzquierda.png" id="22_d7fmu"]
+[ext_resource type="Texture2D" uid="uid://cg5qtlpetxfmy" path="res://Texturas/guardar.jpg" id="23_bxudd"]
 [ext_resource type="Texture2D" uid="uid://s1bh4lg8c1d2" path="res://Texturas/BotonDerecha.png" id="23_edaq6"]
+[ext_resource type="Texture2D" uid="uid://cwrwj7p8l4287" path="res://Texturas/cargar.png" id="24_4x16n"]
 [ext_resource type="Texture2D" uid="uid://1pphh4mf05fq" path="res://Texturas/GirarIzquierda.png" id="25_5g4hx"]
 [ext_resource type="Texture2D" uid="uid://bgb84tih8hp3l" path="res://Texturas/GirarDerecha.png" id="26_f7rg3"]
 
@@ -230,14 +232,23 @@ offset_bottom = 1110.0
 scale = Vector2(0.6, 0.6)
 texture_normal = ExtResource("21_eqbvj")
 
-[node name="BotonSave" type="Button" parent="UI/Opciones"]
+[node name="ButtonSave" type="TextureButton" parent="UI/Opciones"]
 layout_mode = 0
-offset_left = 900.0
-offset_top = 1067.0
-offset_right = 1071.0
-offset_bottom = 1117.0
-theme_override_font_sizes/font_size = 30
-text = "Save/Load"
+offset_left = 903.0
+offset_top = 1060.0
+offset_right = 1515.0
+offset_bottom = 1672.0
+scale = Vector2(0.25, 0.25)
+texture_normal = ExtResource("23_bxudd")
+
+[node name="ButtonLoad" type="TextureButton" parent="UI/Opciones"]
+layout_mode = 0
+offset_left = 920.0
+offset_top = 1244.0
+offset_right = 1432.0
+offset_bottom = 1756.0
+scale = Vector2(0.25, 0.25)
+texture_normal = ExtResource("24_4x16n")
 
 [node name="Mover" type="Control" parent="UI"]
 layout_mode = 3

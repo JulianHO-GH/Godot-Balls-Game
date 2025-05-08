@@ -4,13 +4,12 @@
 [ext_resource type="Texture2D" uid="uid://coxud135l8ti0" path="res://Texturas/teleportador.png" id="2_63kc0"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_mm7pd"]
-radius = 52.0
+radius = 121.004
 
 [node name="Teleportador" type="Area2D"]
 script = ExtResource("1_vixt7")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-scale = Vector2(0.4125, 0.4125)
 texture = ExtResource("2_63kc0")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]

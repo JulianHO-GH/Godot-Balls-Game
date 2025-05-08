@@ -88,7 +88,7 @@ func _ready():
 	$UI/Mover/BotonRotarIzquierda.pressed.connect(_rotar_izquierda)
 	$UI/Mover/BotonRotarDerecha.pressed.connect(_rotar_derecha)
 	
-	#Conectar botones de Save / Load
+	# Conectar botones de Save / Load
 	$UI/Opciones/ButtonSave.pressed.connect(_save_level)
 	$UI/Opciones/ButtonLoad.pressed.connect(_reload)
 
@@ -143,11 +143,10 @@ func _rotar_izquierda():
 	if game_state.seleccionando and ultimo_objeto_seleccionado:
 		ultimo_objeto_seleccionado.rotation_degrees -= 45
 		var tipo_objeto = _get_object_type(ultimo_objeto_seleccionado)
-		if tipo_objeto:
+		var obj_id = ultimo_objeto_seleccionado.get_meta("id", "")
+		if tipo_objeto and obj_id:
 			game_state.set_rotation(tipo_objeto, ultimo_objeto_seleccionado.rotation_degrees)
-			var obj_id = ultimo_objeto_seleccionado.get_meta("id", "")
-			if obj_id:
-				game_state.update_object_rotation(obj_id, ultimo_objeto_seleccionado.rotation_degrees)
+			game_state.update_object_rotation(obj_id, ultimo_objeto_seleccionado.rotation_degrees)
 		if ultimo_objeto_seleccionado is RigidBody2D:
 			ultimo_objeto_seleccionado.saved_state.rotation = deg_to_rad(ultimo_objeto_seleccionado.rotation_degrees)
 			ultimo_objeto_seleccionado.teleport(ultimo_objeto_seleccionado.position)
@@ -156,11 +155,10 @@ func _rotar_derecha():
 	if game_state.seleccionando and ultimo_objeto_seleccionado:
 		ultimo_objeto_seleccionado.rotation_degrees += 45
 		var tipo_objeto = _get_object_type(ultimo_objeto_seleccionado)
-		if tipo_objeto:
+		var obj_id = ultimo_objeto_seleccionado.get_meta("id", "")
+		if tipo_objeto and obj_id:
 			game_state.set_rotation(tipo_objeto, ultimo_objeto_seleccionado.rotation_degrees)
-			var obj_id = ultimo_objeto_seleccionado.get_meta("id", "")
-			if obj_id:
-				game_state.update_object_rotation(obj_id, ultimo_objeto_seleccionado.rotation_degrees)
+			game_state.update_object_rotation(obj_id, ultimo_objeto_seleccionado.rotation_degrees)
 		if ultimo_objeto_seleccionado is RigidBody2D:
 			ultimo_objeto_seleccionado.saved_state.rotation = deg_to_rad(ultimo_objeto_seleccionado.rotation_degrees)
 			ultimo_objeto_seleccionado.teleport(ultimo_objeto_seleccionado.position)
@@ -339,8 +337,37 @@ func _reiniciar():
 		.set_trans(Tween.TRANS_QUINT)
 
 func _eliminar():
+	if not game_state.is_deleting and ultimo_objeto_seleccionado:
+		var collider = ultimo_objeto_seleccionado
+		var obj_id = collider.get_meta("id", "")
+		
+		if collider is RigidBody2D and obj_id:
+			game_state.remove_bola_initial_position(obj_id)
+			collider.remove_from_group("bolas")
+		if obj_id:
+			game_state.remove_object(obj_id)
+		
+		if collider.is_in_group("teleportadores"):
+			var target = collider.teleport_target
+			if target and target.has_meta("id"):
+				var target_id = target.get_meta("id", "")
+				game_state.remove_object(target_id)
+				target.queue_free()
+		elif collider.is_in_group("puntos_teletransporte"):
+			for tele in get_tree().get_nodes_in_group("teleportadores"):
+				if tele.teleport_target == collider:
+					var tele_id = tele.get_meta("id", "")
+					game_state.remove_object(tele_id)
+					tele.queue_free()
+					break
+		
+		var tile_pos = Vector2(floor(collider.position.x / 250), floor(collider.position.y / 250))
+		game_state.set_tile_occupied(tile_pos, false)
+		collider.queue_free()
+		ultimo_objeto_seleccionado = null
+	
+	# Alternar modo de eliminación
 	game_state.is_deleting = !game_state.is_deleting
-
 	if game_state.is_deleting:
 		$UI/Opciones/BotonEliminar.texture_normal = load("res://Texturas/cancelar.png")
 		for button in $UI/Menu.get_children():
@@ -612,10 +639,11 @@ func _on_permission_not_granted_by_user(permission):
 	dialog.show()
 	plugin.resendPermission()
 
-func spawn_bola(pos, rotation_degrees: float = 0.0, texture_path: String = "") -> String:
+func spawn_bola(pos, rotation_degrees: float = -1.0, texture_path: String = "") -> String:
 	var bola = bola_scene.instantiate()
 	bola.position = pos
-	var obj_id = game_state.add_object("res://Bola.tscn", pos, rotation_degrees, texture_path)
+	var rot = rotation_degrees if rotation_degrees != -1.0 else game_state.get_rotation("Bola")
+	var obj_id = game_state.add_object("res://Bola.tscn", pos, rot, texture_path)
 	bola.set_meta("id", obj_id)
 
 	var sprite = bola.get_node("Sprite2D")
@@ -626,8 +654,8 @@ func spawn_bola(pos, rotation_degrees: float = 0.0, texture_path: String = "") -
 			if image:
 				sprite.texture = ImageTexture.create_from_image(image)
 		var texture_size = sprite.texture.get_size() if sprite.texture else Vector2(1, 1)
-		var circle_diameter = min(texture_size.x, texture_size.y)  # Diámetro del círculo en píxeles
-		var target_diameter = 250.0  # Diámetro deseado en píxeles
+		var circle_diameter = min(texture_size.x, texture_size.y)
+		var target_diameter = 250.0
 		var scale = target_diameter / circle_diameter if circle_diameter > 0 else 1.0
 		sprite.scale = Vector2(scale, scale)
 
@@ -639,29 +667,32 @@ func spawn_bola(pos, rotation_degrees: float = 0.0, texture_path: String = "") -
 	bola.add_to_group("bolas")
 	game_state.set_bola_initial_position(obj_id, pos)
 	add_child(bola)
-	bola.rotation_degrees = rotation_degrees
-	if rotation_degrees != 0.0:
-		bola.saved_state.rotation = deg_to_rad(rotation_degrees)
+	bola.rotation_degrees = rot
+	if rot != 0.0:
+		bola.saved_state.rotation = deg_to_rad(rot)
 		bola.teleport(bola.position)
 	return obj_id
 
-func spawn_piso(pos) -> String:
+func spawn_piso(pos, rotation_degrees: float = -1.0) -> String:
 	var piso = piso_scene.instantiate()
 	piso.position = pos
-	var obj_id = game_state.add_object("res://Piso.tscn", pos, game_state.get_rotation("Piso"))
+	var rot = rotation_degrees if rotation_degrees != -1.0 else game_state.get_rotation("Piso")
+	var obj_id = game_state.add_object("res://Piso.tscn", pos, rot)
 	piso.set_meta("id", obj_id)
+	piso.set_meta("scene_path", "res://Piso.tscn")
 	var sprite = piso.get_node("Sprite2D")
 	if sprite:
 		sprite.material = material_base.duplicate()
-	piso.rotation_degrees = game_state.get_rotation("Piso")
-	piso.set_meta("scene_path", "res://Piso.tscn")
+	piso.rotation_degrees = rot
+	piso.add_to_group("pisos")
 	add_child(piso)
 	return obj_id
 
-func spawn_cubo(pos, rotation_degrees: float = 0.0, texture_path: String = "") -> String:
+func spawn_cubo(pos, rotation_degrees: float = -1.0, texture_path: String = "") -> String:
 	var cubo = cubo_scene.instantiate()
 	cubo.position = pos
-	var obj_id = game_state.add_object("res://Cubo.tscn", pos, rotation_degrees, texture_path)
+	var rot = rotation_degrees if rotation_degrees != -1.0 else game_state.get_rotation("Cubo")
+	var obj_id = game_state.add_object("res://Cubo.tscn", pos, rot, texture_path)
 	cubo.set_meta("id", obj_id)
 	var sprite = cubo.get_node("Sprite2D")
 	if sprite:
@@ -671,77 +702,80 @@ func spawn_cubo(pos, rotation_degrees: float = 0.0, texture_path: String = "") -
 			if image:
 				sprite.texture = ImageTexture.create_from_image(image)
 	cubo.add_to_group("cubos")
-	cubo.rotation_degrees = rotation_degrees
+	cubo.rotation_degrees = rot
 	cubo.set_collision_layer_value(1, true)
 	cubo.set_collision_mask_value(1, true)
 	add_child(cubo)
 	return obj_id
 
-func spawn_teleportador(pos) -> String:
+func spawn_teleportador(tele_pos: Vector2, tele_rotation_degrees: float = -1.0, tele_texture_path: String = "", 
+					   target_pos: Vector2 = Vector2.ZERO, target_rotation_degrees: float = -1.0, target_texture_path: String = "") -> String:
 	var teleportador = teleportador_scene.instantiate()
-	teleportador.position = pos
-	var obj_id = game_state.add_object("res://teleportador.tscn", pos, game_state.get_rotation("Teleportador"), "", {"type": "Teleportador"})
-	teleportador.set_meta("id", obj_id)
-	var sprite = teleportador.get_node("Sprite2D")
-	if sprite:
-		sprite.material = material_base.duplicate()
-		sprite.scale = Vector2(1.0, 1.0)
-	var collision_shape = teleportador.get_node("CollisionShape2D")
-	if collision_shape:
-		collision_shape.shape.radius = 125.0
-
-	var tile_size = 250
-	var punto_pos = pos + Vector2(0, -tile_size)
+	teleportador.position = tele_pos
+	var tele_rot = tele_rotation_degrees if tele_rotation_degrees != -1.0 else game_state.get_rotation("Teleportador")
+	var tele_id = game_state.add_object("res://Teleportador.tscn", tele_pos, tele_rot, tele_texture_path)
+	teleportador.set_meta("id", tele_id)
+	
+	var tele_sprite = teleportador.get_node("Sprite2D")
+	if tele_sprite:
+		tele_sprite.material = material_base.duplicate()
+		if tele_texture_path != "":
+			var image = game_state.load_image(tele_texture_path)
+			if image:
+				tele_sprite.texture = ImageTexture.create_from_image(image)
+	
 	var punto = punto_teletransporte_scene.instantiate()
-	punto.position = punto_pos
-	var punto_id = game_state.add_object("res://punto_teletransporte.tscn", punto_pos, game_state.get_rotation("PuntoTeletransporte"), "", {"type": "PuntoTeletransporte"})
-	punto.set_meta("id", punto_id)
+	var target_rot = target_rotation_degrees if target_rotation_degrees != -1.0 else game_state.get_rotation("PuntoTeletransporte")
+	var target_id = game_state.add_object("res://PuntoTeletransporteIndividual.tscn", target_pos, target_rot, target_texture_path, {"teleportador_id": tele_id})
+	punto.set_meta("id", target_id)
+	
 	var punto_sprite = punto.get_node("Sprite2D")
 	if punto_sprite:
 		punto_sprite.material = material_base.duplicate()
-
+		if target_texture_path != "":
+			var image = game_state.load_image(target_texture_path)
+			if image:
+				punto_sprite.texture = ImageTexture.create_from_image(image)
+	
 	teleportador.teleport_target = punto
-	# Actualizar extra_data para asociar el punto al teleportador
-	var teleportador_data = game_state.get_object(obj_id)
-	if teleportador_data:
-		teleportador_data.extra_data["teleport_target_id"] = punto_id
-
 	teleportador.add_to_group("teleportadores")
-	teleportador.set_collision_layer_value(1, true)
-	teleportador.set_collision_mask_value(1, true)
+	punto.add_to_group("puntos_teletransporte")
+	
+	teleportador.rotation_degrees = tele_rot
+	punto.rotation_degrees = target_rot
+	punto.position = target_pos if target_pos != Vector2.ZERO else tele_pos + Vector2(250, 0)
+	
 	add_child(teleportador)
 	add_child(punto)
-	teleportador.rotation_degrees = game_state.get_rotation("Teleportador")
-	punto.rotation_degrees = game_state.get_rotation("PuntoTeletransporte")
+	return tele_id
 
-	var punto_tile_pos = Vector2(floor(punto_pos.x / tile_size), floor(punto_pos.y / tile_size))
-	var punto_tile_key = Vector2(punto_tile_pos.x, punto_tile_pos.y)
-	game_state.set_tile_occupied(punto_tile_key, true)
-	return obj_id
-
-func spawn_esquina(pos) -> String:
+func spawn_esquina(pos, rotation_degrees: float = -1.0) -> String:
 	var esquina = esquina_scene.instantiate()
 	esquina.position = pos
-	var obj_id = game_state.add_object("res://piso_esquina.tscn", pos, game_state.get_rotation("Esquina"))
+	var rot = rotation_degrees if rotation_degrees != -1.0 else game_state.get_rotation("Esquina")
+	var obj_id = game_state.add_object("res://piso_esquina.tscn", pos, rot)
 	esquina.set_meta("id", obj_id)
+	esquina.set_meta("scene_path", "res://piso_esquina.tscn")
 	var sprite = esquina.get_node("Sprite2D")
 	if sprite:
 		sprite.material = material_base.duplicate()
-	esquina.rotation_degrees = game_state.get_rotation("Esquina")
-	esquina.set_meta("scene_path", "res://piso_esquina.tscn")
+	esquina.rotation_degrees = rot
+	esquina.add_to_group("esquinas")
 	add_child(esquina)
 	return obj_id
 
-func spawn_esquinarampa(pos) -> String:
+func spawn_esquinarampa(pos, rotation_degrees: float = -1.0) -> String:
 	var esquinarampa = esquinarampa_scene.instantiate()
 	esquinarampa.position = pos
-	var obj_id = game_state.add_object("res://esquina_rampa.tscn", pos, game_state.get_rotation("EsquinaRampa"))
+	var rot = rotation_degrees if rotation_degrees != -1.0 else game_state.get_rotation("EsquinaRampa")
+	var obj_id = game_state.add_object("res://esquina_rampa.tscn", pos, rot)
 	esquinarampa.set_meta("id", obj_id)
+	esquinarampa.set_meta("scene_path", "res://esquina_rampa.tscn")
 	var sprite = esquinarampa.get_node("Sprite2D")
 	if sprite:
 		sprite.material = material_base.duplicate()
-	esquinarampa.rotation_degrees = game_state.get_rotation("EsquinaRampa")
-	esquinarampa.set_meta("scene_path", "res://esquina_rampa.tscn")
+	esquinarampa.rotation_degrees = rot
+	esquinarampa.add_to_group("esquinas_rampa")
 	add_child(esquinarampa)
 	return obj_id
 
@@ -754,8 +788,9 @@ func _get_object_type(obj) -> String:
 			return "Esquina"
 		elif scene_path == "res://esquina_rampa.tscn":
 			return "EsquinaRampa"
-		else:
+		elif scene_path == "res://Piso.tscn":
 			return "Piso"
+		return "Piso"
 	elif obj is Area2D and obj.get_script():
 		var script_path = obj.get_script().resource_path
 		if script_path == "res://cubo.gd":
@@ -769,20 +804,33 @@ func _get_object_type(obj) -> String:
 func _save_level():
 	var level_data = []
 	var valid_object_ids = {}
-	for obj in get_tree().get_nodes_in_group("bolas") + get_tree().get_nodes_in_group("cubos"):
+	for obj in get_tree().get_nodes_in_group("bolas") + get_tree().get_nodes_in_group("cubos") + \
+			  get_tree().get_nodes_in_group("teleportadores") + get_tree().get_nodes_in_group("puntos_teletransporte") + \
+			  get_tree().get_nodes_in_group("pisos") + get_tree().get_nodes_in_group("esquinas") + \
+			  get_tree().get_nodes_in_group("esquinas_rampa"):
 		var obj_id = obj.get_meta("id", "")
 		if obj_id:
 			valid_object_ids[obj_id] = true
 	
 	for obj in game_state.objects:
-		if obj.scene_path in ["res://Bola.tscn", "res://Cubo.tscn"] and valid_object_ids.has(obj.id):
-			level_data.append({
+		if obj.scene_path in ["res://Bola.tscn", "res://Cubo.tscn", "res://Teleportador.tscn", 
+							 "res://PuntoTeletransporteIndividual.tscn", "res://Piso.tscn", 
+							 "res://piso_esquina.tscn", "res://esquina_rampa.tscn"] and \
+		   valid_object_ids.has(obj.id):
+			var data = {
 				"id": obj.id,
 				"scene_path": obj.scene_path,
 				"position": [obj.position.x, obj.position.y],
 				"rotation_degrees": obj.rotation_degrees,
 				"texture_path": obj.texture_path
-			})
+			}
+			if obj.scene_path == "res://Teleportador.tscn":
+				for target_obj in game_state.objects:
+					if target_obj.scene_path == "res://PuntoTeletransporteIndividual.tscn" and \
+					   target_obj.extra_data.get("teleportador_id", "") == obj.id:
+						data["target_id"] = target_obj.id
+						break
+			level_data.append(data)
 	
 	var level_file_path = "user://saved_level.json"
 	var level_file = FileAccess.open(level_file_path, FileAccess.WRITE)
@@ -792,7 +840,7 @@ func _save_level():
 		print("Nivel guardado en: ", level_file_path)
 	else:
 		print("Error al guardar el archivo en: ", level_file_path)
-
+		
 func _reload():
 	var file_path = "user://saved_level.json"
 	if not FileAccess.file_exists(file_path):
@@ -818,15 +866,53 @@ func _reload():
 		print("Datos inválidos: se esperaba un array")
 		return
 	
+	var objects_by_id = {}
 	for obj_data in level_data:
+		objects_by_id[obj_data.id] = obj_data
+	
+	# Limpiar el estado actual
+	game_state.objects.clear()
+	game_state.ocupados.clear()
+	game_state.bola_initial_positions.clear()
+	
+	for obj_data in level_data:
+		var scene_path = obj_data.scene_path
 		var pos = Vector2(obj_data.position[0], obj_data.position[1])
 		var rotation_degrees = obj_data.rotation_degrees
 		var texture_path = obj_data.texture_path
-		var scene_path = obj_data.scene_path
 		var new_obj_id
+		
 		if scene_path == "res://Bola.tscn":
 			new_obj_id = spawn_bola(pos, rotation_degrees, texture_path)
+			game_state.set_rotation("Bola", rotation_degrees)
 		elif scene_path == "res://Cubo.tscn":
 			new_obj_id = spawn_cubo(pos, rotation_degrees, texture_path)
+			game_state.set_rotation("Cubo", rotation_degrees)
+		elif scene_path == "res://Teleportador.tscn":
+			var target_id = obj_data.get("target_id", "")
+			var target_data = objects_by_id.get(target_id, {})
+			var target_pos = Vector2(target_data.position[0], target_data.position[1]) if target_data.has("position") else pos + Vector2(250, 0)
+			var target_rotation_degrees = target_data.get("rotation_degrees", 0.0)
+			var target_texture_path = target_data.get("texture_path", "")
+			new_obj_id = spawn_teleportador(pos, rotation_degrees, texture_path, target_pos, target_rotation_degrees, target_texture_path)
+			game_state.set_rotation("Teleportador", rotation_degrees)
+			if target_data.has("rotation_degrees"):
+				game_state.set_rotation("PuntoTeletransporte", target_rotation_degrees)
+		elif scene_path == "res://PuntoTeletransporteIndividual.tscn":
+			continue
+		elif scene_path == "res://Piso.tscn":
+			new_obj_id = spawn_piso(pos, rotation_degrees)
+			game_state.set_rotation("Piso", rotation_degrees)
+		elif scene_path == "res://piso_esquina.tscn":
+			new_obj_id = spawn_esquina(pos, rotation_degrees)
+			game_state.set_rotation("Esquina", rotation_degrees)
+		elif scene_path == "res://esquina_rampa.tscn":
+			new_obj_id = spawn_esquinarampa(pos, rotation_degrees)
+			game_state.set_rotation("EsquinaRampa", rotation_degrees)
 		else:
 			print("Scene path desconocido: ", scene_path)
+		
+		if new_obj_id:
+			var tile_size = 250
+			var tile_pos = Vector2(floor(pos.x / tile_size), floor(pos.y / tile_size))
+			game_state.set_tile_occupied(tile_pos, true)

@@ -20,6 +20,7 @@ var initial_touch_position: Vector2  # Posición inicial del toque
 var touch_over_buttons: bool = false  # Indica si el toque inicial fue sobre un botón
 var ultimo_objeto_seleccionado = null  # Referencia al último objeto seleccionado
 var is_dragging: bool = false  # Indica si estamos arrastrando
+var selected_save_file: String = ""  # Archivo de guardado seleccionado (pasado desde MenuGuardados)
 
 # Constantes
 const ZOOM_MIN: float = 0.1
@@ -33,6 +34,7 @@ const CAMERA_LIMIT_LEFT: float = -5000.0
 const CAMERA_LIMIT_TOP: float = -10000.0
 const CAMERA_LIMIT_RIGHT: float = 6000.0
 const CAMERA_LIMIT_BOTTOM: float = 11000.0
+const SAVE_DIR: String = "user://saved_levels/"
 
 # Materiales/Shaders
 var material_base = load("res://materials/resaltado_emision.tres")
@@ -43,6 +45,9 @@ var plugin_name = "GodotGetImage"
 @onready var image_scene = preload("res://sprite_2d.tscn")
 
 func _ready():
+	# Crear el directorio de guardado si no existe
+	DirAccess.make_dir_recursive_absolute(SAVE_DIR)
+
 	# Inicializar posiciones iniciales de la UI en GameState
 	game_state.ui_menu_position = $UI/Menu.position
 	game_state.ui_options_position = $UI/Opciones.position
@@ -68,6 +73,11 @@ func _ready():
 	$UI/Opciones/BotonSelect.pressed.connect(_alternar_seleccionar)
 	$UI/Opciones/BotonLink.pressed.connect(_on_boton_link_pressed)
 	$UI/Opciones/BotonLink.visible = false
+	$UI/Opciones/ButtonSave.pressed.connect(_save_level)
+
+	# Desactivar ButtonLoad (ya no se usa)
+	$UI/Opciones/ButtonLoad.visible = false
+	$UI/Opciones/ButtonLoad.disabled = true
 
 	# Añadir botones al grupo
 	$UI/Menu/BotonBola.add_to_group("spawn_buttons")
@@ -87,10 +97,6 @@ func _ready():
 	$UI/Mover/BotonDerecha.pressed.connect(_mover_derecha)
 	$UI/Mover/BotonRotarIzquierda.pressed.connect(_rotar_izquierda)
 	$UI/Mover/BotonRotarDerecha.pressed.connect(_rotar_derecha)
-	
-	# Conectar botones de Save / Load
-	$UI/Opciones/ButtonSave.pressed.connect(_save_level)
-	$UI/Opciones/ButtonLoad.pressed.connect(_reload)
 
 	# Configurar plugin GodotGetImage
 	if Engine.has_singleton(plugin_name):
@@ -104,6 +110,10 @@ func _ready():
 		})
 	else:
 		print("Could not load plugin: ", plugin_name)
+
+	# Cargar el archivo de guardado seleccionado si existe
+	if selected_save_file != "":
+		_reload(selected_save_file)
 
 func _seleccionar_esquinarampa():
 	if not game_state.descongelado:
@@ -802,6 +812,14 @@ func _get_object_type(obj) -> String:
 	return ""
 
 func _save_level():
+	# Generar un nombre único para el archivo de guardado
+	var save_index = 1
+	var level_file_path = SAVE_DIR + "saved_level_" + str(save_index) + ".json"
+	while FileAccess.file_exists(level_file_path):
+		save_index += 1
+		level_file_path = SAVE_DIR + "saved_level_" + str(save_index) + ".json"
+
+	# Recolectar datos de los objetos
 	var level_data = []
 	var valid_object_ids = {}
 	for obj in get_tree().get_nodes_in_group("bolas") + get_tree().get_nodes_in_group("cubos") + \
@@ -832,7 +850,7 @@ func _save_level():
 						break
 			level_data.append(data)
 	
-	var level_file_path = "user://saved_level.json"
+	# Guardar los datos en el archivo
 	var level_file = FileAccess.open(level_file_path, FileAccess.WRITE)
 	if level_file:
 		level_file.store_string(JSON.stringify(level_data, "  ", false))
@@ -840,9 +858,9 @@ func _save_level():
 		print("Nivel guardado en: ", level_file_path)
 	else:
 		print("Error al guardar el archivo en: ", level_file_path)
-		
-func _reload():
-	var file_path = "user://saved_level.json"
+
+func _reload(file_name: String):
+	var file_path = SAVE_DIR + file_name
 	if not FileAccess.file_exists(file_path):
 		print("No se encontró el archivo de guardado: ", file_path)
 		return
@@ -871,10 +889,17 @@ func _reload():
 		objects_by_id[obj_data.id] = obj_data
 	
 	# Limpiar el estado actual
+	for node in get_tree().get_nodes_in_group("bolas") + get_tree().get_nodes_in_group("cubos") + \
+				get_tree().get_nodes_in_group("teleportadores") + get_tree().get_nodes_in_group("puntos_teletransporte") + \
+				get_tree().get_nodes_in_group("pisos") + get_tree().get_nodes_in_group("esquinas") + \
+				get_tree().get_nodes_in_group("esquinas_rampa"):
+		node.queue_free()
+	
 	game_state.objects.clear()
 	game_state.ocupados.clear()
 	game_state.bola_initial_positions.clear()
 	
+	# Cargar objetos desde el archivo
 	for obj_data in level_data:
 		var scene_path = obj_data.scene_path
 		var pos = Vector2(obj_data.position[0], obj_data.position[1])

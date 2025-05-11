@@ -20,7 +20,7 @@ var initial_touch_position: Vector2  # Posición inicial del toque
 var touch_over_buttons: bool = false  # Indica si el toque inicial fue sobre un botón
 var ultimo_objeto_seleccionado = null  # Referencia al último objeto seleccionado
 var is_dragging: bool = false  # Indica si estamos arrastrando
-var selected_save_file: String = ""  # Archivo de guardado seleccionado (pasado desde MenuGuardados)
+var selected_save_file: String = ""  # Archivo de guardado actual
 
 # Constantes
 const ZOOM_MIN: float = 0.1
@@ -47,6 +47,7 @@ var plugin_name = "GodotGetImage"
 func _ready():
 	# Crear el directorio de guardado si no existe
 	DirAccess.make_dir_recursive_absolute(SAVE_DIR)
+	print("Directorio ", SAVE_DIR, " creado o ya existe")
 
 	# Inicializar posiciones iniciales de la UI en GameState
 	game_state.ui_menu_position = $UI/Menu.position
@@ -74,10 +75,7 @@ func _ready():
 	$UI/Opciones/BotonLink.pressed.connect(_on_boton_link_pressed)
 	$UI/Opciones/BotonLink.visible = false
 	$UI/Opciones/ButtonSave.pressed.connect(_save_level)
-
-	# Desactivar ButtonLoad (ya no se usa)
-	$UI/Opciones/ButtonLoad.visible = false
-	$UI/Opciones/ButtonLoad.disabled = true
+	$UI/Opciones/ButtonLoad.pressed.connect(_on_button_load_pressed)
 
 	# Añadir botones al grupo
 	$UI/Menu/BotonBola.add_to_group("spawn_buttons")
@@ -467,7 +465,7 @@ func _input(event):
 
 						if collider is Area2D and collider.get_script() and collider.get_script().resource_path == "res://teleportador.gd":
 							if collider.teleport_target and is_instance_valid(collider.teleport_target):
-								var punto_tile_pos = Vector2(floor(collider.teleport_target.position.x / tile_size), floor(collider.teleport_target.position.y / tile_size))
+								var punto_tile_pos = Vector2(floor(collider.teleport_target.position.x / tile_size), floor(collider.position.y / tile_size))
 								var punto_tile_key = Vector2(punto_tile_pos.x, punto_tile_pos.y)
 								if game_state.is_tile_occupied(punto_tile_key):
 									game_state.set_tile_occupied(punto_tile_key, false)
@@ -812,14 +810,17 @@ func _get_object_type(obj) -> String:
 	return ""
 
 func _save_level():
-	# Generar un nombre único para el archivo de guardado
-	var save_index = 1
-	var level_file_path = SAVE_DIR + "saved_level_" + str(save_index) + ".json"
-	while FileAccess.file_exists(level_file_path):
-		save_index += 1
-		level_file_path = SAVE_DIR + "saved_level_" + str(save_index) + ".json"
+	if selected_save_file == "":
+		print("Error: No hay un archivo de guardado seleccionado")
+		var dialog = AcceptDialog.new()
+		dialog.dialog_text = "No se puede guardar: No hay un archivo de guardado seleccionado."
+		dialog.ok_button_text = "Aceptar"
+		add_child(dialog)
+		dialog.popup_centered()
+		return
 
-	# Recolectar datos de los objetos
+	# Sobrescribir el archivo de guardado actual
+	var level_file_path = SAVE_DIR + selected_save_file
 	var level_data = []
 	var valid_object_ids = {}
 	for obj in get_tree().get_nodes_in_group("bolas") + get_tree().get_nodes_in_group("cubos") + \
@@ -850,7 +851,6 @@ func _save_level():
 						break
 			level_data.append(data)
 	
-	# Guardar los datos en el archivo
 	var level_file = FileAccess.open(level_file_path, FileAccess.WRITE)
 	if level_file:
 		level_file.store_string(JSON.stringify(level_data, "  ", false))
@@ -859,6 +859,9 @@ func _save_level():
 	else:
 		print("Error al guardar el archivo en: ", level_file_path)
 
+func _on_button_load_pressed():
+	get_tree().change_scene_to_file("res://MenuGuardados.tscn")
+	
 func _reload(file_name: String):
 	var file_path = SAVE_DIR + file_name
 	if not FileAccess.file_exists(file_path):
@@ -899,7 +902,7 @@ func _reload(file_name: String):
 	game_state.ocupados.clear()
 	game_state.bola_initial_positions.clear()
 	
-	# Cargar objetos desde el archivo
+	# Cargar objetos desde el archivo (si hay datos)
 	for obj_data in level_data:
 		var scene_path = obj_data.scene_path
 		var pos = Vector2(obj_data.position[0], obj_data.position[1])

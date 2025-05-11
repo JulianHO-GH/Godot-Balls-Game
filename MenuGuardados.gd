@@ -13,14 +13,38 @@ const MAIN_SCENE = "res://main.tscn"
 func _ready():
 	# Crear el directorio de guardado si no existe
 	DirAccess.make_dir_recursive_absolute(SAVE_DIR)
+	print("Directorio ", SAVE_DIR, " creado o ya existe")
 
 	# Conectar señales de los botones
 	boton_nuevo.pressed.connect(_on_boton_nuevo_pressed)
 	boton_cargar.pressed.connect(_on_boton_cargar_pressed)
 
 func _on_boton_nuevo_pressed():
-	# Cambiar a la escena main.tscn con estado vacío
-	get_tree().change_scene_to_file(MAIN_SCENE)
+	# Generar un nombre único para el nuevo archivo de guardado
+	var save_index = 1
+	var level_file_path = SAVE_DIR + "saved_level_" + str(save_index) + ".json"
+	while FileAccess.file_exists(level_file_path):
+		save_index += 1
+		level_file_path = SAVE_DIR + "saved_level_" + str(save_index) + ".json"
+	
+	# Crear un archivo de guardado vacío
+	var level_file = FileAccess.open(level_file_path, FileAccess.WRITE)
+	if level_file:
+		level_file.store_string(JSON.stringify([], "  ", false))  # Guardar un array vacío
+		level_file.close()
+		print("Nuevo archivo de guardado creado: ", level_file_path)
+	else:
+		print("Error al crear el archivo: ", level_file_path)
+		return
+	
+	# Cambiar a main.tscn y pasar el nombre del archivo
+	var scene_tree = get_tree()
+	var packed_scene = load(MAIN_SCENE)
+	var main_instance = packed_scene.instantiate()
+	main_instance.set("selected_save_file", "saved_level_" + str(save_index) + ".json")
+	scene_tree.root.add_child(main_instance)
+	scene_tree.current_scene = main_instance
+	queue_free()
 
 func _on_boton_cargar_pressed():
 	# Mostrar un menú con los archivos de guardado disponibles
@@ -51,7 +75,7 @@ func _on_boton_cargar_pressed():
 			var scene_tree = get_tree()
 			var packed_scene = load(MAIN_SCENE)
 			var main_instance = packed_scene.instantiate()
-			main_instance.set("selected_save_file", selected_file)  # Variable temporal
+			main_instance.set("selected_save_file", selected_file)
 			scene_tree.root.add_child(main_instance)
 			scene_tree.current_scene = main_instance
 			queue_free()

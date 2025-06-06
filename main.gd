@@ -44,6 +44,7 @@ var plugin
 var plugin_name = "GodotGetImage"
 @onready var image_scene = preload("res://sprite_2d.tscn")
 
+
 func _ready():
 	# Crear el directorio de guardado si no existe
 	DirAccess.make_dir_recursive_absolute(SAVE_DIR)
@@ -571,10 +572,62 @@ func _input(event):
 						print("Este tile ya está ocupado!")
 
 func _on_boton_link_pressed():
-	if plugin:
-		plugin.getGalleryImage()
-	else:
+	if not plugin:
 		print(plugin_name, " plugin not loaded!")
+		var dialog = AcceptDialog.new()
+		dialog.dialog_text = "Error: El plugin GodotGetImage no está cargado."
+		dialog.ok_button_text = "Aceptar"
+		add_child(dialog)
+		dialog.popup_centered()
+		return
+
+	# Crear un ConfirmationDialog para solicitar permisos
+	var dialog = ConfirmationDialog.new()
+	dialog.dialog_text = "Se necesitan permisos para acceder a la galería de imágenes."
+	dialog.title = "Permisos necesarios"
+	dialog.ok_button_text = "Ok"  # Botón para getGalleryImage()
+	dialog.cancel_button_text = "Permitir"  # Botón para solicitar permisos
+	dialog.min_size = Vector2i(400, 200)  # Tamaño para visibilidad en Android
+
+	# Conectar señales del diálogo
+	dialog.confirmed.connect(func():
+		# Acción para "Ok": intenta cargar la imagen
+		plugin.getGalleryImage()
+	)
+	dialog.canceled.connect(func():
+		# Acción para "Permitir": solicita permisos
+		request_storage_permissions()
+	)
+
+	# Añadir y mostrar el diálogo
+	add_child(dialog)
+	dialog.popup_centered()
+
+func request_storage_permissions():
+	if OS.has_feature("android"):
+		var permissions = [
+			"android.permission.READ_EXTERNAL_STORAGE",
+			"android.permission.READ_MEDIA_IMAGES"
+		]
+		print("Solicitando permisos: ", permissions)
+		OS.request_permissions()  # Solicita todos los permisos declarados
+		# Esperar un breve momento para que los permisos se procesen
+		await get_tree().create_timer(0.5).timeout
+		var granted = OS.get_granted_permissions()
+		print("Permisos otorgados: ", granted)
+		var dialog = AcceptDialog.new()
+
+		dialog.dialog_text = "No se si se otorgaron o no xd"
+		dialog.ok_button_text = "Aceptar"
+		add_child(dialog)
+		dialog.popup_centered()
+	else:
+		print("No está ejecutándose en Android, no se requieren permisos.")
+		var dialog = AcceptDialog.new()
+		dialog.dialog_text = "Esta función solo está disponible en Android."
+		dialog.ok_button_text = "Aceptar"
+		add_child(dialog)
+		dialog.popup_centered()
 
 func _on_image_request_completed(dict):
 	print("Image request completed. Dictionary received: ", dict)
@@ -630,6 +683,12 @@ func _on_image_request_completed(dict):
 
 			print("Circular texture assigned to Sprite2D with diameter of 250 pixels")
 	else:
+		
+		var dialog = get_node_or_null("AcceptDialog")
+		dialog.window_title = "Error"
+		dialog.dialog_text = "No image buffers received in dictionary"
+		dialog.ok_button_text = "Aceptar"
+		dialog.popup_centered(Vector2i(300, 150))  # Tamaño ajustado para móviles
 		print("No image buffers received in dictionary")
 
 func _on_error(e):

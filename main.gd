@@ -87,7 +87,6 @@ func _ready():
 	$UI/Menu/BotonEsquinaRampa.add_to_group("spawn_buttons")
 	$UI/Menu/BotonMoverMenu.add_to_group("spawn_buttons")
 
-	$UI/Opciones/BotonEliminar.texture_normal = load("res://Texturas/basura.png")
 
 	# Conectar botones de mover
 	$UI/Mover/BotonArriba.pressed.connect(_mover_arriba)
@@ -247,14 +246,15 @@ func _alternar_congelar_descongelar():
 		.set_trans(Tween.TRANS_QUINT)
 
 	var tween2 = create_tween()
-	tween2.tween_property($UI/Opciones/BotonDescongelar, "position:y", game_state.ui_boton_descongelar_position.y - 120, ANIMATION_DURATION2)\
+	tween2.tween_property($UI/Opciones/BotonDescongelar, "position:y", game_state.ui_boton_descongelar_position.y - 130, ANIMATION_DURATION2)\
 		.set_ease(Tween.EASE_IN_OUT)\
 		.set_trans(Tween.TRANS_QUINT)
 
 	game_state.descongelado = !game_state.descongelado
 
 	if game_state.descongelado:
-		$UI/Opciones/BotonDescongelar.texture_normal = load("res://Texturas/Pausa.png")
+		$UI/Opciones/BotonDescongelar.texture_normal = load("res://Texturas/PausaButton.png")
+		$UI/Opciones/BotonDescongelar.texture_pressed = load("res://Texturas/PausaButtonPressed.png")
 		$UI/Opciones/BotonEliminar.modulate = Color(0.25, 0.25, 0.25)
 		$UI/Opciones/BotonEliminar.disabled = true
 		for bola in get_tree().get_nodes_in_group("bolas"):
@@ -267,7 +267,8 @@ func _alternar_congelar_descongelar():
 		for button in get_tree().get_nodes_in_group("spawn_buttons"):
 			if button is BaseButton:
 				button.modulate = Color(1.0, 1.0, 1.0)
-		$UI/Opciones/BotonDescongelar.texture_normal = load("res://Texturas/play.png")
+		$UI/Opciones/BotonDescongelar.texture_normal = load("res://Texturas/PlayButton.png")
+		$UI/Opciones/BotonDescongelar.texture_pressed = load("res://Texturas/PlayButtonPressed.png")
 		for bola in get_tree().get_nodes_in_group("bolas"):
 			if bola is RigidBody2D and not bola.is_deactivated:
 				bola.pause_physics()
@@ -309,7 +310,7 @@ func _reiniciar():
 	$UI/Opciones/BotonSelect.disabled = false
 
 	game_state.descongelado = false
-	$UI/Opciones/BotonDescongelar.texture_normal = load("res://Texturas/play.png")
+	$UI/Opciones/BotonDescongelar.texture_normal = load("res://Texturas/PlayButton.png")
 	$UI/Opciones/BotonEliminar.modulate = Color(1.0, 1.0, 1.0)
 	$UI/Opciones/BotonEliminar.disabled = false
 
@@ -378,7 +379,8 @@ func _eliminar():
 	# Alternar modo de eliminación
 	game_state.is_deleting = !game_state.is_deleting
 	if game_state.is_deleting:
-		$UI/Opciones/BotonEliminar.texture_normal = load("res://Texturas/cancelar.png")
+		$UI/Opciones/BotonEliminar.texture_normal = load("res://Texturas/CancelarButton.png")
+		$UI/Opciones/BotonEliminar.texture_pressed = load("res://Texturas/CancelarButtonPressed.png")
 		for button in $UI/Menu.get_children():
 			button.modulate = Color(0.25, 0.25, 0.25)
 			button.disabled = true
@@ -387,7 +389,8 @@ func _eliminar():
 				button.modulate = Color(0.25, 0.25, 0.25)
 				button.disabled = true
 	else:
-		$UI/Opciones/BotonEliminar.texture_normal = load("res://Texturas/basura.png")
+		$UI/Opciones/BotonEliminar.texture_normal = load("res://Texturas/EliminarButton.png")
+		$UI/Opciones/BotonEliminar.texture_pressed = load("res://Texturas/EliminarButtonPressed.png")
 		for button in $UI/Menu.get_children():
 			button.modulate = Color(1.0, 1.0, 1.0)
 			button.disabled = false

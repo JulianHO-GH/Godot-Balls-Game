@@ -18,6 +18,12 @@ func _ready():
 	# Conectar señales de los botones
 	boton_nuevo.pressed.connect(_on_boton_nuevo_pressed)
 	boton_cargar.pressed.connect(_on_boton_cargar_pressed)
+	
+	 # Conectar el botón OK (asegúrate de que esto esté después de cargar la escena)
+	$NoSaveFilesAlert/OkButton.pressed.connect(_on_ok_button_pressed)
+	
+	# Inicialmente ocultar el alerta
+	$NoSaveFilesAlert.visible = false
 
 func _on_boton_nuevo_pressed():
 	# Generar un nombre único para el nuevo archivo de guardado
@@ -47,44 +53,66 @@ func _on_boton_nuevo_pressed():
 	queue_free()
 
 func _on_boton_cargar_pressed():
-	# Mostrar un menú con los archivos de guardado disponibles
 	var save_files = _get_save_files()
 	if save_files.is_empty():
-		# Mostrar un mensaje si no hay archivos de guardado
-		var dialog = AcceptDialog.new()
-		dialog.dialog_text = "No hay archivos de guardado disponibles."
-		dialog.ok_button_text = "Aceptar"
+		# Configurar transparencia inicial (0 = invisible)
+		$NoSaveFilesAlert.modulate.a = 0
+		$NoSaveFilesAlert.visible = true
+		$NoSaveFilesAlert/OkButton.disabled = false
+		
+		# Crear tween para fade in (ease in)
+		var tween = create_tween()
+		tween.tween_property($NoSaveFilesAlert, "modulate:a", 1.0, 0.1)\
+			.set_ease(Tween.EASE_IN)\
+			.set_trans(Tween.TRANS_SINE)
+		$NoSaveFilesAlert.scale = Vector2(0.5, 0.5)
+		tween.parallel().tween_property($NoSaveFilesAlert, "scale", Vector2(1.0, 1.0), 0.5)\
+			.set_ease(Tween.EASE_OUT)\
+			.set_trans(Tween.TRANS_ELASTIC)
+	else:
+		# Crear un diálogo para seleccionar el archivo
+		var dialog = ConfirmationDialog.new()
+		dialog.dialog_text = "Selecciona un archivo de guardado:"
+		var item_list = ItemList.new()
+		for file in save_files:
+			item_list.add_item(file)
+		dialog.add_child(item_list)
+		
+		# Conectar la señal de confirmación
+		dialog.confirmed.connect(func():
+			var selected_items = item_list.get_selected_items()
+			if selected_items.size() > 0:
+				var selected_file = save_files[selected_items[0]]
+				# Pasar el nombre del archivo seleccionado a la escena main
+				var scene_tree = get_tree()
+				var packed_scene = load(MAIN_SCENE)
+				var main_instance = packed_scene.instantiate()
+				main_instance.set("selected_save_file", selected_file)
+				scene_tree.root.add_child(main_instance)
+				scene_tree.current_scene = main_instance
+				queue_free()
+		)
+		
+		# Mostrar el diálogo
 		add_child(dialog)
-		dialog.popup_centered()
-		return
+		dialog.popup_centered(Vector2i(400, 300))
 
-	# Crear un diálogo para seleccionar el archivo
-	var dialog = ConfirmationDialog.new()
-	dialog.dialog_text = "Selecciona un archivo de guardado:"
-	var item_list = ItemList.new()
-	for file in save_files:
-		item_list.add_item(file)
-	dialog.add_child(item_list)
+func _on_ok_button_pressed():
+	# Deshabilitar el botón inmediatamente para evitar múltiples clics
+	$NoSaveFilesAlert/OkButton.disabled = true
 	
-	# Conectar la señal de confirmación
-	dialog.confirmed.connect(func():
-		var selected_items = item_list.get_selected_items()
-		if selected_items.size() > 0:
-			var selected_file = save_files[selected_items[0]]
-			# Pasar el nombre del archivo seleccionado a la escena main
-			var scene_tree = get_tree()
-			var packed_scene = load(MAIN_SCENE)
-			var main_instance = packed_scene.instantiate()
-			main_instance.set("selected_save_file", selected_file)
-			scene_tree.root.add_child(main_instance)
-			scene_tree.current_scene = main_instance
-			queue_free()
+	# Crear tween para fade out (ease out)
+	var tween = create_tween()
+	# En _on_ok_button_pressed (antes del fade out):
+	tween.parallel().tween_property($NoSaveFilesAlert, "scale", Vector2(0.1, 0.1), 0.1)\
+		.set_ease(Tween.EASE_OUT)
+	tween.tween_property($NoSaveFilesAlert, "modulate:a", 0.0, 0.1)
+	
+	# Ocultar el TextureRect después de completar la animación
+	tween.tween_callback(func(): 
+		$NoSaveFilesAlert.visible = false
 	)
 	
-	# Mostrar el diálogo
-	add_child(dialog)
-	dialog.popup_centered(Vector2i(400, 300))
-
 func _get_save_files() -> Array:
 	# Obtener la lista de archivos de guardado en SAVE_DIR
 	var files = []

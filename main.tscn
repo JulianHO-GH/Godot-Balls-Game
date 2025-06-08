@@ -1,4 +1,4 @@
-[gd_scene load_steps=36 format=3 uid="uid://cs5whshwnasdf"]
+[gd_scene load_steps=42 format=3 uid="uid://cs5whshwnasdf"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_tpxov"]
 [ext_resource type="PackedScene" uid="uid://fn1hroyr720c" path="res://bola.tscn" id="2_gxh2a"]
@@ -12,24 +12,30 @@
 [ext_resource type="PackedScene" uid="uid://c3icifcstco4s" path="res://esquina_rampa.tscn" id="7_dtj3b"]
 [ext_resource type="PackedScene" uid="uid://ch1kf3dwhrur6" path="res://PuntoTeletransporteIndividual.tscn" id="8_jdxaa"]
 [ext_resource type="Texture2D" uid="uid://coxud135l8ti0" path="res://Texturas/teleportador.png" id="9_vpaak"]
-[ext_resource type="Texture2D" uid="uid://b0po7pjse7n8l" path="res://Texturas/ZoomIn.png" id="11_7keg4"]
-[ext_resource type="Texture2D" uid="uid://fo4e01xd73h5" path="res://Texturas/ZoomOut.png" id="11_kecu8"]
 [ext_resource type="Texture2D" uid="uid://bf0d7vgovj6y7" path="res://Texturas/EsquinaRampa.png" id="12_7imaq"]
-[ext_resource type="Texture2D" uid="uid://sss8f1paonts" path="res://Texturas/play.png" id="13_coray"]
 [ext_resource type="Texture2D" uid="uid://bv8jlwu4miil4" path="res://Texturas/tile.png" id="13_swg81"]
 [ext_resource type="Texture2D" uid="uid://11q7amqtdhu3" path="res://Texturas/Esquina.png" id="14_5hisv"]
-[ext_resource type="Texture2D" uid="uid://bafy6l1qajnip" path="res://Texturas/abajo.png" id="16_0t7hi"]
-[ext_resource type="Texture2D" uid="uid://dpv8g1jpt0gfj" path="res://Texturas/parar.png" id="17_rmfgp"]
-[ext_resource type="Texture2D" uid="uid://du1araa410j85" path="res://Texturas/basura.png" id="19_vn1ye"]
+[ext_resource type="Texture2D" uid="uid://nnwm1o56l1c5" path="res://Texturas/BajarMenuButton.png" id="15_5tw84"]
+[ext_resource type="Texture2D" uid="uid://hwdhwjgk6h18" path="res://Texturas/BajarMenuButtonPressed.png" id="16_ygw64"]
+[ext_resource type="Texture2D" uid="uid://cmbub7q14asyj" path="res://Texturas/ZoomInButton.png" id="17_s82v4"]
+[ext_resource type="Texture2D" uid="uid://cs50mg3l0d6jl" path="res://Texturas/ZoomInButtonPressed.png" id="18_ofhqh"]
+[ext_resource type="Texture2D" uid="uid://cvk2k3u3bi72y" path="res://Texturas/PlayButton.png" id="19_m6743"]
+[ext_resource type="Texture2D" uid="uid://4erlm68ubw03" path="res://Texturas/ZoomOutButton.png" id="19_wodt4"]
+[ext_resource type="Texture2D" uid="uid://bg3ikl0vrdd4w" path="res://Texturas/ZoomOutButtonPressed.png" id="20_beuyn"]
+[ext_resource type="Texture2D" uid="uid://brjxjl6ywdgio" path="res://Texturas/PlayButtonPressed.png" id="20_nka71"]
 [ext_resource type="Texture2D" uid="uid://du64xs8fave3v" path="res://Texturas/select.png" id="20_xj00m"]
 [ext_resource type="Texture2D" uid="uid://b6epy8k7lknul" path="res://Texturas/BotonArriba.png" id="20_xmhny"]
 [ext_resource type="Texture2D" uid="uid://cyr5udqns5hmx" path="res://Texturas/chain.png" id="21_eqbvj"]
+[ext_resource type="Texture2D" uid="uid://qduxx5elwekq" path="res://Texturas/ReiniciarButton.png" id="21_iew8m"]
 [ext_resource type="Texture2D" uid="uid://dbr4tkqxcb54p" path="res://Texturas/BotonAbajo.png" id="21_wd65p"]
 [ext_resource type="Texture2D" uid="uid://cxhlkf0uyg7xo" path="res://Texturas/BotonIzquierda.png" id="22_d7fmu"]
+[ext_resource type="Texture2D" uid="uid://d2rsr1ojovosr" path="res://Texturas/ReiniciarButtonPressed.png" id="22_swss1"]
 [ext_resource type="Texture2D" uid="uid://cg5qtlpetxfmy" path="res://Texturas/guardar.jpg" id="23_bxudd"]
 [ext_resource type="Texture2D" uid="uid://s1bh4lg8c1d2" path="res://Texturas/BotonDerecha.png" id="23_edaq6"]
 [ext_resource type="Texture2D" uid="uid://cwrwj7p8l4287" path="res://Texturas/cargar.png" id="24_4x16n"]
 [ext_resource type="Texture2D" uid="uid://1pphh4mf05fq" path="res://Texturas/GirarIzquierda.png" id="25_5g4hx"]
+[ext_resource type="Texture2D" uid="uid://dwcajbsq2iuhy" path="res://Texturas/EliminarButton.png" id="25_clkci"]
+[ext_resource type="Texture2D" uid="uid://67eqldrfme4w" path="res://Texturas/EliminarButtonPressed.png" id="26_1e0vn"]
 [ext_resource type="Texture2D" uid="uid://bgb84tih8hp3l" path="res://Texturas/GirarDerecha.png" id="26_f7rg3"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_6tccr"]
@@ -155,13 +161,13 @@ texture_normal = ExtResource("12_7imaq")
 
 [node name="BotonMoverMenu" type="TextureButton" parent="UI/Menu"]
 layout_mode = 0
-offset_left = -951.0
-offset_top = -706.0
-offset_right = 1097.0
-offset_bottom = 1342.0
-scale = Vector2(0.05, 0.05)
-pivot_offset = Vector2(1000, 1000)
-texture_normal = ExtResource("16_0t7hi")
+offset_left = 9.0
+offset_top = 249.0
+offset_right = 129.0
+offset_bottom = 369.0
+pivot_offset = Vector2(60, 60)
+texture_normal = ExtResource("15_5tw84")
+texture_pressed = ExtResource("16_ygw64")
 
 [node name="Opciones" type="Control" parent="UI"]
 layout_mode = 3
@@ -171,64 +177,69 @@ offset_bottom = 40.0
 
 [node name="BotonZoomIn" type="TextureButton" parent="UI/Opciones"]
 layout_mode = 0
-offset_left = 976.0
-offset_top = 546.0
-offset_right = 1476.0
-offset_bottom = 1046.0
-scale = Vector2(0.1, 0.1)
-texture_normal = ExtResource("11_7keg4")
+offset_left = 957.0
+offset_top = 507.0
+offset_right = 1037.0
+offset_bottom = 587.0
+pivot_offset = Vector2(40, 40)
+texture_normal = ExtResource("17_s82v4")
+texture_pressed = ExtResource("18_ofhqh")
 
 [node name="BotonZoomOut" type="TextureButton" parent="UI/Opciones"]
 layout_mode = 0
-offset_left = 976.0
-offset_top = 618.0
-offset_right = 1476.0
-offset_bottom = 1118.0
-scale = Vector2(0.1, 0.1)
-texture_normal = ExtResource("11_kecu8")
+offset_left = 957.0
+offset_top = 592.0
+offset_right = 1037.0
+offset_bottom = 672.0
+pivot_offset = Vector2(40, 40)
+texture_normal = ExtResource("19_wodt4")
+texture_pressed = ExtResource("20_beuyn")
 
 [node name="BotonDescongelar" type="TextureButton" parent="UI/Opciones"]
 layout_mode = 0
 offset_left = 937.0
 offset_top = 382.0
-offset_right = 1449.0
-offset_bottom = 894.0
-scale = Vector2(0.25, 0.25)
-texture_normal = ExtResource("13_coray")
+offset_right = 1057.0
+offset_bottom = 502.0
+pivot_offset = Vector2(60, 60)
+texture_normal = ExtResource("19_m6743")
+texture_pressed = ExtResource("20_nka71")
 
 [node name="BotonReiniciar" type="TextureButton" parent="UI/Opciones"]
 layout_mode = 0
-offset_left = 1107.0
-offset_top = 388.0
-offset_right = 1289.0
-offset_bottom = 572.0
-scale = Vector2(0.6, 0.6)
-texture_normal = ExtResource("17_rmfgp")
+offset_left = 1097.0
+offset_top = 382.0
+offset_right = 1217.0
+offset_bottom = 502.0
+pivot_offset = Vector2(60, 60)
+texture_normal = ExtResource("21_iew8m")
+texture_pressed = ExtResource("22_swss1")
 
 [node name="BotonEliminar" type="TextureButton" parent="UI/Opciones"]
 layout_mode = 0
-offset_left = 944.0
+offset_left = 940.0
 offset_top = 681.0
-offset_right = 1144.0
-offset_bottom = 881.0
-scale = Vector2(0.55, 0.55)
-texture_normal = ExtResource("19_vn1ye")
+offset_right = 1060.0
+offset_bottom = 801.0
+pivot_offset = Vector2(60, 60)
+texture_normal = ExtResource("25_clkci")
+texture_pressed = ExtResource("26_1e0vn")
 
 [node name="BotonSelect" type="TextureButton" parent="UI/Opciones"]
 layout_mode = 0
 offset_left = 939.0
-offset_top = 795.0
+offset_top = 806.0
 offset_right = 1071.0
-offset_bottom = 933.0
+offset_bottom = 944.0
 scale = Vector2(0.9, 0.9)
 texture_normal = ExtResource("20_xj00m")
 
 [node name="BotonLink" type="TextureButton" parent="UI/Opciones"]
 layout_mode = 0
 offset_left = 945.0
-offset_top = 926.0
+offset_top = 937.0
 offset_right = 1127.0
-offset_bottom = 1110.0
+offset_bottom = 1121.0
 scale = Vector2(0.6, 0.6)
 texture_normal = ExtResource("21_eqbvj")
 

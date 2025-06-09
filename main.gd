@@ -222,13 +222,15 @@ func _alternar_seleccionar():
 			ultimo_objeto_seleccionado = null
 
 	if game_state.seleccionando:
-		$UI/Opciones/BotonSelect.texture_normal = load("res://Texturas/deselect.png")
+		$UI/Opciones/BotonSelect.texture_normal = load("res://Texturas/DeseleccionarButton.png")
+		$UI/Opciones/BotonSelect.texture_pressed = load("res://Texturas/DeseleccionarButtonPressed.png")
 		$UI/Opciones/BotonEliminar.modulate = Color(0.25, 0.25, 0.25)
 		$UI/Opciones/BotonEliminar.disabled = true
 		$UI/Opciones/BotonDescongelar.modulate = Color(0.25, 0.25, 0.25)
 		$UI/Opciones/BotonDescongelar.disabled = true
 	else:
-		$UI/Opciones/BotonSelect.texture_normal = load("res://Texturas/select.png")
+		$UI/Opciones/BotonSelect.texture_normal = load("res://Texturas/SeleccionarButton.png")
+		$UI/Opciones/BotonSelect.texture_pressed = load("res://Texturas/SeleccionarButtonPressed.png")
 		$UI/Opciones/BotonEliminar.modulate = Color(1, 1, 1)
 		$UI/Opciones/BotonEliminar.disabled = false
 		$UI/Opciones/BotonDescongelar.modulate = Color(1, 1, 1)

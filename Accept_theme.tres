@@ -1,14 +1,114 @@
-[gd_resource type="Theme" load_steps=2 format=3 uid="uid://delr4p2r46s7e"]
+[gd_resource type="Theme" load_steps=12 format=3 uid="uid://delr4p2r46s7e"]
 
 [ext_resource type="FontFile" uid="uid://cffar7b2cic6s" path="res://Comic Sans MS.ttf" id="1_5laea"]
+[ext_resource type="Texture2D" uid="uid://bcnf2qpvnvuqv" path="res://Texturas/PanelBackground.png" id="1_a8404"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_44xiu"]
+bg_color = Color(0, 0, 0, 1)
+border_width_left = 10
+border_width_top = 10
+border_width_right = 10
+border_width_bottom = 10
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 30
+corner_radius_top_right = 30
+corner_radius_bottom_right = 30
+corner_radius_bottom_left = 30
+corner_detail = 10
+anti_aliasing_size = 1.01
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_enfdn"]
+bg_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_iyv4g"]
+bg_color = Color(1, 1, 1, 1)
+border_width_left = 10
+border_width_top = 10
+border_width_right = 10
+border_width_bottom = 10
+border_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_b6bex"]
+bg_color = Color(0.680321, 0.680321, 0.680321, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7hiug"]
+bg_color = Color(0, 0, 0, 1)
+draw_center = false
+border_width_top = 2
+border_width_bottom = 2
+border_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_kfm7h"]
+bg_color = Color(0, 0, 0, 1)
+draw_center = false
+border_width_top = 2
+border_width_bottom = 2
+border_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5vtoi"]
+bg_color = Color(0, 0, 0, 1)
+draw_center = false
+border_width_left = 10
+border_width_top = 10
+border_width_right = 10
+border_width_bottom = 10
+border_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_orgxb"]
+texture = ExtResource("1_a8404")
+texture_margin_left = 10.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7vfwc"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
 
 [resource]
 default_font = ExtResource("1_5laea")
-default_font_size = 45
-/colors/AcceptDialogFontColor = Color(0, 0, 0, 1)
-/font_sizes/AcceptDialogFontSize = 33
-/fonts/AcceptDialogFont = ExtResource("1_5laea")
-Button/constants/outline_size = 13
+default_font_size = 29
+AcceptDialog/styles/panel = SubResource("StyleBoxFlat_44xiu")
+Button/colors/font_color = Color(0, 0, 0, 1)
+Button/colors/font_focus_color = Color(0, 0, 0, 1)
+Button/colors/font_hover_color = Color(0, 0, 0, 1)
+Button/colors/font_outline_color = Color(0, 0, 0, 1)
+Button/colors/font_pressed_color = Color(0, 0, 0, 1)
+Button/constants/align_to_largest_stylebox = 1
+Button/constants/outline_size = 10
 Button/font_sizes/font_size = 40
-Label/constants/outline_size = 12
-Label/font_sizes/font_size = 40
+Button/styles/focus = SubResource("StyleBoxFlat_enfdn")
+Button/styles/hover = SubResource("StyleBoxFlat_enfdn")
+Button/styles/normal = SubResource("StyleBoxFlat_iyv4g")
+Button/styles/pressed = SubResource("StyleBoxFlat_b6bex")
+ItemList/colors/font_color = Color(0, 0, 0, 1)
+ItemList/colors/font_hovered_color = Color(0.86, 0.86, 0.86, 1)
+ItemList/colors/font_outline_color = Color(0, 0, 0, 1)
+ItemList/colors/font_selected_color = Color(1, 1, 1, 1)
+ItemList/colors/guide_color = Color(0, 0, 0, 1)
+ItemList/constants/h_separation = 50
+ItemList/constants/line_separation = 5
+ItemList/constants/outline_size = 10
+ItemList/constants/v_separation = 10
+ItemList/font_sizes/font_size = 70
+ItemList/styles/cursor = SubResource("StyleBoxFlat_7hiug")
+ItemList/styles/cursor_unfocused = SubResource("StyleBoxFlat_kfm7h")
+ItemList/styles/focus = SubResource("StyleBoxFlat_5vtoi")
+ItemList/styles/panel = SubResource("StyleBoxTexture_orgxb")
+ItemList/styles/selected = null
+ItemList/styles/selected_focus = null
+VScrollBar/styles/scroll = SubResource("StyleBoxFlat_7vfwc")
+Window/colors/title_color = Color(0, 0, 0, 1)
+Window/colors/title_outline_modulate = Color(0, 0, 0, 1)
+Window/constants/resize_margin = 4
+Window/constants/title_height = 36
+Window/constants/title_outline_size = 10
+Window/font_sizes/title_font_size = 19

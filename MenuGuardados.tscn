@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://62jub00hfpdd"]
+[gd_scene load_steps=17 format=3 uid="uid://62jub00hfpdd"]
 
 [ext_resource type="Script" path="res://MenuGuardados.gd" id="1_ux2iq"]
 [ext_resource type="FontFile" uid="uid://cffar7b2cic6s" path="res://Comic Sans MS.ttf" id="2_7pxbt"]
@@ -9,6 +9,13 @@
 [ext_resource type="Texture2D" uid="uid://mn3xfqlgaaed" path="res://Texturas/CargarNivelesButtonPressed.png" id="5_8wmry"]
 [ext_resource type="Texture2D" uid="uid://iael1cawv7f2" path="res://Texturas/OkButton.png" id="5_vx8qn"]
 [ext_resource type="Texture2D" uid="uid://guxgfl2cr4vh" path="res://Texturas/OkButtonPressed.png" id="6_hpqba"]
+[ext_resource type="Script" path="res://button_animations.gd" id="10_joidb"]
+[ext_resource type="Texture2D" uid="uid://brrrr6y18h4rl" path="res://Texturas/marco.png" id="11_a7u3y"]
+[ext_resource type="Theme" uid="uid://delr4p2r46s7e" path="res://Accept_theme.tres" id="11_ysey4"]
+[ext_resource type="Texture2D" uid="uid://b256enr8sg8r1" path="res://Texturas/AceptarButton.png" id="13_0klsn"]
+[ext_resource type="Texture2D" uid="uid://cy8illvhu5yaf" path="res://Texturas/AceptarButtonPressed.png" id="14_qv5xf"]
+[ext_resource type="Texture2D" uid="uid://bv4d58k6xsgg6" path="res://Texturas/CancelarButton.png" id="15_lrb8a"]
+[ext_resource type="Texture2D" uid="uid://3ldr2pe3kvhp" path="res://Texturas/CancelarButtonPressed.png" id="16_7whvo"]
 
 [node name="MenuGuardados" type="Control"]
 layout_mode = 3
@@ -28,13 +35,16 @@ color = Color(1, 0.99, 0.9905, 1)
 [node name="Label" type="Label" parent="."]
 modulate = Color(0, 0, 0, 1)
 layout_mode = 2
-offset_left = 93.0
-offset_top = 38.0
-offset_right = 896.0
-offset_bottom = 148.0
+offset_left = 40.0
+offset_top = 58.0
+offset_right = 1040.0
+offset_bottom = 258.0
+pivot_offset = Vector2(500, 100)
 theme_override_fonts/font = ExtResource("2_7pxbt")
-theme_override_font_sizes/font_size = 80
+theme_override_font_sizes/font_size = 140
 text = "Bolas xdxd"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="BotonNuevo" type="TextureButton" parent="."]
 layout_mode = 0
@@ -42,6 +52,7 @@ offset_left = 165.0
 offset_top = 640.0
 offset_right = 435.0
 offset_bottom = 910.0
+pivot_offset = Vector2(135, 135)
 texture_normal = ExtResource("3_sj8ms")
 texture_pressed = ExtResource("4_p7qlo")
 
@@ -51,6 +62,7 @@ offset_left = 649.0
 offset_top = 644.0
 offset_right = 919.0
 offset_bottom = 914.0
+pivot_offset = Vector2(135, 135)
 texture_normal = ExtResource("4_e8ih0")
 texture_pressed = ExtResource("5_8wmry")
 
@@ -73,3 +85,82 @@ offset_bottom = 658.0
 disabled = true
 texture_normal = ExtResource("5_vx8qn")
 texture_pressed = ExtResource("6_hpqba")
+
+[node name="ButtonAnimations" type="Control" parent="."]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("10_joidb")
+
+[node name="ConfirmationDialog" type="ConfirmationDialog" parent="."]
+auto_translate_mode = 1
+transparent_bg = true
+title = "¿?"
+initial_position = 1
+size = Vector2i(900, 900)
+transient = false
+exclusive = false
+unresizable = true
+borderless = true
+always_on_top = true
+transparent = true
+keep_title_visible = false
+theme = ExtResource("11_ysey4")
+
+[node name="PopUp" type="Control" parent="."]
+anchors_preset = 0
+offset_left = 90.0
+offset_top = 400.0
+offset_right = 990.0
+offset_bottom = 1323.0
+
+[node name="MarcoPopUp" type="TextureRect" parent="PopUp"]
+layout_mode = 0
+offset_right = 900.0
+offset_bottom = 923.0
+texture = ExtResource("11_a7u3y")
+
+[node name="ItemList" type="ItemList" parent="PopUp"]
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 890.0
+offset_bottom = 803.0
+theme = ExtResource("11_ysey4")
+item_count = 8
+item_0/text = "Test"
+item_1/text = "Test2"
+item_2/text = "Test 3"
+item_3/text = "Test 4"
+item_4/text = "Test 5"
+item_5/text = "Test6"
+item_6/text = "Test7"
+item_7/text = "Test8"
+
+[node name="AceptarButton" type="TextureButton" parent="PopUp"]
+layout_mode = 0
+offset_left = 150.0
+offset_top = 875.0
+offset_right = 350.0
+offset_bottom = 1025.0
+pivot_offset = Vector2(100, 75)
+texture_normal = ExtResource("13_0klsn")
+texture_pressed = ExtResource("14_qv5xf")
+
+[node name="CancelarButton" type="TextureButton" parent="PopUp"]
+layout_mode = 0
+offset_left = 550.0
+offset_top = 875.0
+offset_right = 750.0
+offset_bottom = 1025.0
+pivot_offset = Vector2(100, 75)
+texture_normal = ExtResource("15_lrb8a")
+texture_pressed = ExtResource("16_7whvo")
+
+[connection signal="button_down" from="BotonNuevo" to="ButtonAnimations" method="_on_boton_nuevo_button_down"]
+[connection signal="button_up" from="BotonNuevo" to="ButtonAnimations" method="_on_boton_nuevo_button_up"]
+[connection signal="button_down" from="BotonCargar" to="ButtonAnimations" method="_on_boton_cargar_button_down"]
+[connection signal="button_up" from="BotonCargar" to="ButtonAnimations" method="_on_boton_cargar_button_up"]
+[connection signal="button_down" from="PopUp/AceptarButton" to="ButtonAnimations" method="_on_aceptar_button_button_down"]
+[connection signal="button_up" from="PopUp/AceptarButton" to="ButtonAnimations" method="_on_aceptar_button_button_up"]
+[connection signal="button_down" from="PopUp/CancelarButton" to="ButtonAnimations" method="_on_cancelar_button_button_down"]
+[connection signal="button_up" from="PopUp/CancelarButton" to="ButtonAnimations" method="_on_cancelar_button_button_up"]

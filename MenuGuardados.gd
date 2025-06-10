@@ -3,6 +3,10 @@ extends Control
 # Referencias a los nodos
 @onready var boton_nuevo = $BotonNuevo
 @onready var boton_cargar = $BotonCargar
+@onready var item_list = $PopUp/ItemList
+@onready var popup = $PopUp
+@onready var aceptarButton = $PopUp/AceptarButton
+@onready var cancelarButton = $PopUp/CancelarButton
 
 # Directorio para archivos de guardado
 const SAVE_DIR = "user://saved_levels/"
@@ -70,32 +74,12 @@ func _on_boton_cargar_pressed():
 			.set_ease(Tween.EASE_OUT)\
 			.set_trans(Tween.TRANS_ELASTIC)
 	else:
-		# Crear un diálogo para seleccionar el archivo
-		var dialog = ConfirmationDialog.new()
-		dialog.dialog_text = "Selecciona un archivo de guardado:"
-		var item_list = ItemList.new()
+		item_list.clear()
 		for file in save_files:
 			item_list.add_item(file)
-		dialog.add_child(item_list)
-		
-		# Conectar la señal de confirmación
-		dialog.confirmed.connect(func():
-			var selected_items = item_list.get_selected_items()
-			if selected_items.size() > 0:
-				var selected_file = save_files[selected_items[0]]
-				# Pasar el nombre del archivo seleccionado a la escena main
-				var scene_tree = get_tree()
-				var packed_scene = load(MAIN_SCENE)
-				var main_instance = packed_scene.instantiate()
-				main_instance.set("selected_save_file", selected_file)
-				scene_tree.root.add_child(main_instance)
-				scene_tree.current_scene = main_instance
-				queue_free()
-		)
-		
-		# Mostrar el diálogo
-		add_child(dialog)
-		dialog.popup_centered(Vector2i(400, 300))
+		popup.visible = true
+		aceptarButton.disabled = false
+		cancelarButton.disabled = false
 
 func _on_ok_button_pressed():
 	# Deshabilitar el botón inmediatamente para evitar múltiples clics
@@ -126,3 +110,19 @@ func _get_save_files() -> Array:
 			file_name = dir.get_next()
 		dir.list_dir_end()
 	return files
+
+
+func _on_aceptar_button_pressed() -> void:
+	# Conectar la señal de confirmación
+	var save_files = _get_save_files()
+	var selected_items = item_list.get_selected_items()
+	if selected_items.size() > 0:
+		var selected_file = save_files[selected_items[0]]
+		# Pasar el nombre del archivo seleccionado a la escena main
+		var scene_tree = get_tree()
+		var packed_scene = load(MAIN_SCENE)
+		var main_instance = packed_scene.instantiate()
+		main_instance.set("selected_save_file", selected_file)
+		scene_tree.root.add_child(main_instance)
+		scene_tree.current_scene = main_instance
+		queue_free()

@@ -14,8 +14,8 @@
 [ext_resource type="Theme" uid="uid://delr4p2r46s7e" path="res://Accept_theme.tres" id="11_ysey4"]
 [ext_resource type="Texture2D" uid="uid://b256enr8sg8r1" path="res://Texturas/AceptarButton.png" id="13_0klsn"]
 [ext_resource type="Texture2D" uid="uid://cy8illvhu5yaf" path="res://Texturas/AceptarButtonPressed.png" id="14_qv5xf"]
-[ext_resource type="Texture2D" uid="uid://bwfban0c85u4g" path="res://Texturas/CancelarButtonCuadrado.png" id="15_dywtw"]
-[ext_resource type="Texture2D" uid="uid://cgaiy460r7k4h" path="res://Texturas/CancelarButtonCuadradoPressed.png" id="16_6577d"]
+[ext_resource type="Texture2D" uid="uid://bv4d58k6xsgg6" path="res://Texturas/CancelarButton.png" id="15_lrb8a"]
+[ext_resource type="Texture2D" uid="uid://3ldr2pe3kvhp" path="res://Texturas/CancelarButtonPressed.png" id="16_7whvo"]
 
 [node name="MenuGuardados" type="Control"]
 layout_mode = 3
@@ -148,8 +148,8 @@ offset_right = 750.0
 offset_bottom = 1025.0
 pivot_offset = Vector2(100, 75)
 disabled = true
-texture_normal = ExtResource("15_dywtw")
-texture_pressed = ExtResource("16_6577d")
+texture_normal = ExtResource("15_lrb8a")
+texture_pressed = ExtResource("16_7whvo")
 
 [connection signal="button_down" from="BotonNuevo" to="ButtonAnimations" method="_on_boton_nuevo_button_down"]
 [connection signal="button_up" from="BotonNuevo" to="ButtonAnimations" method="_on_boton_nuevo_button_up"]

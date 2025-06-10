@@ -2,17 +2,39 @@ extends Node
 	
 func buttonDown(path):
 	var tween1 = create_tween()
-	#path.scale = Vector2(0.5, 0.5)
 	tween1.parallel().tween_property(path, "scale", Vector2(1.1, 1.1), 0.5)\
 		.set_ease(Tween.EASE_OUT)\
 		.set_trans(Tween.TRANS_ELASTIC)
 		
 func buttonUp(path):
 	var tween2 = create_tween()
-	#path.scale = Vector2(0.5, 0.5)
 	tween2.parallel().tween_property(path, "scale", Vector2(1.0, 1.0), 0.5)\
 		.set_ease(Tween.EASE_OUT)\
 		.set_trans(Tween.TRANS_ELASTIC)
+		
+func popIn(path):
+	# Crear tween para fade in (ease in)
+	var tween = create_tween()
+	tween.tween_property(path, "modulate:a", 1.0, 0.1)\
+		.set_ease(Tween.EASE_IN)\
+		.set_trans(Tween.TRANS_SINE)
+	path.scale = Vector2(0.5, 0.5)
+	tween.parallel().tween_property(path, "scale", Vector2(1.0, 1.0), 0.5)\
+		.set_ease(Tween.EASE_OUT)\
+		.set_trans(Tween.TRANS_ELASTIC)
+		
+func popOut(path):
+	# Crear tween para fade out (ease out)
+	var tween = create_tween()
+	# En _on_ok_button_pressed (antes del fade out):
+	tween.parallel().tween_property(path, "scale", Vector2(0.1, 0.1), 0.1)\
+		.set_ease(Tween.EASE_OUT)
+	tween.tween_property(path, "modulate:a", 0.0, 0.1)
+	
+	# Ocultar el TextureRect después de completar la animación
+	tween.tween_callback(func(): 
+		path.visible = false
+	)
 
 func _on_boton_nuevo_button_down() -> void:
 	buttonDown($/root/MenuGuardados/BotonNuevo)
@@ -41,3 +63,13 @@ func _on_cancelar_button_button_down() -> void:
 
 func _on_cancelar_button_button_up() -> void:
 	buttonUp($/root/MenuGuardados/PopUp/CancelarButton)
+
+
+func _on_boton_cargar_pressed() -> void:
+	popIn($/root/MenuGuardados/PopUp)
+
+
+func _on_cancelar_button_pressed() -> void:
+	popOut($/root/MenuGuardados/PopUp)
+	$/root/MenuGuardados/PopUp/AceptarButton.disabled = true
+	$/root/MenuGuardados/PopUp/CancelarButton.disabled = true

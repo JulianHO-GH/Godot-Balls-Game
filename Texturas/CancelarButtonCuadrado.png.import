@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dp14u3pbsnpkw"
-path="res://.godot/imported/DeSeleccionarButtonPressed.png-72bea0c7a4b03cd18631292c1a45746e.ctex"
+uid="uid://bwfban0c85u4g"
+path="res://.godot/imported/CancelarButtonCuadrado.png-9f5bf0056047d99863c900fda4eae552.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Texturas/DeSeleccionarButtonPressed.png"
-dest_files=["res://.godot/imported/DeSeleccionarButtonPressed.png-72bea0c7a4b03cd18631292c1a45746e.ctex"]
+source_file="res://Texturas/CancelarButtonCuadrado.png"
+dest_files=["res://.godot/imported/CancelarButtonCuadrado.png-9f5bf0056047d99863c900fda4eae552.ctex"]
 
 [params]
 

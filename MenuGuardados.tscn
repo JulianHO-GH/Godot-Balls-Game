@@ -142,6 +142,7 @@ offset_bottom = 923.0
 texture = ExtResource("11_a7u3y")
 
 [node name="ItemList" type="ItemList" parent="PopUp"]
+layout_mode = 0
 offset_left = 10.0
 offset_top = 10.0
 offset_right = 890.0

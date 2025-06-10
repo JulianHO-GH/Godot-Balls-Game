@@ -13,6 +13,30 @@ func buttonUp(path):
 	tween2.parallel().tween_property(path, "scale", Vector2(1.0, 1.0), 0.5)\
 		.set_ease(Tween.EASE_OUT)\
 		.set_trans(Tween.TRANS_ELASTIC)
+		
+func popIn(path):
+	# Crear tween para fade in (ease in)
+	var tween = create_tween()
+	tween.tween_property(path, "modulate:a", 1.0, 0.1)\
+		.set_ease(Tween.EASE_IN)\
+		.set_trans(Tween.TRANS_SINE)
+	path.scale = Vector2(0.5, 0.5)
+	tween.parallel().tween_property(path, "scale", Vector2(1.0, 1.0), 0.5)\
+		.set_ease(Tween.EASE_OUT)\
+		.set_trans(Tween.TRANS_ELASTIC)
+		
+func popOut(path):
+	# Crear tween para fade out (ease out)
+	var tween = create_tween()
+	# En _on_ok_button_pressed (antes del fade out):
+	tween.parallel().tween_property(path, "scale", Vector2(0.1, 0.1), 0.1)\
+		.set_ease(Tween.EASE_OUT)
+	tween.tween_property(path, "modulate:a", 0.0, 0.1)
+	
+	# Ocultar el TextureRect después de completar la animación
+	tween.tween_callback(func(): 
+		path.visible = false
+	)
 			
 func _on_boton_zoom_in_button_down() -> void:
 	buttonDown($BotonZoomIn)

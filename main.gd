@@ -114,7 +114,6 @@ func _ready():
 	if selected_save_file != "":
 		_reload(selected_save_file)
 	
-	await get_tree().create_timer(0.5).timeout
 
 func _seleccionar_esquinarampa():
 	if not game_state.descongelado:
@@ -589,8 +588,8 @@ func _on_boton_link_pressed():
 		dialog.popup_centered()
 		return
 		
-		request_storage_permissions()
-		plugin.getGalleryImage()
+	request_storage_permissions()
+	plugin.getGalleryImage()
 
 
 func request_storage_permissions():
@@ -605,12 +604,7 @@ func request_storage_permissions():
 		await get_tree().create_timer(0.5).timeout
 		var granted = OS.get_granted_permissions()
 		print("Permisos otorgados: ", granted)
-		var dialog = AcceptDialog.new()
-
-		dialog.dialog_text = "No se si se otorgaron o no xd"
-		dialog.ok_button_text = "Aceptar"
-		add_child(dialog)
-		dialog.popup_centered()
+		
 	else:
 		print("No está ejecutándose en Android, no se requieren permisos.")
 		var dialog = AcceptDialog.new()

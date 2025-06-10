@@ -253,6 +253,7 @@ offset_left = 940.0
 offset_top = 933.0
 offset_right = 1060.0
 offset_bottom = 1053.0
+pivot_offset = Vector2(60, 60)
 texture_normal = ExtResource("30_8cb4l")
 texture_pressed = ExtResource("31_5bv8f")
 

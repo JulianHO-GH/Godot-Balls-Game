@@ -29,6 +29,7 @@ const ZOOM_STEP: float = 0.1
 const MOVE_OFFSET: float = -250.0
 const ANIMATION_DURATION: float = 0.5
 const ANIMATION_DURATION2: float = 0.2
+const ANIMATION_DURATION3: float = 0.6
 const DRAG_THRESHOLD: float = 10.0
 const CAMERA_LIMIT_LEFT: float = -5000.0
 const CAMERA_LIMIT_TOP: float = -10000.0
@@ -112,6 +113,8 @@ func _ready():
 	# Cargar el archivo de guardado seleccionado si existe
 	if selected_save_file != "":
 		_reload(selected_save_file)
+	
+	await get_tree().create_timer(0.5).timeout
 
 func _seleccionar_esquinarampa():
 	if not game_state.descongelado:
@@ -207,14 +210,14 @@ func _alternar_seleccionar():
 
 	if game_state.seleccionando:
 		var tween = create_tween()
-		tween.tween_property($UI/Mover, "position:y", game_state.ui_botones_mover_position.y - 450, ANIMATION_DURATION2)\
-			.set_ease(Tween.EASE_IN_OUT)\
-			.set_trans(Tween.TRANS_QUINT)
+		tween.tween_property($UI/Mover, "position:y", game_state.ui_botones_mover_position.y - 450, ANIMATION_DURATION3)\
+			.set_ease(Tween.EASE_OUT)\
+			.set_trans(Tween.TRANS_ELASTIC)
 	else:
 		var tween2 = create_tween()
-		tween2.tween_property($UI/Mover, "position:y", game_state.ui_botones_mover_position.y, ANIMATION_DURATION2)\
+		tween2.tween_property($UI/Mover, "position:y", game_state.ui_botones_mover_position.y, ANIMATION_DURATION3)\
 			.set_ease(Tween.EASE_IN_OUT)\
-			.set_trans(Tween.TRANS_QUINT)
+			.set_trans(Tween.TRANS_ELASTIC)
 		if ultimo_objeto_seleccionado:
 			var sprite = ultimo_objeto_seleccionado.get_node_or_null("Sprite2D")
 			if sprite and sprite.material:
@@ -585,28 +588,10 @@ func _on_boton_link_pressed():
 		add_child(dialog)
 		dialog.popup_centered()
 		return
-
-	# Crear un ConfirmationDialog para solicitar permisos
-	var dialog = ConfirmationDialog.new()
-	dialog.dialog_text = "Se necesitan permisos para acceder a la galería de imágenes."
-	dialog.title = "Permisos necesarios"
-	dialog.ok_button_text = "Ok"  # Botón para getGalleryImage()
-	dialog.cancel_button_text = "Permitir"  # Botón para solicitar permisos
-	dialog.min_size = Vector2i(400, 200)  # Tamaño para visibilidad en Android
-
-	# Conectar señales del diálogo
-	dialog.confirmed.connect(func():
-		# Acción para "Ok": intenta cargar la imagen
-		plugin.getGalleryImage()
-	)
-	dialog.canceled.connect(func():
-		# Acción para "Permitir": solicita permisos
+		
 		request_storage_permissions()
-	)
+		plugin.getGalleryImage()
 
-	# Añadir y mostrar el diálogo
-	add_child(dialog)
-	dialog.popup_centered()
 
 func request_storage_permissions():
 	if OS.has_feature("android"):

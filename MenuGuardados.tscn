@@ -32,7 +32,26 @@ offset_right = 1113.0
 offset_bottom = 2083.0
 color = Color(1, 0.99, 0.9905, 1)
 
+[node name="RichTextLabel" type="RichTextLabel" parent="."]
+clip_contents = false
+layout_mode = 0
+offset_left = 38.0
+offset_top = 76.0
+offset_right = 1038.0
+offset_bottom = 276.0
+pivot_offset = Vector2(500, 100)
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 40
+theme_override_fonts/normal_font = ExtResource("2_7pxbt")
+theme_override_font_sizes/normal_font_size = 140
+bbcode_enabled = true
+text = "[shake][rainbow freq=1.0 sat=0.8 val=0.8][center]Bolas xdxdx[/center][/rainbow][/shake]
+"
+tab_size = 24
+text_direction = 1
+
 [node name="Label" type="Label" parent="."]
+visible = false
 modulate = Color(0, 0, 0, 1)
 layout_mode = 2
 offset_left = 40.0

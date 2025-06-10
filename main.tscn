@@ -1,4 +1,4 @@
-[gd_scene load_steps=46 format=3 uid="uid://cs5whshwnasdf"]
+[gd_scene load_steps=53 format=3 uid="uid://cs5whshwnasdf"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_tpxov"]
 [ext_resource type="PackedScene" uid="uid://fn1hroyr720c" path="res://bola.tscn" id="2_gxh2a"]
@@ -24,23 +24,30 @@
 [ext_resource type="Texture2D" uid="uid://4erlm68ubw03" path="res://Texturas/ZoomOutButton.png" id="19_wodt4"]
 [ext_resource type="Texture2D" uid="uid://bg3ikl0vrdd4w" path="res://Texturas/ZoomOutButtonPressed.png" id="20_beuyn"]
 [ext_resource type="Texture2D" uid="uid://brjxjl6ywdgio" path="res://Texturas/PlayButtonPressed.png" id="20_nka71"]
-[ext_resource type="Texture2D" uid="uid://b6epy8k7lknul" path="res://Texturas/BotonArriba.png" id="20_xmhny"]
-[ext_resource type="Texture2D" uid="uid://cyr5udqns5hmx" path="res://Texturas/chain.png" id="21_eqbvj"]
 [ext_resource type="Texture2D" uid="uid://qduxx5elwekq" path="res://Texturas/ReiniciarButton.png" id="21_iew8m"]
-[ext_resource type="Texture2D" uid="uid://dbr4tkqxcb54p" path="res://Texturas/BotonAbajo.png" id="21_wd65p"]
-[ext_resource type="Texture2D" uid="uid://cxhlkf0uyg7xo" path="res://Texturas/BotonIzquierda.png" id="22_d7fmu"]
 [ext_resource type="Texture2D" uid="uid://d2rsr1ojovosr" path="res://Texturas/ReiniciarButtonPressed.png" id="22_swss1"]
-[ext_resource type="Texture2D" uid="uid://s1bh4lg8c1d2" path="res://Texturas/BotonDerecha.png" id="23_edaq6"]
-[ext_resource type="Texture2D" uid="uid://1pphh4mf05fq" path="res://Texturas/GirarIzquierda.png" id="25_5g4hx"]
 [ext_resource type="Texture2D" uid="uid://dwcajbsq2iuhy" path="res://Texturas/EliminarButton.png" id="25_clkci"]
 [ext_resource type="Texture2D" uid="uid://67eqldrfme4w" path="res://Texturas/EliminarButtonPressed.png" id="26_1e0vn"]
-[ext_resource type="Texture2D" uid="uid://bgb84tih8hp3l" path="res://Texturas/GirarDerecha.png" id="26_f7rg3"]
 [ext_resource type="Texture2D" uid="uid://dpt2tck8v08mq" path="res://Texturas/SeleccionarButton.png" id="27_c4j7u"]
 [ext_resource type="Texture2D" uid="uid://082dlffynq3d" path="res://Texturas/SeleccionarButtonPressed.png" id="28_8v53c"]
+[ext_resource type="Texture2D" uid="uid://d1p4oxpcde7ur" path="res://Texturas/CargarImagenButton.png" id="30_8cb4l"]
 [ext_resource type="Texture2D" uid="uid://cu207oqy8r7wx" path="res://Texturas/GuardarButton.png" id="30_egmyw"]
+[ext_resource type="Texture2D" uid="uid://btwsqfcljpq22" path="res://Texturas/CargarImagenButtonPressed.png" id="31_5bv8f"]
 [ext_resource type="Texture2D" uid="uid://bhaqqyvn5mmmj" path="res://Texturas/GuardarButtonPressed.png" id="31_wan16"]
 [ext_resource type="Texture2D" uid="uid://be7whv6yvlbo7" path="res://Texturas/SalirButton.png" id="32_2c5jw"]
 [ext_resource type="Texture2D" uid="uid://cgoaukycn4xut" path="res://Texturas/SalirButtonPressed.png" id="33_0i8cd"]
+[ext_resource type="Texture2D" uid="uid://dj2lr00alnd3d" path="res://Texturas/ArribaButton.png" id="36_fj135"]
+[ext_resource type="Texture2D" uid="uid://7kf7e7eta5g5" path="res://Texturas/ArribaButtonPressed.png" id="37_bvyqh"]
+[ext_resource type="Texture2D" uid="uid://h75jncs2akik" path="res://Texturas/AbajoButtonPressed.png" id="38_28vre"]
+[ext_resource type="Texture2D" uid="uid://bwwctk5fuddx" path="res://Texturas/AbajoButton.png" id="39_webf6"]
+[ext_resource type="Texture2D" uid="uid://5ha6uq04b4ri" path="res://Texturas/IzquierdaButton.png" id="40_3ohxn"]
+[ext_resource type="Texture2D" uid="uid://drbclsuykk77b" path="res://Texturas/IzquierdaButtonPressed.png" id="41_1mrhl"]
+[ext_resource type="Texture2D" uid="uid://cxmy6n8oe2qkb" path="res://Texturas/DerechaButton.png" id="42_i7utl"]
+[ext_resource type="Texture2D" uid="uid://0qolxi3duw2a" path="res://Texturas/DerechabuttonPressed.png" id="43_gdy0i"]
+[ext_resource type="Texture2D" uid="uid://bvvcernc3iput" path="res://Texturas/GirarIzquierdaButton.png" id="44_jpqaa"]
+[ext_resource type="Texture2D" uid="uid://bxn7kw0vm5tw7" path="res://Texturas/GirarIzquierdaButtonPressed.png" id="45_0xhtp"]
+[ext_resource type="Texture2D" uid="uid://tmtoen1yg8j7" path="res://Texturas/GirarDerechaButton.png" id="46_m356r"]
+[ext_resource type="Texture2D" uid="uid://q2cl5l6dmxjf" path="res://Texturas/GirarDerechaButtonPressed.png" id="47_1qamr"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_6tccr"]
 size = Vector2(1079, 1999)
@@ -242,12 +249,12 @@ texture_pressed = ExtResource("28_8v53c")
 
 [node name="BotonLink" type="TextureButton" parent="UI/Opciones"]
 layout_mode = 0
-offset_left = 945.0
-offset_top = 937.0
-offset_right = 1127.0
-offset_bottom = 1121.0
-scale = Vector2(0.6, 0.6)
-texture_normal = ExtResource("21_eqbvj")
+offset_left = 940.0
+offset_top = 933.0
+offset_right = 1060.0
+offset_bottom = 1053.0
+texture_normal = ExtResource("30_8cb4l")
+texture_pressed = ExtResource("31_5bv8f")
 
 [node name="ButtonSave" type="TextureButton" parent="UI/Opciones"]
 layout_mode = 0
@@ -278,51 +285,63 @@ scale = Vector2(0.8, 0.8)
 
 [node name="BotonArriba" type="TextureButton" parent="UI/Mover"]
 layout_mode = 0
-offset_left = 316.25
-offset_top = 2521.25
-offset_right = 516.25
-offset_bottom = 2721.25
-texture_normal = ExtResource("20_xmhny")
+offset_left = 315.0
+offset_top = 2515.0
+offset_right = 515.0
+offset_bottom = 2715.0
+pivot_offset = Vector2(100, 100)
+texture_normal = ExtResource("36_fj135")
+texture_pressed = ExtResource("37_bvyqh")
 
 [node name="BotonAbajo" type="TextureButton" parent="UI/Mover"]
 layout_mode = 0
-offset_left = 316.25
+offset_left = 315.0
 offset_top = 2725.0
-offset_right = 516.25
+offset_right = 515.0
 offset_bottom = 2925.0
-texture_normal = ExtResource("21_wd65p")
+pivot_offset = Vector2(100, 100)
+texture_normal = ExtResource("38_28vre")
+texture_pressed = ExtResource("39_webf6")
 
 [node name="BotonIzquierda" type="TextureButton" parent="UI/Mover"]
 layout_mode = 0
-offset_left = 105.75
-offset_top = 2723.0
-offset_right = 305.75
-offset_bottom = 2923.0
-texture_normal = ExtResource("22_d7fmu")
+offset_left = 105.0
+offset_top = 2725.0
+offset_right = 305.0
+offset_bottom = 2925.0
+pivot_offset = Vector2(100, 100)
+texture_normal = ExtResource("40_3ohxn")
+texture_pressed = ExtResource("41_1mrhl")
 
 [node name="BotonDerecha" type="TextureButton" parent="UI/Mover"]
 layout_mode = 0
 offset_left = 525.0
-offset_top = 2722.5
+offset_top = 2725.0
 offset_right = 725.0
-offset_bottom = 2922.5
-texture_normal = ExtResource("23_edaq6")
+offset_bottom = 2925.0
+pivot_offset = Vector2(100, 100)
+texture_normal = ExtResource("42_i7utl")
+texture_pressed = ExtResource("43_gdy0i")
 
 [node name="BotonRotarIzquierda" type="TextureButton" parent="UI/Mover"]
 layout_mode = 0
-offset_left = 821.25
-offset_top = 2723.75
-offset_right = 1021.25
-offset_bottom = 2923.75
-texture_normal = ExtResource("25_5g4hx")
+offset_left = 825.0
+offset_top = 2725.0
+offset_right = 1025.0
+offset_bottom = 2925.0
+pivot_offset = Vector2(100, 100)
+texture_normal = ExtResource("44_jpqaa")
+texture_pressed = ExtResource("45_0xhtp")
 
 [node name="BotonRotarDerecha" type="TextureButton" parent="UI/Mover"]
 layout_mode = 0
-offset_left = 1036.25
-offset_top = 2723.75
-offset_right = 1236.25
-offset_bottom = 2923.75
-texture_normal = ExtResource("26_f7rg3")
+offset_left = 1035.0
+offset_top = 2725.0
+offset_right = 1235.0
+offset_bottom = 2925.0
+pivot_offset = Vector2(100, 100)
+texture_normal = ExtResource("46_m356r")
+texture_pressed = ExtResource("47_1qamr")
 
 [node name="GridTileMap" type="TileMap" parent="."]
 tile_set = SubResource("TileSet_juhui")
@@ -341,7 +360,21 @@ layer_0/tile_data = PackedInt32Array(-2293780, 0, 0, -2228244, 0, 0, -2162708, 0
 [connection signal="button_up" from="UI/Opciones/BotonEliminar" to="UI/Opciones" method="_on_boton_eliminar_button_up"]
 [connection signal="button_down" from="UI/Opciones/BotonSelect" to="UI/Opciones" method="_on_boton_select_button_down"]
 [connection signal="button_up" from="UI/Opciones/BotonSelect" to="UI/Opciones" method="_on_boton_select_button_up"]
+[connection signal="button_down" from="UI/Opciones/BotonLink" to="UI/Opciones" method="_on_boton_link_button_down"]
+[connection signal="button_up" from="UI/Opciones/BotonLink" to="UI/Opciones" method="_on_boton_link_button_up"]
 [connection signal="button_down" from="UI/Opciones/ButtonSave" to="UI/Opciones" method="_on_button_save_button_down"]
 [connection signal="button_up" from="UI/Opciones/ButtonSave" to="UI/Opciones" method="_on_button_save_button_up"]
 [connection signal="button_down" from="UI/Opciones/ButtonLoad" to="UI/Opciones" method="_on_button_load_button_down"]
 [connection signal="button_up" from="UI/Opciones/ButtonLoad" to="UI/Opciones" method="_on_button_load_button_up"]
+[connection signal="button_down" from="UI/Mover/BotonArriba" to="UI/Opciones" method="_on_boton_arriba_button_down"]
+[connection signal="button_up" from="UI/Mover/BotonArriba" to="UI/Opciones" method="_on_boton_arriba_button_up"]
+[connection signal="button_down" from="UI/Mover/BotonAbajo" to="UI/Opciones" method="_on_boton_abajo_button_down"]
+[connection signal="button_up" from="UI/Mover/BotonAbajo" to="UI/Opciones" method="_on_boton_abajo_button_up"]
+[connection signal="button_down" from="UI/Mover/BotonIzquierda" to="UI/Opciones" method="_on_boton_izquierda_button_down"]
+[connection signal="button_up" from="UI/Mover/BotonIzquierda" to="UI/Opciones" method="_on_boton_izquierda_button_up"]
+[connection signal="button_down" from="UI/Mover/BotonDerecha" to="UI/Opciones" method="_on_boton_derecha_button_down"]
+[connection signal="button_up" from="UI/Mover/BotonDerecha" to="UI/Opciones" method="_on_boton_derecha_button_up"]
+[connection signal="button_down" from="UI/Mover/BotonRotarIzquierda" to="UI/Opciones" method="_on_boton_rotar_izquierda_button_down"]
+[connection signal="button_up" from="UI/Mover/BotonRotarIzquierda" to="UI/Opciones" method="_on_boton_rotar_izquierda_button_up"]
+[connection signal="button_down" from="UI/Mover/BotonRotarDerecha" to="UI/Opciones" method="_on_boton_rotar_derecha_button_down"]
+[connection signal="button_up" from="UI/Mover/BotonRotarDerecha" to="UI/Opciones" method="_on_boton_rotar_derecha_button_up"]

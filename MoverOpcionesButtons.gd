@@ -76,3 +76,59 @@ func _on_button_load_button_down() -> void:
 
 func _on_button_load_button_up() -> void:
 	buttonUp($ButtonLoad)
+
+
+func _on_boton_link_button_down() -> void:
+	buttonDown($BotonLink)
+
+
+func _on_boton_link_button_up() -> void:
+	buttonUp($BotonLink)
+
+
+func _on_boton_rotar_derecha_button_down() -> void:
+	buttonDown($/root/Main/UI/Mover/BotonRotarDerecha)
+
+
+func _on_boton_rotar_derecha_button_up() -> void:
+	buttonUp($/root/Main/UI/Mover/BotonRotarDerecha)
+
+
+func _on_boton_rotar_izquierda_button_down() -> void:
+	buttonDown($/root/Main/UI/Mover/BotonRotarIzquierda)
+
+
+func _on_boton_rotar_izquierda_button_up() -> void:
+	buttonUp($/root/Main/UI/Mover/BotonRotarIzquierda)
+
+
+func _on_boton_derecha_button_down() -> void:
+	buttonDown($/root/Main/UI/Mover/BotonDerecha)
+
+
+func _on_boton_derecha_button_up() -> void:
+	buttonUp($/root/Main/UI/Mover/BotonDerecha)
+
+
+func _on_boton_abajo_button_down() -> void:
+	buttonDown($/root/Main/UI/Mover/BotonAbajo)
+
+
+func _on_boton_abajo_button_up() -> void:
+	buttonUp($/root/Main/UI/Mover/BotonAbajo)
+
+
+func _on_boton_arriba_button_down() -> void:
+	buttonDown($/root/Main/UI/Mover/BotonArriba)
+
+
+func _on_boton_arriba_button_up() -> void:
+	buttonUp($/root/Main/UI/Mover/BotonArriba)
+
+
+func _on_boton_izquierda_button_down() -> void:
+	buttonDown($/root/Main/UI/Mover/BotonIzquierda)
+
+
+func _on_boton_izquierda_button_up() -> void:
+	buttonUp($/root/Main/UI/Mover/BotonIzquierda)

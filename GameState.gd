@@ -3,6 +3,8 @@ class_name GameState
 
 # Diccionarios para datos del juego
 var ocupados: Dictionary = {}  # Tiles ocupados: Vector2 -> bool
+
+var teleport_lines: Dictionary = {}  # ID de teleportador -> Line2D
 var bola_initial_positions: Dictionary = {}  # ID de bola -> Vector2
 var ultimas_rotaciones: Dictionary = {
 	"Bola": 0.0,

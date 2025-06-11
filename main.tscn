@@ -1,4 +1,4 @@
-[gd_scene load_steps=53 format=3 uid="uid://cs5whshwnasdf"]
+[gd_scene load_steps=54 format=3 uid="uid://cs5whshwnasdf"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_tpxov"]
 [ext_resource type="PackedScene" uid="uid://fn1hroyr720c" path="res://bola.tscn" id="2_gxh2a"]
@@ -13,6 +13,7 @@
 [ext_resource type="PackedScene" uid="uid://ch1kf3dwhrur6" path="res://PuntoTeletransporteIndividual.tscn" id="8_jdxaa"]
 [ext_resource type="Texture2D" uid="uid://coxud135l8ti0" path="res://Texturas/teleportador.png" id="9_vpaak"]
 [ext_resource type="Texture2D" uid="uid://bf0d7vgovj6y7" path="res://Texturas/EsquinaRampa.png" id="12_7imaq"]
+[ext_resource type="Texture2D" uid="uid://ddn1sw07ndnmh" path="res://Texturas/Triangulo.png" id="12_w5nhl"]
 [ext_resource type="Texture2D" uid="uid://bv8jlwu4miil4" path="res://Texturas/tile.png" id="13_swg81"]
 [ext_resource type="Texture2D" uid="uid://11q7amqtdhu3" path="res://Texturas/Esquina.png" id="14_5hisv"]
 [ext_resource type="Texture2D" uid="uid://nnwm1o56l1c5" path="res://Texturas/BajarMenuButton.png" id="15_5tw84"]
@@ -134,12 +135,12 @@ stretch_mode = 0
 
 [node name="BotonCubo" type="TextureButton" parent="UI/Menu"]
 layout_mode = 0
-offset_left = 515.0
-offset_top = 49.0
-offset_right = 1215.0
-offset_bottom = 529.0
-scale = Vector2(0.3, 0.3)
-texture_normal = ExtResource("4_wxlrs")
+offset_left = 517.0
+offset_top = 36.0
+offset_right = 767.0
+offset_bottom = 286.0
+scale = Vector2(0.8, 0.8)
+texture_normal = ExtResource("12_w5nhl")
 stretch_mode = 0
 
 [node name="BotonTeleportador" type="TextureButton" parent="UI/Menu"]

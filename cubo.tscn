@@ -1,18 +1,27 @@
-[gd_scene load_steps=4 format=3 uid="uid://biguqg3fhh22o"]
+[gd_scene load_steps=5 format=3 uid="uid://biguqg3fhh22o"]
 
 [ext_resource type="Script" path="res://cubo.gd" id="1_3otch"]
-[ext_resource type="Texture2D" uid="uid://nu0pfrg47ghc" path="res://Texturas/walterapachurrao.png" id="2_1q6lw"]
+[ext_resource type="Texture2D" uid="uid://e2ur7vd5fomh" path="res://Texturas/OutlineTriangle.png" id="2_qd62m"]
+[ext_resource type="Texture2D" uid="uid://oh80dhsux2v5" path="res://Texturas/InLineTriangle.png" id="3_2py77"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ygm53"]
-size = Vector2(104, 89.5)
+size = Vector2(65.5, 184.75)
 
 [node name="Cubo" type="Area2D"]
 script = ExtResource("1_3otch")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 position = Vector2(1.90735e-06, 1.90735e-06)
-scale = Vector2(0.148571, 0.1875)
-texture = ExtResource("2_1q6lw")
+
+[node name="Outline" type="Sprite2D" parent="Sprite2D"]
+z_index = 2
+texture = ExtResource("2_qd62m")
+
+[node name="Inline" type="Sprite2D" parent="Sprite2D"]
+z_index = 1
+texture = ExtResource("3_2py77")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+z_index = 3
+position = Vector2(0, 31.375)
 shape = SubResource("RectangleShape2D_ygm53")

@@ -182,7 +182,7 @@ func _mover_objeto(direccion: Vector2):
 
 		var obj_id = ultimo_objeto_seleccionado.get_meta("id", "")
 		if obj_id:
-			game_state.update_object_position(obj_id, nueva_posicion)  # Actualizar posición en GameState.objects
+			game_state.update_object_position(obj_id, nueva_posicion)
 			if ultimo_objeto_seleccionado is RigidBody2D:
 				ultimo_objeto_seleccionado.teleport(nueva_posicion)
 				game_state.set_bola_initial_position(obj_id, nueva_posicion)
@@ -191,6 +191,25 @@ func _mover_objeto(direccion: Vector2):
 		var nueva_tile = Vector2(floor(nueva_posicion.x / tile_size), floor(nueva_posicion.y / tile_size))
 		game_state.set_tile_occupied(vieja_tile, false)
 		game_state.set_tile_occupied(nueva_tile, true)
+
+		# Actualizar la línea si es un teleportador o punto de teletransporte
+		var tipo_objeto = _get_object_type(ultimo_objeto_seleccionado)
+		if tipo_objeto == "Teleportador":
+			var line = game_state.teleport_lines.get(obj_id)
+			if line and is_instance_valid(line) and is_instance_valid(ultimo_objeto_seleccionado.teleport_target):
+				line.set_point_position(0, nueva_posicion)
+				line.set_point_position(1, ultimo_objeto_seleccionado.teleport_target.position)
+				line.visible = not game_state.descongelado  # Asegurar visibilidad según estado
+		elif tipo_objeto == "PuntoTeletransporte":
+			for tele in get_tree().get_nodes_in_group("teleportadores"):
+				if tele.teleport_target == ultimo_objeto_seleccionado:
+					var tele_id = tele.get_meta("id", "")
+					var line = game_state.teleport_lines.get(tele_id)
+					if line and is_instance_valid(line):
+						line.set_point_position(0, tele.position)
+						line.set_point_position(1, nueva_posicion)
+						line.visible = not game_state.descongelado  # Asegurar visibilidad según estado
+					break
 
 func _mover_arriba():
 	_mover_objeto(Vector2(0, -1))
@@ -282,6 +301,11 @@ func _alternar_congelar_descongelar():
 		if button is BaseButton:
 			button.disabled = disabled_state
 
+	# Actualizar visibilidad de todas las líneas
+	for line in game_state.teleport_lines.values():
+		if is_instance_valid(line):
+			line.visible = not game_state.descongelado
+
 func _mover_menu():
 	game_state.menu_moved_up = !game_state.menu_moved_up
 	game_state.menu_moved_right = !game_state.menu_moved_right
@@ -312,7 +336,10 @@ func _mover_menu():
 func _reiniciar():
 	$UI/Opciones/BotonSelect.modulate = Color(1, 1, 1)
 	$UI/Opciones/BotonSelect.disabled = false
-
+	
+	if game_state.descongelado:
+		_alternar_congelar_descongelar()
+	
 	game_state.descongelado = false
 	$UI/Opciones/BotonDescongelar.texture_normal = load("res://Texturas/PlayButton.png")
 	$UI/Opciones/BotonEliminar.modulate = Color(1.0, 1.0, 1.0)
@@ -367,11 +394,21 @@ func _eliminar():
 				var target_id = target.get_meta("id", "")
 				game_state.remove_object(target_id)
 				target.queue_free()
+			# Eliminar la línea asociada
+			var line = game_state.teleport_lines.get(obj_id)
+			if line and is_instance_valid(line):
+				line.queue_free()
+				game_state.teleport_lines.erase(obj_id)
 		elif collider.is_in_group("puntos_teletransporte"):
 			for tele in get_tree().get_nodes_in_group("teleportadores"):
 				if tele.teleport_target == collider:
 					var tele_id = tele.get_meta("id", "")
 					game_state.remove_object(tele_id)
+					# Eliminar la línea asociada
+					var line = game_state.teleport_lines.get(tele_id)
+					if line and is_instance_valid(line):
+						line.queue_free()
+						game_state.teleport_lines.erase(tele_id)
 					tele.queue_free()
 					break
 		
@@ -796,6 +833,19 @@ func spawn_teleportador(tele_pos: Vector2, tele_rotation_degrees: float = -1.0, 
 	punto.rotation_degrees = target_rot
 	punto.position = target_pos if target_pos != Vector2.ZERO else tele_pos + Vector2(250, 0)
 	
+	# Crear la línea
+	var line = Line2D.new()
+	line.add_point(tele_pos)
+	line.add_point(punto.position)
+	line.default_color = Color.RED
+	line.width = 5.0  # Ancho de la línea (ajusta según necesites)
+	line.z_index = -1  # Asegura que la línea esté detrás de los objetos
+	line.visible = not game_state.descongelado  # Oculta la línea si el juego está despausado
+	add_child(line)
+	
+	# Almacenar la línea en GameState
+	game_state.teleport_lines[tele_id] = line
+	
 	add_child(teleportador)
 	add_child(punto)
 	return tele_id
@@ -941,11 +991,17 @@ func _reload(file_name: String):
 				get_tree().get_nodes_in_group("esquinas_rampa"):
 		node.queue_free()
 	
+	# Limpiar las líneas existentes
+	for line in game_state.teleport_lines.values():
+		if is_instance_valid(line):
+			line.queue_free()
+	game_state.teleport_lines.clear()
+	
 	game_state.objects.clear()
 	game_state.ocupados.clear()
 	game_state.bola_initial_positions.clear()
 	
-	# Cargar objetos desde el archivo (si hay datos)
+	# Cargar objetos desde el archivo
 	for obj_data in level_data:
 		var scene_path = obj_data.scene_path
 		var pos = Vector2(obj_data.position[0], obj_data.position[1])

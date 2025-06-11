@@ -1,7 +1,7 @@
 shader_type canvas_item;
 
 uniform bool seleccionado = false;
-uniform vec4 color_emision : source_color = vec4(0.5, 1.0, 0.5, 1.0);
+uniform vec4 color_emision : source_color = vec4(0.0, 1.0, -0.5, 1.0);
 
 void fragment() {
     vec4 color_base = texture(TEXTURE, UV);  // Color original del sprite con alfa

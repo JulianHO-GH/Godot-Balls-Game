@@ -236,10 +236,19 @@ func _alternar_seleccionar():
 		tween2.tween_property($UI/Mover, "position:y", game_state.ui_botones_mover_position.y, ANIMATION_DURATION3)\
 			.set_ease(Tween.EASE_IN_OUT)\
 			.set_trans(Tween.TRANS_ELASTIC)
-		if ultimo_objeto_seleccionado:
-			var sprite = ultimo_objeto_seleccionado.get_node_or_null("Sprite2D")
-			if sprite and sprite.material:
-				sprite.material.set_shader_parameter("seleccionado", false)
+		if ultimo_objeto_seleccionado and is_instance_valid(ultimo_objeto_seleccionado):
+			var tipo_objeto = _get_object_type(ultimo_objeto_seleccionado)
+			if tipo_objeto == "Cubo":
+				var outline_sprite = ultimo_objeto_seleccionado.get_node_or_null("Sprite2D/Outline")
+				var inline_sprite = ultimo_objeto_seleccionado.get_node_or_null("Sprite2D/Inline")
+				if outline_sprite and outline_sprite.material:
+					outline_sprite.material.set_shader_parameter("seleccionado", false)
+				if inline_sprite and inline_sprite.material:
+					inline_sprite.material.set_shader_parameter("seleccionado", false)
+			else:
+				var sprite = ultimo_objeto_seleccionado.get_node_or_null("Sprite2D")
+				if sprite and sprite.material:
+					sprite.material.set_shader_parameter("seleccionado", false)
 			ultimo_objeto_seleccionado = null
 
 	if game_state.seleccionando:
@@ -334,9 +343,6 @@ func _mover_menu():
 		.set_trans(Tween.TRANS_BOUNCE)
 
 func _reiniciar():
-	$UI/Opciones/BotonSelect.modulate = Color(1, 1, 1)
-	$UI/Opciones/BotonSelect.disabled = false
-	
 	if game_state.descongelado:
 		_alternar_congelar_descongelar()
 	
@@ -344,6 +350,8 @@ func _reiniciar():
 	$UI/Opciones/BotonDescongelar.texture_normal = load("res://Texturas/PlayButton.png")
 	$UI/Opciones/BotonEliminar.modulate = Color(1.0, 1.0, 1.0)
 	$UI/Opciones/BotonEliminar.disabled = false
+	$UI/Opciones/BotonSelect.modulate = Color(1, 1, 1)
+	$UI/Opciones/BotonSelect.disabled = false
 
 	for bola in get_tree().get_nodes_in_group("bolas"):
 		if bola is RigidBody2D:
@@ -574,21 +582,43 @@ func _input(event):
 								break
 
 					if collider:
-						var sprite = collider.get_node_or_null("Sprite2D")
-						if sprite and sprite.material:
-							if ultimo_objeto_seleccionado and ultimo_objeto_seleccionado != collider and is_instance_valid(ultimo_objeto_seleccionado):
+						# Desactivar el shader del objeto anteriormente seleccionado
+						if ultimo_objeto_seleccionado and ultimo_objeto_seleccionado != collider and is_instance_valid(ultimo_objeto_seleccionado):
+							var tipo_anterior = _get_object_type(ultimo_objeto_seleccionado)
+							if tipo_anterior == "Cubo":
+								var outline_anterior = ultimo_objeto_seleccionado.get_node_or_null("Sprite2D/Outline")
+								var inline_anterior = ultimo_objeto_seleccionado.get_node_or_null("Sprite2D/Inline")
+								if outline_anterior and outline_anterior.material:
+									outline_anterior.material.set_shader_parameter("seleccionado", false)
+								if inline_anterior and inline_anterior.material:
+									inline_anterior.material.set_shader_parameter("seleccionado", false)
+							else:
 								var sprite_anterior = ultimo_objeto_seleccionado.get_node_or_null("Sprite2D")
 								if sprite_anterior and sprite_anterior.material:
 									sprite_anterior.material.set_shader_parameter("seleccionado", false)
-							sprite.material.set_shader_parameter("seleccionado", true)
-							ultimo_objeto_seleccionado = collider
 
-							if collider.get_script() and collider.get_script().resource_path == "res://bola.gd":
-								$UI/Opciones/BotonLink.visible = true
-								game_state.is_boton_link_visible = true
-							else:
-								$UI/Opciones/BotonLink.visible = false
-								game_state.is_boton_link_visible = false
+						# Activar el shader en el objeto seleccionado
+						var tipo_objeto = _get_object_type(collider)
+						if tipo_objeto == "Cubo":
+							var outline_sprite = collider.get_node_or_null("Sprite2D/Outline")
+							var inline_sprite = collider.get_node_or_null("Sprite2D/Inline")
+							if outline_sprite and outline_sprite.material:
+								outline_sprite.material.set_shader_parameter("seleccionado", true)
+							if inline_sprite and inline_sprite.material:
+								inline_sprite.material.set_shader_parameter("seleccionado", true)
+						else:
+							var sprite = collider.get_node_or_null("Sprite2D")
+							if sprite and sprite.material:
+								sprite.material.set_shader_parameter("seleccionado", true)
+
+						ultimo_objeto_seleccionado = collider
+						# Mostrar BotonLink si es un cubo o bola
+						if collider is Area2D and collider.get_script() and collider.get_script().resource_path == "res://bola.gd":
+							$UI/Opciones/BotonLink.visible = true
+							game_state.is_boton_link_visible = true
+						else:
+							$UI/Opciones/BotonLink.visible = false
+							game_state.is_boton_link_visible = false
 
 			elif not game_state.seleccionando and not game_state.is_deleting:
 				if not game_state.descongelado:
@@ -782,6 +812,9 @@ func spawn_cubo(pos, rotation_degrees: float = -1.0, texture_path: String = "") 
 	var rot = rotation_degrees if rotation_degrees != -1.0 else game_state.get_rotation("Cubo")
 	var obj_id = game_state.add_object("res://Cubo.tscn", pos, rot, texture_path)
 	cubo.set_meta("id", obj_id)
+	
+	var outline_sprite = cubo.get_node("Sprite2D/Outline")
+	var inline_sprite = cubo.get_node("Sprite2D/Inline")
 	var sprite = cubo.get_node("Sprite2D")
 	if sprite:
 		sprite.material = material_base.duplicate()
@@ -789,6 +822,21 @@ func spawn_cubo(pos, rotation_degrees: float = -1.0, texture_path: String = "") 
 			var image = game_state.load_image(texture_path)
 			if image:
 				sprite.texture = ImageTexture.create_from_image(image)
+				
+	# Asignar el material con el shader a Outline y Inline
+	if outline_sprite:
+		outline_sprite.material = material_base.duplicate()  # Asegúrate de que material_base tenga el shader
+		if texture_path != "":
+			var image = game_state.load_image(texture_path)
+			if image:
+				outline_sprite.texture = ImageTexture.create_from_image(image)
+	
+	if inline_sprite:
+		inline_sprite.material = material_base.duplicate()  # Asegúrate de que material_base tenga el shader
+		if texture_path != "":
+			var image = game_state.load_image(texture_path)
+			if image:
+				inline_sprite.texture = ImageTexture.create_from_image(image)
 	cubo.add_to_group("cubos")
 	cubo.rotation_degrees = rot
 	cubo.set_collision_layer_value(1, true)

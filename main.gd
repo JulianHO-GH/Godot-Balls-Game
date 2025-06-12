@@ -106,6 +106,7 @@ func _ready():
 		plugin.setOptions({
 			"keep_aspect": true,
 			"image_format": "png",
+			"image_quality": 80,
 		})
 	else:
 		print("Could not load plugin: ", plugin_name)
@@ -613,7 +614,7 @@ func _input(event):
 
 						ultimo_objeto_seleccionado = collider
 						# Mostrar BotonLink si es un cubo o bola
-						if collider is Area2D and collider.get_script() and collider.get_script().resource_path == "res://bola.gd":
+						if collider.get_script().resource_path == "res://bola.gd":
 							$UI/Opciones/BotonLink.visible = true
 							game_state.is_boton_link_visible = true
 						else:
@@ -707,32 +708,43 @@ func _on_image_request_completed(dict):
 		var height = image.get_height()
 		var center = Vector2(width / 2.0, height / 2.0)
 		var radius = min(width, height) / 2.0
+		var opcionesButtons = $/root/Main/UI/Opciones
+		
+		var sepuede: bool = true
+		
+		if width < 250 or height < 250:
+			opcionesButtons._on_minsize_detected()
+			sepuede = false
+		if width > 3000 or height > 3000:
+			opcionesButtons._on_maxsize_detected()
+			sepuede = false
+			
+		if sepuede:
+			for x in range(width):
+				for y in range(height):
+					var pixel_pos = Vector2(x, y)
+					var distance = pixel_pos.distance_to(center)
+					if distance > radius:
+						image.set_pixel(x, y, Color(0, 0, 0, 0))
 
-		for x in range(width):
-			for y in range(height):
-				var pixel_pos = Vector2(x, y)
-				var distance = pixel_pos.distance_to(center)
-				if distance > radius:
-					image.set_pixel(x, y, Color(0, 0, 0, 0))
+			var texture_path = game_state.save_image(image)
+			var image_node = image_scene.instantiate()
+			image_node.texture = ImageTexture.create_from_image(image)
 
-		var texture_path = game_state.save_image(image)
-		var image_node = image_scene.instantiate()
-		image_node.texture = ImageTexture.create_from_image(image)
+			var sprite = ultimo_objeto_seleccionado.get_node_or_null("Sprite2D")
+			if sprite:
+				sprite.texture = image_node.texture
+				var texture_size = sprite.texture.get_size()
+				var circle_diameter = min(texture_size.x, texture_size.y)
+				var target_diameter = 250.0
+				var scale = target_diameter / circle_diameter
+				sprite.scale = Vector2(scale, scale)
 
-		var sprite = ultimo_objeto_seleccionado.get_node_or_null("Sprite2D")
-		if sprite:
-			sprite.texture = image_node.texture
-			var texture_size = sprite.texture.get_size()
-			var circle_diameter = min(texture_size.x, texture_size.y)
-			var target_diameter = 250.0
-			var scale = target_diameter / circle_diameter
-			sprite.scale = Vector2(scale, scale)
+				var obj_id = ultimo_objeto_seleccionado.get_meta("id", "")
+				if obj_id:
+					game_state.update_object_texture(obj_id, texture_path)
 
-			var obj_id = ultimo_objeto_seleccionado.get_meta("id", "")
-			if obj_id:
-				game_state.update_object_texture(obj_id, texture_path)
-
-			print("Circular texture assigned to Sprite2D with diameter of 250 pixels")
+				print("Circular texture assigned to Sprite2D with diameter of 250 pixels")
 	else:
 		
 		var dialog = get_node_or_null("AcceptDialog")

@@ -17,6 +17,7 @@ func buttonUp(path):
 func popIn(path):
 	# Crear tween para fade in (ease in)
 	var tween = create_tween()
+	path.visible = true
 	tween.tween_property(path, "modulate:a", 1.0, 0.1)\
 		.set_ease(Tween.EASE_IN)\
 		.set_trans(Tween.TRANS_SINE)
@@ -156,3 +157,37 @@ func _on_boton_izquierda_button_down() -> void:
 
 func _on_boton_izquierda_button_up() -> void:
 	buttonUp($/root/Main/UI/Mover/BotonIzquierda)
+
+
+func _on_ok_button_pressed() -> void:
+	popOut($/root/Main/MaxSizeAlert)
+	$/root/Main/MaxSizeAlert/OkButton.disabled = true
+
+
+func _on_ok_button_button_up() -> void:
+	buttonUp($/root/Main/MaxSizeAlert/OkButton)
+
+
+func _on_ok_button_button_down() -> void:
+	buttonDown($/root/Main/MaxSizeAlert/OkButton)
+
+func _on_maxsize_detected() -> void:
+	popIn($/root/Main/MaxSizeAlert)
+	$/root/Main/MaxSizeAlert/OkButton.disabled = false
+
+
+func _on_ok_button_2_pressed() -> void:
+	popOut($/root/Main/MinSizeAlert)
+	$/root/Main/MinSizeAlert/OkButton2.disabled = true
+
+
+func _on_ok_button_2_button_up() -> void:
+	buttonUp($/root/Main/MinSizeAlert/OkButton2)
+
+
+func _on_ok_button_2_button_down() -> void:
+	buttonDown($/root/Main/MinSizeAlert/OkButton2)
+
+func _on_minsize_detected() -> void:
+	popIn($/root/Main/MinSizeAlert)
+	$/root/Main/MinSizeAlert/OkButton2.disabled = false

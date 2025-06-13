@@ -160,34 +160,42 @@ func _on_boton_izquierda_button_up() -> void:
 
 
 func _on_ok_button_pressed() -> void:
-	popOut($/root/Main/MaxSizeAlert)
-	$/root/Main/MaxSizeAlert/OkButton.disabled = true
+	popOut($/root/Main/Camera2D/MaxLayer/MaxSizeAlert)
+	$/root/Main/Camera2D/MaxLayer/MaxSizeAlert/OkButton.disabled = true
 
 
 func _on_ok_button_button_up() -> void:
-	buttonUp($/root/Main/MaxSizeAlert/OkButton)
+	buttonUp($/root/Main/Camera2D/MaxLayer/MaxSizeAlert/OkButton)
 
 
 func _on_ok_button_button_down() -> void:
-	buttonDown($/root/Main/MaxSizeAlert/OkButton)
+	buttonDown($/root/Main/Camera2D/MaxLayer/MaxSizeAlert/OkButton)
 
 func _on_maxsize_detected() -> void:
-	popIn($/root/Main/MaxSizeAlert)
-	$/root/Main/MaxSizeAlert/OkButton.disabled = false
+	popIn($/root/Main/Camera2D/MaxLayer/MaxSizeAlert)
+	$/root/Main/Camera2D/MaxLayer/MaxSizeAlert/OkButton.disabled = false
 
 
 func _on_ok_button_2_pressed() -> void:
-	popOut($/root/Main/MinSizeAlert)
-	$/root/Main/MinSizeAlert/OkButton2.disabled = true
+	popOut($/root/Main/Camera2D/MinLayer/MinSizeAlert)
+	$/root/Main/Camera2D/MinLayer/MinSizeAlert/OkButton2.disabled = true
 
 
 func _on_ok_button_2_button_up() -> void:
-	buttonUp($/root/Main/MinSizeAlert/OkButton2)
+	buttonUp($/root/Main/Camera2D/MinLayer/MinSizeAlert/OkButton2)
 
 
 func _on_ok_button_2_button_down() -> void:
-	buttonDown($/root/Main/MinSizeAlert/OkButton2)
+	buttonDown($/root/Main/Camera2D/MinLayer/MinSizeAlert/OkButton2)
 
 func _on_minsize_detected() -> void:
-	popIn($/root/Main/MinSizeAlert)
-	$/root/Main/MinSizeAlert/OkButton2.disabled = false
+	popIn($/root/Main/Camera2D/MinLayer/MinSizeAlert)
+	$/root/Main/Camera2D/MinLayer/MinSizeAlert/OkButton2.disabled = false
+
+
+func _on_button_color_button_down() -> void:
+	buttonDown($/root/Main/UI/Opciones/ButtonColor)
+
+
+func _on_button_color_button_up() -> void:
+	buttonUp($/root/Main/UI/Opciones/ButtonColor)

@@ -55,18 +55,19 @@ func generate_id() -> String:
 	return str(_id_counter)
 
 # Añadir un objeto al estado
-func add_object(scene_path: String, position: Vector2, rotation_degrees: float = 0.0, texture_path: String = "", extra_data: Dictionary = {}) -> String:
-	var id = generate_id()
-	var object_data = {
-		"id": id,
+func add_object(scene_path: String, position: Vector2, rotation_degrees: float, texture_path: String = "", extra_data: Dictionary = {}) -> String:
+	var obj_id = str(randi())  # Generar un ID único
+	var obj_data = {
+		"id": obj_id,
 		"scene_path": scene_path,
 		"position": position,
 		"rotation_degrees": rotation_degrees,
 		"texture_path": texture_path,
+		"color": Color.WHITE,  # Color por defecto
 		"extra_data": extra_data
 	}
-	objects.append(object_data)
-	return id
+	objects.append(obj_data)
+	return obj_id
 
 # Actualizar la posición de un objeto
 func update_object_position(id: String, position: Vector2):

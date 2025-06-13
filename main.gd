@@ -617,9 +617,15 @@ func _input(event):
 						if collider.get_script().resource_path == "res://bola.gd":
 							$UI/Opciones/BotonLink.visible = true
 							game_state.is_boton_link_visible = true
+							$UI/Opciones/ButtonColor.visible = false
+						elif collider.get_script().resource_path == "res://cubo.gd":
+							$UI/Opciones/BotonLink.visible = false
+							game_state.is_boton_link_visible = false
+							$UI/Opciones/ButtonColor.visible = true
 						else:
 							$UI/Opciones/BotonLink.visible = false
 							game_state.is_boton_link_visible = false
+							$UI/Opciones/ButtonColor.visible = false
 
 			elif not game_state.seleccionando and not game_state.is_deleting:
 				if not game_state.descongelado:
@@ -713,9 +719,11 @@ func _on_image_request_completed(dict):
 		var sepuede: bool = true
 		
 		if width < 250 or height < 250:
+			await get_tree().create_timer(0.5).timeout
 			opcionesButtons._on_minsize_detected()
 			sepuede = false
 		if width > 3000 or height > 3000:
+			await get_tree().create_timer(0.5).timeout
 			opcionesButtons._on_maxsize_detected()
 			sepuede = false
 			
@@ -1103,3 +1111,34 @@ func _reload(file_name: String):
 			var tile_size = 250
 			var tile_pos = Vector2(floor(pos.x / tile_size), floor(pos.y / tile_size))
 			game_state.set_tile_occupied(tile_pos, true)
+
+
+func _on_button_color_pressed() -> void:
+	var dialog = AcceptDialog.new()
+	if ultimo_objeto_seleccionado and is_instance_valid(ultimo_objeto_seleccionado):
+		var tipo_objeto = _get_object_type(ultimo_objeto_seleccionado)
+		if tipo_objeto == "Cubo":
+			var inline_sprite = ultimo_objeto_seleccionado.get_node_or_null("Sprite2D/Inline")
+			if inline_sprite:
+				# Generar un color aleatorio
+				var new_color = Color(randf(), randf(), randf(), 1.0)
+				inline_sprite.modulate = new_color
+				
+				# Actualizar GameState para persistir el color
+				var obj_id = ultimo_objeto_seleccionado.get_meta("id", "")
+				if obj_id:
+					game_state.update_object_color(obj_id, new_color)
+				else:
+					dialog.dialog_text = "No obj_id"
+			else:
+				dialog.dialog_text = "No inline_sprite"
+		else:
+			dialog.dialog_text = "tipo_objeto != 'Cubo'"
+	else:
+		dialog.dialog_text = " Una de las condiciones en 'ultimo_objeto_seleccionado and is_instance_valid(ultimo_objeto_seleccionado)' no se cumple"
+	print("xd")
+	
+	
+	dialog.ok_button_text = "Aceptar"
+	add_child(dialog)
+	dialog.popup_centered()

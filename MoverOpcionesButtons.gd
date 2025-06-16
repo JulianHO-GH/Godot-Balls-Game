@@ -26,6 +26,18 @@ func popIn(path):
 		.set_ease(Tween.EASE_OUT)\
 		.set_trans(Tween.TRANS_ELASTIC)
 		
+func popInDoubleSize(path):
+	# Crear tween para fade in (ease in)
+	var tween = create_tween()
+	path.visible = true
+	tween.tween_property(path, "modulate:a", 1.0, 0.1)\
+		.set_ease(Tween.EASE_IN)\
+		.set_trans(Tween.TRANS_SINE)
+	path.scale = Vector2(1.0, 1.0)
+	tween.parallel().tween_property(path, "scale", Vector2(2.0, 2.0), 0.5)\
+		.set_ease(Tween.EASE_OUT)\
+		.set_trans(Tween.TRANS_ELASTIC)
+		
 func popOut(path):
 	# Crear tween para fade out (ease out)
 	var tween = create_tween()
@@ -38,6 +50,8 @@ func popOut(path):
 	tween.tween_callback(func(): 
 		path.visible = false
 	)
+	
+	
 			
 func _on_boton_zoom_in_button_down() -> void:
 	buttonDown($BotonZoomIn)
@@ -199,3 +213,11 @@ func _on_button_color_button_down() -> void:
 
 func _on_button_color_button_up() -> void:
 	buttonUp($/root/Main/UI/Opciones/ButtonColor)
+
+
+func _on_texture_button_button_down() -> void:
+	buttonDown($/root/Main/CanvasColor/TextureButton)
+
+
+func _on_texture_button_button_up() -> void:
+	buttonUp($/root/Main/CanvasColor/TextureButton)

@@ -449,7 +449,7 @@ func _eliminar():
 			button.disabled = false
 
 func _input(event):
-	if event is InputEventScreenTouch and event.pressed:
+	if (event is InputEventScreenTouch or event is InputEventMouseButton) and event.pressed:
 		initial_touch_position = event.position
 		ultima_posicion_toque = event.position
 		is_dragging = false
@@ -480,7 +480,7 @@ func _input(event):
 			ultima_posicion_toque = event.position
 			game_state.camera_position = $Camera2D.position
 
-	elif event is InputEventScreenTouch and not event.pressed:
+	elif (event is InputEventScreenTouch or event is InputEventMouseButton) and not event.pressed:
 		if touch_over_buttons:
 			return
 		if not is_dragging:
@@ -842,21 +842,26 @@ func spawn_cubo(pos, rotation_degrees: float = -1.0, texture_path: String = "") 
 			var image = game_state.load_image(texture_path)
 			if image:
 				sprite.texture = ImageTexture.create_from_image(image)
-				
-	# Asignar el material con el shader a Outline y Inline
+	
 	if outline_sprite:
-		outline_sprite.material = material_base.duplicate()  # Asegúrate de que material_base tenga el shader
+		outline_sprite.material = material_base.duplicate()
 		if texture_path != "":
 			var image = game_state.load_image(texture_path)
 			if image:
 				outline_sprite.texture = ImageTexture.create_from_image(image)
 	
 	if inline_sprite:
-		inline_sprite.material = material_base.duplicate()  # Asegúrate de que material_base tenga el shader
+		inline_sprite.material = material_base.duplicate()
 		if texture_path != "":
 			var image = game_state.load_image(texture_path)
 			if image:
 				inline_sprite.texture = ImageTexture.create_from_image(image)
+		# Aplicar el color almacenado
+		for obj in game_state.objects:
+			if obj.id == obj_id:
+				inline_sprite.modulate = obj.color
+				break
+	
 	cubo.add_to_group("cubos")
 	cubo.rotation_degrees = rot
 	cubo.set_collision_layer_value(1, true)
@@ -980,7 +985,6 @@ func _save_level():
 		dialog.popup_centered()
 		return
 
-	# Sobrescribir el archivo de guardado actual
 	var level_file_path = SAVE_DIR + selected_save_file
 	var level_data = []
 	var valid_object_ids = {}
@@ -1002,7 +1006,8 @@ func _save_level():
 				"scene_path": obj.scene_path,
 				"position": [obj.position.x, obj.position.y],
 				"rotation_degrees": obj.rotation_degrees,
-				"texture_path": obj.texture_path
+				"texture_path": obj.texture_path,
+				"color": [obj.color.r, obj.color.g, obj.color.b, obj.color.a]  # Guardar color
 			}
 			if obj.scene_path == "res://Teleportador.tscn":
 				for target_obj in game_state.objects:
@@ -1059,7 +1064,6 @@ func _reload(file_name: String):
 				get_tree().get_nodes_in_group("esquinas_rampa"):
 		node.queue_free()
 	
-	# Limpiar las líneas existentes
 	for line in game_state.teleport_lines.values():
 		if is_instance_valid(line):
 			line.queue_free()
@@ -1069,12 +1073,12 @@ func _reload(file_name: String):
 	game_state.ocupados.clear()
 	game_state.bola_initial_positions.clear()
 	
-	# Cargar objetos desde el archivo
 	for obj_data in level_data:
 		var scene_path = obj_data.scene_path
 		var pos = Vector2(obj_data.position[0], obj_data.position[1])
 		var rotation_degrees = obj_data.rotation_degrees
 		var texture_path = obj_data.texture_path
+		var color = Color(obj_data.color[0], obj_data.color[1], obj_data.color[2], obj_data.color[3]) if obj_data.has("color") else Color.WHITE
 		var new_obj_id
 		
 		if scene_path == "res://Bola.tscn":
@@ -1083,6 +1087,8 @@ func _reload(file_name: String):
 		elif scene_path == "res://Cubo.tscn":
 			new_obj_id = spawn_cubo(pos, rotation_degrees, texture_path)
 			game_state.set_rotation("Cubo", rotation_degrees)
+			if new_obj_id:
+				game_state.update_object_color(new_obj_id, color)
 		elif scene_path == "res://Teleportador.tscn":
 			var target_id = obj_data.get("target_id", "")
 			var target_data = objects_by_id.get(target_id, {})
@@ -1114,31 +1120,45 @@ func _reload(file_name: String):
 
 
 func _on_button_color_pressed() -> void:
-	var dialog = AcceptDialog.new()
+	
+	
+	var colorpicker = $CanvasColor
+	var opciones = $UI/Opciones
+	colorpicker.visible = true
+	$CanvasColor/TextureButton.disabled = false
+	opciones.popInDoubleSize($/root/Main/CanvasColor/ColorPicker)
+	opciones.popInDoubleSize($/root/Main/CanvasColor/TextureRect)
+	opciones.popIn($/root/Main/CanvasColor/TextureButton)
+
+
+
+func _on_texture_button_pressed() -> void: #Boton de "OK" del colorPicker
+	
+	
+	var colorpickerUI = $CanvasColor
+	var colorpicker = $CanvasColor/ColorPicker
+	var opciones = $UI/Opciones
+	opciones.popOut($/root/Main/CanvasColor/ColorPicker)
+	opciones.popOut($/root/Main/CanvasColor/TextureRect)
+	opciones.popOut($/root/Main/CanvasColor/TextureButton)
+	
 	if ultimo_objeto_seleccionado and is_instance_valid(ultimo_objeto_seleccionado):
+		
 		var tipo_objeto = _get_object_type(ultimo_objeto_seleccionado)
 		if tipo_objeto == "Cubo":
-			var inline_sprite = ultimo_objeto_seleccionado.get_node_or_null("Sprite2D/Inline")
+			
+			var inline_sprite = ultimo_objeto_seleccionado.get_node_or_null("Sprite2D/InlineFalso")
 			if inline_sprite:
-				# Generar un color aleatorio
-				var new_color = Color(randf(), randf(), randf(), 1.0)
+				
+				# Generar un color
+				var new_color = colorpicker.color
 				inline_sprite.modulate = new_color
 				
 				# Actualizar GameState para persistir el color
 				var obj_id = ultimo_objeto_seleccionado.get_meta("id", "")
 				if obj_id:
+					print("Bienobjid")
 					game_state.update_object_color(obj_id, new_color)
-				else:
-					dialog.dialog_text = "No obj_id"
-			else:
-				dialog.dialog_text = "No inline_sprite"
 		else:
-			dialog.dialog_text = "tipo_objeto != 'Cubo'"
-	else:
-		dialog.dialog_text = " Una de las condiciones en 'ultimo_objeto_seleccionado and is_instance_valid(ultimo_objeto_seleccionado)' no se cumple"
-	print("xd")
-	
-	
-	dialog.ok_button_text = "Aceptar"
-	add_child(dialog)
-	dialog.popup_centered()
+			
+			$UI/Opciones/ButtonColor.modulate = Color(0.25, 0.25, 0.25)

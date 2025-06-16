@@ -11,8 +11,17 @@ script = ExtResource("1_3otch")
 position = Vector2(1.90735e-06, 1.90735e-06)
 
 [node name="Outline" type="Sprite2D" parent="Sprite2D"]
-z_index = 2
+z_index = 11
 texture = ExtResource("2_qd62m")
+
+[node name="InlineFalso" type="TextureRect" parent="Sprite2D"]
+z_index = 10
+offset_left = -125.0
+offset_top = -125.0
+offset_right = 125.0
+offset_bottom = 125.0
+pivot_offset = Vector2(125, 125)
+texture = ExtResource("3_2py77")
 
 [node name="Inline" type="Sprite2D" parent="Sprite2D"]
 z_index = 1

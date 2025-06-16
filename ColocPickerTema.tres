@@ -1,0 +1,97 @@
+[gd_resource type="Theme" load_steps=9 format=3 uid="uid://dvwy2srmobo2b"]
+
+[ext_resource type="Texture2D" uid="uid://n13edb4ugywr" path="res://Texturas/subirbajar.png" id="1_8c4j6"]
+[ext_resource type="Texture2D" uid="uid://it8r5oqskdaq" path="res://Texturas/Picker.png" id="1_fuy0s"]
+[ext_resource type="FontFile" uid="uid://cffar7b2cic6s" path="res://Comic Sans MS.ttf" id="2_rpvk8"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nrhkc"]
+bg_color = Color(1, 1, 1, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fotks"]
+bg_color = Color(1, 1, 1, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6fohd"]
+bg_color = Color(1, 1, 1, 1)
+border_width_left = 10
+border_width_top = 10
+border_width_right = 10
+border_width_bottom = 10
+border_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fnyne"]
+bg_color = Color(0.87186, 0.87186, 0.87186, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yhqun"]
+bg_color = Color(1, 1, 1, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[resource]
+default_font = ExtResource("2_rpvk8")
+default_font_size = 29
+Button/colors/font_hover_color = Color(0, 0.94902, 0.94902, 1)
+Button/colors/font_outline_color = Color(0, 0, 0, 1)
+Button/colors/icon_normal_color = Color(1, 1, 1, 1)
+Button/constants/h_separation = 4
+Button/constants/outline_size = 20
+Button/styles/focus = SubResource("StyleBoxFlat_nrhkc")
+Button/styles/hover = SubResource("StyleBoxFlat_nrhkc")
+Button/styles/hover_pressed = SubResource("StyleBoxFlat_nrhkc")
+Button/styles/normal = SubResource("StyleBoxFlat_nrhkc")
+Button/styles/pressed = SubResource("StyleBoxFlat_nrhkc")
+ColorPicker/icons/expanded_arrow = ExtResource("1_8c4j6")
+ColorPicker/icons/screen_picker = ExtResource("1_fuy0s")
+ColorPicker/styles/tab_selected = SubResource("StyleBoxFlat_fotks")
+ColorPicker/styles/tab_unselected = SubResource("StyleBoxFlat_fotks")
+ColorPickerButton/constants/outline_size = 10
+ColorPickerButton/styles/normal = SubResource("StyleBoxFlat_6fohd")
+Label/colors/font_color = Color(1, 1, 1, 1)
+Label/colors/font_outline_color = Color(0, 0, 0, 1)
+Label/constants/outline_size = 20
+Label/styles/normal = null
+LineEdit/colors/font_color = Color(1, 1, 1, 1)
+LineEdit/colors/font_outline_color = Color(0, 0, 0, 1)
+LineEdit/constants/outline_size = 20
+LineEdit/font_sizes/font_size = 25
+LineEdit/styles/normal = SubResource("StyleBoxFlat_fnyne")
+MenuButton/colors/font_color = Color(0.875, 0.875, 0.875, 1)
+MenuButton/styles/normal = null
+Tree/colors/font_color = Color(1, 1, 1, 1)
+Tree/colors/font_outline_color = Color(0, 0, 0, 1)
+Tree/constants/outline_size = 15
+Tree/styles/panel = SubResource("StyleBoxFlat_yhqun")
+Tree/styles/selected = SubResource("StyleBoxFlat_yhqun")

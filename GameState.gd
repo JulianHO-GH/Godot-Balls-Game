@@ -69,6 +69,13 @@ func add_object(scene_path: String, position: Vector2, rotation_degrees: float, 
 	objects.append(obj_data)
 	return obj_id
 
+func update_object_color(obj_id: String, color: Color) -> void:
+	for obj in objects:
+		if obj.id == obj_id:
+			obj.color = color
+			break
+			
+
 # Actualizar la posición de un objeto
 func update_object_position(id: String, position: Vector2):
 	for obj in objects:

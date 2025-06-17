@@ -435,6 +435,7 @@ layer_0/tile_data = PackedInt32Array(-2293780, 0, 0, -2228244, 0, 0, -2162708, 0
 
 [node name="CanvasColor" type="CanvasLayer" parent="."]
 layer = 50
+visible = false
 
 [node name="ColorPicker" type="ColorPicker" parent="CanvasColor"]
 z_index = 10
@@ -462,7 +463,7 @@ offset_right = 799.0
 offset_bottom = 1252.0
 scale = Vector2(2, 2)
 pivot_offset = Vector2(260, 250)
-mouse_filter = 2
+mouse_filter = 0
 texture = ExtResource("57_3qd5t")
 
 [node name="TextureButton" type="TextureButton" parent="CanvasColor"]
@@ -472,10 +473,16 @@ offset_top = 531.0
 offset_right = 1033.0
 offset_bottom = 681.0
 pivot_offset = Vector2(100, 75)
-disabled = true
 keep_pressed_outside = true
 texture_normal = ExtResource("51_h723n")
 texture_pressed = ExtResource("52_fxd35")
+
+[node name="Control" type="Control" parent="CanvasColor"]
+z_index = 7
+layout_mode = 3
+anchors_preset = 0
+offset_right = 1075.0
+offset_bottom = 1997.0
 
 [connection signal="button_down" from="Camera2D/MaxLayer/MaxSizeAlert/OkButton" to="UI/Opciones" method="_on_ok_button_button_down"]
 [connection signal="button_up" from="Camera2D/MaxLayer/MaxSizeAlert/OkButton" to="UI/Opciones" method="_on_ok_button_button_up"]

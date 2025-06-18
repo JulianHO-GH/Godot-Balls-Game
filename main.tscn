@@ -455,17 +455,6 @@ sampler_visible = false
 color_modes_visible = false
 presets_visible = false
 
-[node name="TextureRect" type="TextureRect" parent="CanvasColor"]
-z_index = 8
-offset_left = 279.0
-offset_top = 752.0
-offset_right = 799.0
-offset_bottom = 1252.0
-scale = Vector2(2, 2)
-pivot_offset = Vector2(260, 250)
-mouse_filter = 0
-texture = ExtResource("57_3qd5t")
-
 [node name="TextureButton" type="TextureButton" parent="CanvasColor"]
 z_index = 9
 offset_left = 833.0
@@ -477,12 +466,16 @@ keep_pressed_outside = true
 texture_normal = ExtResource("51_h723n")
 texture_pressed = ExtResource("52_fxd35")
 
-[node name="Control" type="Control" parent="CanvasColor"]
-z_index = 7
-layout_mode = 3
-anchors_preset = 0
-offset_right = 1075.0
-offset_bottom = 1997.0
+[node name="TextureRect" type="TextureRect" parent="CanvasColor"]
+z_index = 8
+offset_left = 279.0
+offset_top = 752.0
+offset_right = 799.0
+offset_bottom = 1252.0
+scale = Vector2(2, 2)
+pivot_offset = Vector2(260, 250)
+mouse_filter = 2
+texture = ExtResource("57_3qd5t")
 
 [connection signal="button_down" from="Camera2D/MaxLayer/MaxSizeAlert/OkButton" to="UI/Opciones" method="_on_ok_button_button_down"]
 [connection signal="button_up" from="Camera2D/MaxLayer/MaxSizeAlert/OkButton" to="UI/Opciones" method="_on_ok_button_button_up"]

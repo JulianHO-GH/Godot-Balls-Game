@@ -51,7 +51,6 @@ func popOut(path):
 		path.visible = false
 	)
 	
-	
 			
 func _on_boton_zoom_in_button_down() -> void:
 	buttonDown($BotonZoomIn)

@@ -21,6 +21,7 @@ var touch_over_buttons: bool = false  # Indica si el toque inicial fue sobre un 
 var ultimo_objeto_seleccionado = null  # Referencia al último objeto seleccionado
 var is_dragging: bool = false  # Indica si estamos arrastrando
 var selected_save_file: String = ""  # Archivo de guardado actual
+var showing_popup: bool = false #Si se está mostrando un popup
 
 # Constantes
 const ZOOM_MIN: float = 0.1
@@ -117,41 +118,43 @@ func _ready():
 	
 
 func _seleccionar_esquinarampa():
-	if not game_state.descongelado:
+	if not game_state.descongelado and not showing_popup:
 		game_state.modo = "EsquinaRampa"
 
 func _seleccionar_esquina():
-	if not game_state.descongelado:
+	if not game_state.descongelado and not showing_popup:
 		game_state.modo = "Esquina"
 
 func _seleccionar_teleportador():
-	if not game_state.descongelado:
+	if not game_state.descongelado and not showing_popup:
 		game_state.modo = "Teleportador"
 
 func _seleccionar_bola():
-	if not game_state.descongelado:
+	if not game_state.descongelado and not showing_popup:
 		game_state.modo = "Bola"
 
 func _seleccionar_piso():
-	if not game_state.descongelado:
+	if not game_state.descongelado and not showing_popup:
 		game_state.modo = "Piso"
 
 func _seleccionar_cubo():
-	if not game_state.descongelado:
+	if not game_state.descongelado and not showing_popup:
 		game_state.modo = "Cubo"
 
 func _zoom_in():
-	var nuevo_zoom = $Camera2D.zoom + Vector2(ZOOM_STEP, ZOOM_STEP)
-	$Camera2D.zoom = Vector2(clamp(nuevo_zoom.x, ZOOM_MIN, ZOOM_MAX), clamp(nuevo_zoom.y, ZOOM_MIN, ZOOM_MAX))
-	game_state.camera_zoom = $Camera2D.zoom
+	if not showing_popup:
+		var nuevo_zoom = $Camera2D.zoom + Vector2(ZOOM_STEP, ZOOM_STEP)
+		$Camera2D.zoom = Vector2(clamp(nuevo_zoom.x, ZOOM_MIN, ZOOM_MAX), clamp(nuevo_zoom.y, ZOOM_MIN, ZOOM_MAX))
+		game_state.camera_zoom = $Camera2D.zoom
 
 func _zoom_out():
-	var nuevo_zoom = $Camera2D.zoom - Vector2(ZOOM_STEP, ZOOM_STEP)
-	$Camera2D.zoom = Vector2(clamp(nuevo_zoom.x, ZOOM_MIN, ZOOM_MAX), clamp(nuevo_zoom.y, ZOOM_MIN, ZOOM_MAX))
-	game_state.camera_zoom = $Camera2D.zoom
+	if not showing_popup:
+		var nuevo_zoom = $Camera2D.zoom - Vector2(ZOOM_STEP, ZOOM_STEP)
+		$Camera2D.zoom = Vector2(clamp(nuevo_zoom.x, ZOOM_MIN, ZOOM_MAX), clamp(nuevo_zoom.y, ZOOM_MIN, ZOOM_MAX))
+		game_state.camera_zoom = $Camera2D.zoom
 
 func _rotar_izquierda():
-	if game_state.seleccionando and ultimo_objeto_seleccionado:
+	if game_state.seleccionando and ultimo_objeto_seleccionado and not showing_popup:
 		ultimo_objeto_seleccionado.rotation_degrees -= 45
 		var tipo_objeto = _get_object_type(ultimo_objeto_seleccionado)
 		var obj_id = ultimo_objeto_seleccionado.get_meta("id", "")
@@ -163,7 +166,7 @@ func _rotar_izquierda():
 			ultimo_objeto_seleccionado.teleport(ultimo_objeto_seleccionado.position)
 
 func _rotar_derecha():
-	if game_state.seleccionando and ultimo_objeto_seleccionado:
+	if game_state.seleccionando and ultimo_objeto_seleccionado and not showing_popup:
 		ultimo_objeto_seleccionado.rotation_degrees += 45
 		var tipo_objeto = _get_object_type(ultimo_objeto_seleccionado)
 		var obj_id = ultimo_objeto_seleccionado.get_meta("id", "")
@@ -175,7 +178,7 @@ func _rotar_derecha():
 			ultimo_objeto_seleccionado.teleport(ultimo_objeto_seleccionado.position)
 
 func _mover_objeto(direccion: Vector2):
-	if game_state.seleccionando and ultimo_objeto_seleccionado:
+	if game_state.seleccionando and ultimo_objeto_seleccionado and not showing_popup:
 		var tile_size = 250
 		var vieja_posicion = ultimo_objeto_seleccionado.position
 		var nueva_posicion = vieja_posicion + (direccion * tile_size)
@@ -225,231 +228,236 @@ func _mover_derecha():
 	_mover_objeto(Vector2(1, 0))
 
 func _alternar_seleccionar():
-	game_state.seleccionando = !game_state.seleccionando
+	if not showing_popup:
+		game_state.seleccionando = !game_state.seleccionando
 
-	if game_state.seleccionando:
-		var tween = create_tween()
-		tween.tween_property($UI/Mover, "position:y", game_state.ui_botones_mover_position.y - 450, ANIMATION_DURATION3)\
-			.set_ease(Tween.EASE_OUT)\
-			.set_trans(Tween.TRANS_ELASTIC)
-	else:
-		var tween2 = create_tween()
-		tween2.tween_property($UI/Mover, "position:y", game_state.ui_botones_mover_position.y, ANIMATION_DURATION3)\
-			.set_ease(Tween.EASE_IN_OUT)\
-			.set_trans(Tween.TRANS_ELASTIC)
-		if ultimo_objeto_seleccionado and is_instance_valid(ultimo_objeto_seleccionado):
-			var tipo_objeto = _get_object_type(ultimo_objeto_seleccionado)
-			if tipo_objeto == "Cubo":
-				var outline_sprite = ultimo_objeto_seleccionado.get_node_or_null("Sprite2D/Outline")
-				var inline_sprite = ultimo_objeto_seleccionado.get_node_or_null("Sprite2D/Inline")
-				if outline_sprite and outline_sprite.material:
-					outline_sprite.material.set_shader_parameter("seleccionado", false)
-				if inline_sprite and inline_sprite.material:
-					inline_sprite.material.set_shader_parameter("seleccionado", false)
-			else:
-				var sprite = ultimo_objeto_seleccionado.get_node_or_null("Sprite2D")
-				if sprite and sprite.material:
-					sprite.material.set_shader_parameter("seleccionado", false)
-			ultimo_objeto_seleccionado = null
+		if game_state.seleccionando:
+			var tween = create_tween()
+			tween.tween_property($UI/Mover, "position:y", game_state.ui_botones_mover_position.y - 450, ANIMATION_DURATION3)\
+				.set_ease(Tween.EASE_OUT)\
+				.set_trans(Tween.TRANS_ELASTIC)
+		else:
+			var tween2 = create_tween()
+			tween2.tween_property($UI/Mover, "position:y", game_state.ui_botones_mover_position.y, ANIMATION_DURATION3)\
+				.set_ease(Tween.EASE_IN_OUT)\
+				.set_trans(Tween.TRANS_ELASTIC)
+			if ultimo_objeto_seleccionado and is_instance_valid(ultimo_objeto_seleccionado):
+				var tipo_objeto = _get_object_type(ultimo_objeto_seleccionado)
+				if tipo_objeto == "Cubo":
+					var outline_sprite = ultimo_objeto_seleccionado.get_node_or_null("Sprite2D/Outline")
+					var inline_sprite = ultimo_objeto_seleccionado.get_node_or_null("Sprite2D/Inline")
+					if outline_sprite and outline_sprite.material:
+						outline_sprite.material.set_shader_parameter("seleccionado", false)
+					if inline_sprite and inline_sprite.material:
+						inline_sprite.material.set_shader_parameter("seleccionado", false)
+				else:
+					var sprite = ultimo_objeto_seleccionado.get_node_or_null("Sprite2D")
+					if sprite and sprite.material:
+						sprite.material.set_shader_parameter("seleccionado", false)
+				ultimo_objeto_seleccionado = null
 
-	if game_state.seleccionando:
-		$UI/Opciones/BotonSelect.texture_normal = load("res://Texturas/DeseleccionarButton.png")
-		$UI/Opciones/BotonSelect.texture_pressed = load("res://Texturas/DeseleccionarButtonPressed.png")
-		$UI/Opciones/BotonEliminar.modulate = Color(0.25, 0.25, 0.25)
-		$UI/Opciones/BotonEliminar.disabled = true
-		$UI/Opciones/BotonDescongelar.modulate = Color(0.25, 0.25, 0.25)
-		$UI/Opciones/BotonDescongelar.disabled = true
-	else:
-		$UI/Opciones/BotonSelect.texture_normal = load("res://Texturas/SeleccionarButton.png")
-		$UI/Opciones/BotonSelect.texture_pressed = load("res://Texturas/SeleccionarButtonPressed.png")
-		$UI/Opciones/BotonEliminar.modulate = Color(1, 1, 1)
-		$UI/Opciones/BotonEliminar.disabled = false
-		$UI/Opciones/BotonDescongelar.modulate = Color(1, 1, 1)
-		$UI/Opciones/BotonDescongelar.disabled = false
-		$UI/Opciones/BotonLink.visible = false
-		game_state.is_boton_link_visible = false
+		if game_state.seleccionando:
+			$UI/Opciones/BotonSelect.texture_normal = load("res://Texturas/DeseleccionarButton.png")
+			$UI/Opciones/BotonSelect.texture_pressed = load("res://Texturas/DeseleccionarButtonPressed.png")
+			$UI/Opciones/BotonEliminar.modulate = Color(0.25, 0.25, 0.25)
+			$UI/Opciones/BotonEliminar.disabled = true
+			$UI/Opciones/BotonDescongelar.modulate = Color(0.25, 0.25, 0.25)
+			$UI/Opciones/BotonDescongelar.disabled = true
+		else:
+			$UI/Opciones/BotonSelect.texture_normal = load("res://Texturas/SeleccionarButton.png")
+			$UI/Opciones/BotonSelect.texture_pressed = load("res://Texturas/SeleccionarButtonPressed.png")
+			$UI/Opciones/BotonEliminar.modulate = Color(1, 1, 1)
+			$UI/Opciones/BotonEliminar.disabled = false
+			$UI/Opciones/BotonDescongelar.modulate = Color(1, 1, 1)
+			$UI/Opciones/BotonDescongelar.disabled = false
+			$UI/Opciones/BotonLink.visible = false
+			game_state.is_boton_link_visible = false
 
 func _alternar_congelar_descongelar():
-	$UI/Opciones/BotonSelect.modulate = Color(0.25, 0.25, 0.25)
-	$UI/Opciones/BotonSelect.disabled = true
+	if not showing_popup:
+		$UI/Opciones/BotonSelect.modulate = Color(0.25, 0.25, 0.25)
+		$UI/Opciones/BotonSelect.disabled = true
 
-	var tween = create_tween()
-	tween.tween_property($UI/Opciones/BotonReiniciar, "position:x", game_state.ui_boton_reiniciar_position.x - 160, ANIMATION_DURATION2)\
-		.set_ease(Tween.EASE_IN_OUT)\
-		.set_trans(Tween.TRANS_QUINT)
+		var tween = create_tween()
+		tween.tween_property($UI/Opciones/BotonReiniciar, "position:x", game_state.ui_boton_reiniciar_position.x - 160, ANIMATION_DURATION2)\
+			.set_ease(Tween.EASE_IN_OUT)\
+			.set_trans(Tween.TRANS_QUINT)
 
-	var tween2 = create_tween()
-	tween2.tween_property($UI/Opciones/BotonDescongelar, "position:y", game_state.ui_boton_descongelar_position.y - 130, ANIMATION_DURATION2)\
-		.set_ease(Tween.EASE_IN_OUT)\
-		.set_trans(Tween.TRANS_QUINT)
+		var tween2 = create_tween()
+		tween2.tween_property($UI/Opciones/BotonDescongelar, "position:y", game_state.ui_boton_descongelar_position.y - 130, ANIMATION_DURATION2)\
+			.set_ease(Tween.EASE_IN_OUT)\
+			.set_trans(Tween.TRANS_QUINT)
 
-	game_state.descongelado = !game_state.descongelado
+		game_state.descongelado = !game_state.descongelado
 
-	if game_state.descongelado:
-		$UI/Opciones/BotonDescongelar.texture_normal = load("res://Texturas/PausaButton.png")
-		$UI/Opciones/BotonDescongelar.texture_pressed = load("res://Texturas/PausaButtonPressed.png")
-		$UI/Opciones/BotonEliminar.modulate = Color(0.25, 0.25, 0.25)
-		$UI/Opciones/BotonEliminar.disabled = true
-		for bola in get_tree().get_nodes_in_group("bolas"):
-			if bola is RigidBody2D and not bola.is_deactivated:
-				bola.resume_physics()
+		if game_state.descongelado:
+			$UI/Opciones/BotonDescongelar.texture_normal = load("res://Texturas/PausaButton.png")
+			$UI/Opciones/BotonDescongelar.texture_pressed = load("res://Texturas/PausaButtonPressed.png")
+			$UI/Opciones/BotonEliminar.modulate = Color(0.25, 0.25, 0.25)
+			$UI/Opciones/BotonEliminar.disabled = true
+			for bola in get_tree().get_nodes_in_group("bolas"):
+				if bola is RigidBody2D and not bola.is_deactivated:
+					bola.resume_physics()
+			for button in get_tree().get_nodes_in_group("spawn_buttons"):
+				if button is BaseButton:
+					button.modulate = Color(0.25, 0.25, 0.25)
+		else:
+			for button in get_tree().get_nodes_in_group("spawn_buttons"):
+				if button is BaseButton:
+					button.modulate = Color(1.0, 1.0, 1.0)
+			$UI/Opciones/BotonDescongelar.texture_normal = load("res://Texturas/PlayButton.png")
+			$UI/Opciones/BotonDescongelar.texture_pressed = load("res://Texturas/PlayButtonPressed.png")
+			for bola in get_tree().get_nodes_in_group("bolas"):
+				if bola is RigidBody2D and not bola.is_deactivated:
+					bola.pause_physics()
+
+		var disabled_state = game_state.descongelado
 		for button in get_tree().get_nodes_in_group("spawn_buttons"):
 			if button is BaseButton:
-				button.modulate = Color(0.25, 0.25, 0.25)
-	else:
-		for button in get_tree().get_nodes_in_group("spawn_buttons"):
-			if button is BaseButton:
-				button.modulate = Color(1.0, 1.0, 1.0)
-		$UI/Opciones/BotonDescongelar.texture_normal = load("res://Texturas/PlayButton.png")
-		$UI/Opciones/BotonDescongelar.texture_pressed = load("res://Texturas/PlayButtonPressed.png")
-		for bola in get_tree().get_nodes_in_group("bolas"):
-			if bola is RigidBody2D and not bola.is_deactivated:
-				bola.pause_physics()
+				button.disabled = disabled_state
 
-	var disabled_state = game_state.descongelado
-	for button in get_tree().get_nodes_in_group("spawn_buttons"):
-		if button is BaseButton:
-			button.disabled = disabled_state
-
-	# Actualizar visibilidad de todas las líneas
-	for line in game_state.teleport_lines.values():
-		if is_instance_valid(line):
-			line.visible = not game_state.descongelado
+		# Actualizar visibilidad de todas las líneas
+		for line in game_state.teleport_lines.values():
+			if is_instance_valid(line):
+				line.visible = not game_state.descongelado
 
 func _mover_menu():
-	game_state.menu_moved_up = !game_state.menu_moved_up
-	game_state.menu_moved_right = !game_state.menu_moved_right
+	if not showing_popup:
+		game_state.menu_moved_up = !game_state.menu_moved_up
+		game_state.menu_moved_right = !game_state.menu_moved_right
 
-	var target_y = game_state.ui_menu_position.y
-	var target_x = game_state.ui_options_position.x
+		var target_y = game_state.ui_menu_position.y
+		var target_x = game_state.ui_options_position.x
 
-	if game_state.menu_moved_up:
-		target_y -= MOVE_OFFSET
-	if game_state.menu_moved_right:
-		target_x -= MOVE_OFFSET
+		if game_state.menu_moved_up:
+			target_y -= MOVE_OFFSET
+		if game_state.menu_moved_right:
+			target_x -= MOVE_OFFSET
 
-	var tween = create_tween()
-	tween.tween_property($UI/Menu, "position:y", target_y, ANIMATION_DURATION)\
-		.set_ease(Tween.EASE_IN_OUT)\
-		.set_trans(Tween.TRANS_QUINT)
+		var tween = create_tween()
+		tween.tween_property($UI/Menu, "position:y", target_y, ANIMATION_DURATION)\
+			.set_ease(Tween.EASE_IN_OUT)\
+			.set_trans(Tween.TRANS_QUINT)
 
-	var tween2 = create_tween()
-	tween2.tween_property($UI/Opciones, "position:x", target_x, ANIMATION_DURATION)\
-		.set_ease(Tween.EASE_IN_OUT)\
-		.set_trans(Tween.TRANS_QUINT)
+		var tween2 = create_tween()
+		tween2.tween_property($UI/Opciones, "position:x", target_x, ANIMATION_DURATION)\
+			.set_ease(Tween.EASE_IN_OUT)\
+			.set_trans(Tween.TRANS_QUINT)
 
-	var tween3 = create_tween()
-	tween3.tween_property($UI/Menu/BotonMoverMenu, "rotation_degrees", $UI/Menu/BotonMoverMenu.rotation_degrees + 180.0, ANIMATION_DURATION)\
-		.set_ease(Tween.EASE_OUT)\
-		.set_trans(Tween.TRANS_BOUNCE)
+		var tween3 = create_tween()
+		tween3.tween_property($UI/Menu/BotonMoverMenu, "rotation_degrees", $UI/Menu/BotonMoverMenu.rotation_degrees + 180.0, ANIMATION_DURATION)\
+			.set_ease(Tween.EASE_OUT)\
+			.set_trans(Tween.TRANS_BOUNCE)
 
 func _reiniciar():
-	if game_state.descongelado:
+	if game_state.descongelado and not showing_popup:
 		_alternar_congelar_descongelar()
-	
-	game_state.descongelado = false
-	$UI/Opciones/BotonDescongelar.texture_normal = load("res://Texturas/PlayButton.png")
-	$UI/Opciones/BotonEliminar.modulate = Color(1.0, 1.0, 1.0)
-	$UI/Opciones/BotonEliminar.disabled = false
-	$UI/Opciones/BotonSelect.modulate = Color(1, 1, 1)
-	$UI/Opciones/BotonSelect.disabled = false
+		
+		game_state.descongelado = false
+		$UI/Opciones/BotonDescongelar.texture_normal = load("res://Texturas/PlayButton.png")
+		$UI/Opciones/BotonEliminar.modulate = Color(1.0, 1.0, 1.0)
+		$UI/Opciones/BotonEliminar.disabled = false
+		$UI/Opciones/BotonSelect.modulate = Color(1, 1, 1)
+		$UI/Opciones/BotonSelect.disabled = false
 
-	for bola in get_tree().get_nodes_in_group("bolas"):
-		if bola is RigidBody2D:
-			var obj_id = bola.get_meta("id", "")
-			if obj_id and game_state.get_bola_initial_position(obj_id):
-				var target_position = game_state.get_bola_initial_position(obj_id)
-				if bola.is_deactivated:
-					bola.reactivate()
-				bola.saved_state.linear_velocity = Vector2.ZERO
-				bola.saved_state.angular_velocity = 0.0
-				bola.saved_state.position = target_position
-				bola.global_transform.origin = target_position
-				bola.restart_physics(target_position)
+		for bola in get_tree().get_nodes_in_group("bolas"):
+			if bola is RigidBody2D:
+				var obj_id = bola.get_meta("id", "")
+				if obj_id and game_state.get_bola_initial_position(obj_id):
+					var target_position = game_state.get_bola_initial_position(obj_id)
+					if bola.is_deactivated:
+						bola.reactivate()
+					bola.saved_state.linear_velocity = Vector2.ZERO
+					bola.saved_state.angular_velocity = 0.0
+					bola.saved_state.position = target_position
+					bola.global_transform.origin = target_position
+					bola.restart_physics(target_position)
 
-	var disabled_state = game_state.descongelado
-	for button in get_tree().get_nodes_in_group("spawn_buttons"):
-		if button is BaseButton:
-			button.disabled = disabled_state
-			if game_state.descongelado:
-				button.modulate = Color(0.25, 0.25, 0.25)
-			else:
-				button.modulate = Color(1.0, 1.0, 1.0)
+		var disabled_state = game_state.descongelado
+		for button in get_tree().get_nodes_in_group("spawn_buttons"):
+			if button is BaseButton:
+				button.disabled = disabled_state
+				if game_state.descongelado:
+					button.modulate = Color(0.25, 0.25, 0.25)
+				else:
+					button.modulate = Color(1.0, 1.0, 1.0)
 
-	var tween = create_tween()
-	tween.tween_property($UI/Opciones/BotonReiniciar, "position:x", game_state.ui_boton_reiniciar_position.x, ANIMATION_DURATION2)\
-		.set_ease(Tween.EASE_IN_OUT)\
-		.set_trans(Tween.TRANS_QUINT)
+		var tween = create_tween()
+		tween.tween_property($UI/Opciones/BotonReiniciar, "position:x", game_state.ui_boton_reiniciar_position.x, ANIMATION_DURATION2)\
+			.set_ease(Tween.EASE_IN_OUT)\
+			.set_trans(Tween.TRANS_QUINT)
 
-	var tween2 = create_tween()
-	tween2.tween_property($UI/Opciones/BotonDescongelar, "position:y", game_state.ui_boton_descongelar_position.y, ANIMATION_DURATION2)\
-		.set_ease(Tween.EASE_IN_OUT)\
-		.set_trans(Tween.TRANS_QUINT)
+		var tween2 = create_tween()
+		tween2.tween_property($UI/Opciones/BotonDescongelar, "position:y", game_state.ui_boton_descongelar_position.y, ANIMATION_DURATION2)\
+			.set_ease(Tween.EASE_IN_OUT)\
+			.set_trans(Tween.TRANS_QUINT)
 
 func _eliminar():
-	if not game_state.is_deleting and ultimo_objeto_seleccionado:
-		var collider = ultimo_objeto_seleccionado
-		var obj_id = collider.get_meta("id", "")
+	if not showing_popup:
+			
+		if not game_state.is_deleting and ultimo_objeto_seleccionado:
+			var collider = ultimo_objeto_seleccionado
+			var obj_id = collider.get_meta("id", "")
+			
+			if collider is RigidBody2D and obj_id:
+				game_state.remove_bola_initial_position(obj_id)
+				collider.remove_from_group("bolas")
+			if obj_id:
+				game_state.remove_object(obj_id)
+			
+			if collider.is_in_group("teleportadores"):
+				var target = collider.teleport_target
+				if target and target.has_meta("id"):
+					var target_id = target.get_meta("id", "")
+					game_state.remove_object(target_id)
+					target.queue_free()
+				# Eliminar la línea asociada
+				var line = game_state.teleport_lines.get(obj_id)
+				if line and is_instance_valid(line):
+					line.queue_free()
+					game_state.teleport_lines.erase(obj_id)
+			elif collider.is_in_group("puntos_teletransporte"):
+				for tele in get_tree().get_nodes_in_group("teleportadores"):
+					if tele.teleport_target == collider:
+						var tele_id = tele.get_meta("id", "")
+						game_state.remove_object(tele_id)
+						# Eliminar la línea asociada
+						var line = game_state.teleport_lines.get(tele_id)
+						if line and is_instance_valid(line):
+							line.queue_free()
+							game_state.teleport_lines.erase(tele_id)
+						tele.queue_free()
+						break
+			
+			var tile_pos = Vector2(floor(collider.position.x / 250), floor(collider.position.y / 250))
+			game_state.set_tile_occupied(tile_pos, false)
+			collider.queue_free()
+			ultimo_objeto_seleccionado = null
 		
-		if collider is RigidBody2D and obj_id:
-			game_state.remove_bola_initial_position(obj_id)
-			collider.remove_from_group("bolas")
-		if obj_id:
-			game_state.remove_object(obj_id)
-		
-		if collider.is_in_group("teleportadores"):
-			var target = collider.teleport_target
-			if target and target.has_meta("id"):
-				var target_id = target.get_meta("id", "")
-				game_state.remove_object(target_id)
-				target.queue_free()
-			# Eliminar la línea asociada
-			var line = game_state.teleport_lines.get(obj_id)
-			if line and is_instance_valid(line):
-				line.queue_free()
-				game_state.teleport_lines.erase(obj_id)
-		elif collider.is_in_group("puntos_teletransporte"):
-			for tele in get_tree().get_nodes_in_group("teleportadores"):
-				if tele.teleport_target == collider:
-					var tele_id = tele.get_meta("id", "")
-					game_state.remove_object(tele_id)
-					# Eliminar la línea asociada
-					var line = game_state.teleport_lines.get(tele_id)
-					if line and is_instance_valid(line):
-						line.queue_free()
-						game_state.teleport_lines.erase(tele_id)
-					tele.queue_free()
-					break
-		
-		var tile_pos = Vector2(floor(collider.position.x / 250), floor(collider.position.y / 250))
-		game_state.set_tile_occupied(tile_pos, false)
-		collider.queue_free()
-		ultimo_objeto_seleccionado = null
-	
-	# Alternar modo de eliminación
-	game_state.is_deleting = !game_state.is_deleting
-	if game_state.is_deleting:
-		$UI/Opciones/BotonEliminar.texture_normal = load("res://Texturas/CancelarButton.png")
-		$UI/Opciones/BotonEliminar.texture_pressed = load("res://Texturas/CancelarButtonPressed.png")
-		for button in $UI/Menu.get_children():
-			button.modulate = Color(0.25, 0.25, 0.25)
-			button.disabled = true
-		for button in $UI/Opciones.get_children():
-			if button != $UI/Opciones/BotonEliminar:
+		# Alternar modo de eliminación
+		game_state.is_deleting = !game_state.is_deleting
+		if game_state.is_deleting:
+			$UI/Opciones/BotonEliminar.texture_normal = load("res://Texturas/CancelarButton.png")
+			$UI/Opciones/BotonEliminar.texture_pressed = load("res://Texturas/CancelarButtonPressed.png")
+			for button in $UI/Menu.get_children():
 				button.modulate = Color(0.25, 0.25, 0.25)
 				button.disabled = true
-	else:
-		$UI/Opciones/BotonEliminar.texture_normal = load("res://Texturas/EliminarButton.png")
-		$UI/Opciones/BotonEliminar.texture_pressed = load("res://Texturas/EliminarButtonPressed.png")
-		for button in $UI/Menu.get_children():
-			button.modulate = Color(1.0, 1.0, 1.0)
-			button.disabled = false
-		for button in $UI/Opciones.get_children():
-			button.modulate = Color(1.0, 1.0, 1.0)
-			button.disabled = false
+			for button in $UI/Opciones.get_children():
+				if button != $UI/Opciones/BotonEliminar:
+					button.modulate = Color(0.25, 0.25, 0.25)
+					button.disabled = true
+		else:
+			$UI/Opciones/BotonEliminar.texture_normal = load("res://Texturas/EliminarButton.png")
+			$UI/Opciones/BotonEliminar.texture_pressed = load("res://Texturas/EliminarButtonPressed.png")
+			for button in $UI/Menu.get_children():
+				button.modulate = Color(1.0, 1.0, 1.0)
+				button.disabled = false
+			for button in $UI/Opciones.get_children():
+				button.modulate = Color(1.0, 1.0, 1.0)
+				button.disabled = false
 
 func _input(event):
-	if (event is InputEventScreenTouch or event is InputEventMouseButton) and event.pressed:
+	if (event is InputEventScreenTouch or event is InputEventMouseButton) and event.pressed and not showing_popup:
 		initial_touch_position = event.position
 		ultima_posicion_toque = event.position
 		is_dragging = false
@@ -469,7 +477,7 @@ func _input(event):
 					touch_over_buttons = true
 					break
 
-	elif event is InputEventScreenDrag:
+	elif event is InputEventScreenDrag and not showing_popup:
 		var distance_moved = (event.position - initial_touch_position).length()
 		if distance_moved > DRAG_THRESHOLD and not touch_over_buttons:
 			is_dragging = true
@@ -480,7 +488,7 @@ func _input(event):
 			ultima_posicion_toque = event.position
 			game_state.camera_position = $Camera2D.position
 
-	elif (event is InputEventScreenTouch or event is InputEventMouseButton) and not event.pressed:
+	elif (event is InputEventScreenTouch or event is InputEventMouseButton) and not event.pressed and not showing_popup:
 		if touch_over_buttons:
 			return
 		if not is_dragging:
@@ -614,11 +622,11 @@ func _input(event):
 
 						ultimo_objeto_seleccionado = collider
 						# Mostrar BotonLink si es un cubo o bola
-						if collider.get_script().resource_path == "res://bola.gd":
+						if has_script(collider, "res://bola.gd"):
 							$UI/Opciones/BotonLink.visible = true
 							game_state.is_boton_link_visible = true
 							$UI/Opciones/ButtonColor.visible = false
-						elif collider.get_script().resource_path == "res://cubo.gd":
+						elif has_script(collider, "res://cubo.gd"):
 							$UI/Opciones/BotonLink.visible = false
 							game_state.is_boton_link_visible = false
 							$UI/Opciones/ButtonColor.visible = true
@@ -652,6 +660,13 @@ func _input(event):
 					else:
 						print("Este tile ya está ocupado!")
 
+# Función auxiliar para verificar el script
+func has_script(node: Node, script_path: String) -> bool:
+	var script = node.get_script()
+	if script and script.resource_path == script_path:
+		return true
+	return false
+	
 func _on_boton_link_pressed():
 	if not plugin:
 		print(plugin_name, " plugin not loaded!")
@@ -976,57 +991,59 @@ func _get_object_type(obj) -> String:
 	return ""
 
 func _save_level():
-	if selected_save_file == "":
-		print("Error: No hay un archivo de guardado seleccionado")
-		var dialog = AcceptDialog.new()
-		dialog.dialog_text = "No se puede guardar: No hay un archivo de guardado seleccionado."
-		dialog.ok_button_text = "Aceptar"
-		add_child(dialog)
-		dialog.popup_centered()
-		return
+	if not showing_popup:
+		if selected_save_file == "":
+			print("Error: No hay un archivo de guardado seleccionado")
+			var dialog = AcceptDialog.new()
+			dialog.dialog_text = "No se puede guardar: No hay un archivo de guardado seleccionado."
+			dialog.ok_button_text = "Aceptar"
+			add_child(dialog)
+			dialog.popup_centered()
+			return
 
-	var level_file_path = SAVE_DIR + selected_save_file
-	var level_data = []
-	var valid_object_ids = {}
-	for obj in get_tree().get_nodes_in_group("bolas") + get_tree().get_nodes_in_group("cubos") + \
-			  get_tree().get_nodes_in_group("teleportadores") + get_tree().get_nodes_in_group("puntos_teletransporte") + \
-			  get_tree().get_nodes_in_group("pisos") + get_tree().get_nodes_in_group("esquinas") + \
-			  get_tree().get_nodes_in_group("esquinas_rampa"):
-		var obj_id = obj.get_meta("id", "")
-		if obj_id:
-			valid_object_ids[obj_id] = true
-	
-	for obj in game_state.objects:
-		if obj.scene_path in ["res://Bola.tscn", "res://Cubo.tscn", "res://Teleportador.tscn", 
-							 "res://PuntoTeletransporteIndividual.tscn", "res://Piso.tscn", 
-							 "res://piso_esquina.tscn", "res://esquina_rampa.tscn"] and \
-		   valid_object_ids.has(obj.id):
-			var data = {
-				"id": obj.id,
-				"scene_path": obj.scene_path,
-				"position": [obj.position.x, obj.position.y],
-				"rotation_degrees": obj.rotation_degrees,
-				"texture_path": obj.texture_path,
-				"color": [obj.color.r, obj.color.g, obj.color.b, obj.color.a]  # Guardar color
-			}
-			if obj.scene_path == "res://Teleportador.tscn":
-				for target_obj in game_state.objects:
-					if target_obj.scene_path == "res://PuntoTeletransporteIndividual.tscn" and \
-					   target_obj.extra_data.get("teleportador_id", "") == obj.id:
-						data["target_id"] = target_obj.id
-						break
-			level_data.append(data)
-	
-	var level_file = FileAccess.open(level_file_path, FileAccess.WRITE)
-	if level_file:
-		level_file.store_string(JSON.stringify(level_data, "  ", false))
-		level_file.close()
-		print("Nivel guardado en: ", level_file_path)
-	else:
-		print("Error al guardar el archivo en: ", level_file_path)
+		var level_file_path = SAVE_DIR + selected_save_file
+		var level_data = []
+		var valid_object_ids = {}
+		for obj in get_tree().get_nodes_in_group("bolas") + get_tree().get_nodes_in_group("cubos") + \
+				  get_tree().get_nodes_in_group("teleportadores") + get_tree().get_nodes_in_group("puntos_teletransporte") + \
+				  get_tree().get_nodes_in_group("pisos") + get_tree().get_nodes_in_group("esquinas") + \
+				  get_tree().get_nodes_in_group("esquinas_rampa"):
+			var obj_id = obj.get_meta("id", "")
+			if obj_id:
+				valid_object_ids[obj_id] = true
+		
+		for obj in game_state.objects:
+			if obj.scene_path in ["res://Bola.tscn", "res://Cubo.tscn", "res://Teleportador.tscn", 
+								 "res://PuntoTeletransporteIndividual.tscn", "res://Piso.tscn", 
+								 "res://piso_esquina.tscn", "res://esquina_rampa.tscn"] and \
+			   valid_object_ids.has(obj.id):
+				var data = {
+					"id": obj.id,
+					"scene_path": obj.scene_path,
+					"position": [obj.position.x, obj.position.y],
+					"rotation_degrees": obj.rotation_degrees,
+					"texture_path": obj.texture_path,
+					"color": [obj.color.r, obj.color.g, obj.color.b, obj.color.a]  # Guardar color
+				}
+				if obj.scene_path == "res://Teleportador.tscn":
+					for target_obj in game_state.objects:
+						if target_obj.scene_path == "res://PuntoTeletransporteIndividual.tscn" and \
+						   target_obj.extra_data.get("teleportador_id", "") == obj.id:
+							data["target_id"] = target_obj.id
+							break
+				level_data.append(data)
+		
+		var level_file = FileAccess.open(level_file_path, FileAccess.WRITE)
+		if level_file:
+			level_file.store_string(JSON.stringify(level_data, "  ", false))
+			level_file.close()
+			print("Nivel guardado en: ", level_file_path)
+		else:
+			print("Error al guardar el archivo en: ", level_file_path)
 
 func _on_button_load_pressed():
-	get_tree().change_scene_to_file("res://MenuGuardados.tscn")
+	if not showing_popup:
+		get_tree().change_scene_to_file("res://MenuGuardados.tscn")
 	
 func _reload(file_name: String):
 	var file_path = SAVE_DIR + file_name
@@ -1129,6 +1146,8 @@ func _on_button_color_pressed() -> void:
 	opciones.popInDoubleSize($/root/Main/CanvasColor/ColorPicker)
 	opciones.popInDoubleSize($/root/Main/CanvasColor/TextureRect)
 	opciones.popIn($/root/Main/CanvasColor/TextureButton)
+	showing_popup = true
+	print(showing_popup)
 
 
 
@@ -1162,3 +1181,5 @@ func _on_texture_button_pressed() -> void: #Boton de "OK" del colorPicker
 		else:
 			
 			$UI/Opciones/ButtonColor.modulate = Color(0.25, 0.25, 0.25)
+	showing_popup = false
+	print(showing_popup)

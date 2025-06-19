@@ -289,6 +289,7 @@ func _alternar_congelar_descongelar():
 			.set_trans(Tween.TRANS_QUINT)
 
 		game_state.descongelado = !game_state.descongelado
+		
 
 		if game_state.descongelado:
 			$UI/Opciones/BotonDescongelar.texture_normal = load("res://Texturas/PausaButton.png")
@@ -301,6 +302,7 @@ func _alternar_congelar_descongelar():
 			for button in get_tree().get_nodes_in_group("spawn_buttons"):
 				if button is BaseButton:
 					button.modulate = Color(0.25, 0.25, 0.25)
+			grid_tilemap.visible = false
 		else:
 			for button in get_tree().get_nodes_in_group("spawn_buttons"):
 				if button is BaseButton:
@@ -310,6 +312,7 @@ func _alternar_congelar_descongelar():
 			for bola in get_tree().get_nodes_in_group("bolas"):
 				if bola is RigidBody2D and not bola.is_deactivated:
 					bola.pause_physics()
+			grid_tilemap.visible = true
 
 		var disabled_state = game_state.descongelado
 		for button in get_tree().get_nodes_in_group("spawn_buttons"):

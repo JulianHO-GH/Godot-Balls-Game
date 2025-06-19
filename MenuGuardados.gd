@@ -20,7 +20,6 @@ func _ready():
 	print("Directorio ", SAVE_DIR, " creado o ya existe")
 
 	# Conectar señales de los botones
-	boton_nuevo.pressed.connect(_on_boton_nuevo_pressed)
 	boton_cargar.pressed.connect(_on_boton_cargar_pressed)
 	
 	 # Conectar el botón OK (asegúrate de que esto esté después de cargar la escena)
@@ -29,32 +28,7 @@ func _ready():
 	# Inicialmente ocultar el alerta
 	$NoSaveFilesAlert.visible = false
 
-func _on_boton_nuevo_pressed():
-	# Generar un nombre único para el nuevo archivo de guardado
-	var save_index = 1
-	var level_file_path = SAVE_DIR + "saved_level_" + str(save_index) + ".json"
-	while FileAccess.file_exists(level_file_path):
-		save_index += 1
-		level_file_path = SAVE_DIR + "saved_level_" + str(save_index) + ".json"
-	
-	# Crear un archivo de guardado vacío
-	var level_file = FileAccess.open(level_file_path, FileAccess.WRITE)
-	if level_file:
-		level_file.store_string(JSON.stringify([], "  ", false))  # Guardar un array vacío
-		level_file.close()
-		print("Nuevo archivo de guardado creado: ", level_file_path)
-	else:
-		print("Error al crear el archivo: ", level_file_path)
-		return
-	
-	# Cambiar a main.tscn y pasar el nombre del archivo
-	var scene_tree = get_tree()
-	var packed_scene = load(MAIN_SCENE)
-	var main_instance = packed_scene.instantiate()
-	main_instance.set("selected_save_file", "saved_level_" + str(save_index) + ".json")
-	scene_tree.root.add_child(main_instance)
-	scene_tree.current_scene = main_instance
-	queue_free()
+
 
 func _on_boton_cargar_pressed():
 	var save_files = _get_save_files()
@@ -76,7 +50,9 @@ func _on_boton_cargar_pressed():
 	else:
 		item_list.clear()
 		for file in save_files:
-			item_list.add_item(file)
+			# Remover la extensión .json antes de añadirlo al ItemList
+			var display_name = file.replace(".json", "")
+			item_list.add_item(display_name)
 		popup.visible = true
 		aceptarButton.disabled = false
 		cancelarButton.disabled = false
@@ -126,3 +102,42 @@ func _on_aceptar_button_pressed() -> void:
 		scene_tree.root.add_child(main_instance)
 		scene_tree.current_scene = main_instance
 		queue_free()
+
+
+func _on_nombre_aceptado_pressed() -> void:
+	var NombreInput = $/root/MenuGuardados/PopUp2/InputNombre
+	var nombre_nivel = NombreInput.text.strip_edges()
+	
+	# Validar nombre
+	if nombre_nivel.is_empty():
+		nombre_nivel = "NoN"
+	# Limpiar caracteres no válidos
+	nombre_nivel = nombre_nivel.replace("/", "").replace("\\", "").replace(":", "").replace("*", "")\
+				   .replace("?", "").replace("\"", "").replace("<", "").replace(">", "").replace("|", "")
+	
+	var level_file_path = SAVE_DIR + nombre_nivel + ".json"
+	
+	# Verificar si ya existe
+	if FileAccess.file_exists(level_file_path):
+		# Mostrar mensaje de error (puedes implementar esto similar al NoSaveFilesAlert)
+		print("Ya existe un nivel con ese nombre")
+
+		return
+	
+	# Crear archivo
+	var level_file = FileAccess.open(level_file_path, FileAccess.WRITE)
+	if level_file:
+		level_file.store_string(JSON.stringify([], "  ", false))
+		level_file.close()
+		
+		# Cambiar a la escena principal
+		var scene_tree = get_tree()
+		var packed_scene = load(MAIN_SCENE)
+		var main_instance = packed_scene.instantiate()
+		main_instance.set("selected_save_file", nombre_nivel + ".json")
+		scene_tree.root.add_child(main_instance)
+		scene_tree.current_scene = main_instance
+		queue_free()
+	else:
+		print("Error al crear el archivo")
+	

@@ -77,9 +77,9 @@ vertical_alignment = 1
 
 [node name="BotonNuevo" type="TextureButton" parent="."]
 layout_mode = 0
-offset_left = 175.0
+offset_left = 165.0
 offset_top = 640.0
-offset_right = 445.0
+offset_right = 435.0
 offset_bottom = 910.0
 pivot_offset = Vector2(135, 135)
 texture_normal = ExtResource("3_sj8ms")
@@ -87,9 +87,9 @@ texture_pressed = ExtResource("4_p7qlo")
 
 [node name="BotonCargar" type="TextureButton" parent="."]
 layout_mode = 0
-offset_left = 635.0
+offset_left = 649.0
 offset_top = 644.0
-offset_right = 905.0
+offset_right = 919.0
 offset_bottom = 914.0
 pivot_offset = Vector2(135, 135)
 texture_normal = ExtResource("4_e8ih0")
@@ -120,6 +120,21 @@ anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
 script = ExtResource("10_joidb")
+
+[node name="ConfirmationDialog" type="ConfirmationDialog" parent="."]
+auto_translate_mode = 1
+transparent_bg = true
+title = "¿?"
+initial_position = 1
+size = Vector2i(900, 900)
+transient = false
+exclusive = false
+unresizable = true
+borderless = true
+always_on_top = true
+transparent = true
+keep_title_visible = false
+theme = ExtResource("11_ysey4")
 
 [node name="PopUp" type="Control" parent="."]
 visible = false

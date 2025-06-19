@@ -848,9 +848,10 @@ func spawn_cubo(pos, rotation_degrees: float = -1.0, texture_path: String = "") 
 	var obj_id = game_state.add_object("res://Cubo.tscn", pos, rot, texture_path)
 	cubo.set_meta("id", obj_id)
 	
+	# Configurar texturas y materiales
 	var outline_sprite = cubo.get_node("Sprite2D/Outline")
-	var inline_sprite = cubo.get_node("Sprite2D/Inline")
 	var sprite = cubo.get_node("Sprite2D")
+	
 	if sprite:
 		sprite.material = material_base.duplicate()
 		if texture_path != "":
@@ -865,17 +866,17 @@ func spawn_cubo(pos, rotation_degrees: float = -1.0, texture_path: String = "") 
 			if image:
 				outline_sprite.texture = ImageTexture.create_from_image(image)
 	
-	if inline_sprite:
-		inline_sprite.material = material_base.duplicate()
-		if texture_path != "":
-			var image = game_state.load_image(texture_path)
-			if image:
-				inline_sprite.texture = ImageTexture.create_from_image(image)
-		# Aplicar el color almacenado
+	# Configurar el color del TextureRect (InlineFalso)
+	var inline_falso = cubo.get_node_or_null("Sprite2D/InlineFalso")
+	if inline_falso and inline_falso is TextureRect:
+		# Buscar el color guardado para este objeto
 		for obj in game_state.objects:
 			if obj.id == obj_id:
-				inline_sprite.modulate = obj.color
+				inline_falso.modulate = obj.color
 				break
+		# Si no hay color guardado, usar blanco por defecto
+		if inline_falso.modulate == Color(0, 0, 0, 0): # Si está transparente
+			inline_falso.modulate = Color.WHITE
 	
 	cubo.add_to_group("cubos")
 	cubo.rotation_degrees = rot
@@ -1023,7 +1024,7 @@ func _save_level():
 					"position": [obj.position.x, obj.position.y],
 					"rotation_degrees": obj.rotation_degrees,
 					"texture_path": obj.texture_path,
-					"color": [obj.color.r, obj.color.g, obj.color.b, obj.color.a]  # Guardar color
+					"color": [obj.color.r, obj.color.g, obj.color.b, obj.color.a]  # Asegúrate de guardar el color
 				}
 				if obj.scene_path == "res://Teleportador.tscn":
 					for target_obj in game_state.objects:
@@ -1105,7 +1106,17 @@ func _reload(file_name: String):
 			new_obj_id = spawn_cubo(pos, rotation_degrees, texture_path)
 			game_state.set_rotation("Cubo", rotation_degrees)
 			if new_obj_id:
-				game_state.update_object_color(new_obj_id, color)
+				# Asegúrate de actualizar el color después de spawnear
+				for obj in game_state.objects:
+					if obj.id == new_obj_id:
+						obj.color = color
+						break
+				# Actualizar el color visualmente
+				var cubo = get_node_by_meta("id", new_obj_id)
+				if cubo:
+					var inline_falso = cubo.get_node_or_null("Sprite2D/InlineFalso")
+					if inline_falso and inline_falso is TextureRect:
+						inline_falso.modulate = color
 		elif scene_path == "res://Teleportador.tscn":
 			var target_id = obj_data.get("target_id", "")
 			var target_data = objects_by_id.get(target_id, {})
@@ -1183,3 +1194,9 @@ func _on_texture_button_pressed() -> void: #Boton de "OK" del colorPicker
 			$UI/Opciones/ButtonColor.modulate = Color(0.25, 0.25, 0.25)
 	showing_popup = false
 	print(showing_popup)
+	
+func get_node_by_meta(meta_key: String, meta_value) -> Node:
+	for child in get_children():
+		if child.has_meta(meta_key) and child.get_meta(meta_key) == meta_value:
+			return child
+	return null

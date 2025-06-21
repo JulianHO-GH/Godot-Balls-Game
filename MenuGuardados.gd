@@ -141,3 +141,120 @@ func _on_nombre_aceptado_pressed() -> void:
 	else:
 		print("Error al crear el archivo")
 	
+
+
+func _on_edit_aceptado_pressed() -> void:
+	# Obtener el nuevo nombre base (sin extensión)
+	var input_edit = get_node("/root/MenuGuardados/PopUp3/InputEdit")
+	var new_base_name = input_edit.text.strip_edges()
+	
+	new_base_name = new_base_name.replace("/", "").replace("\\", "").replace(":", "").replace("*", "")\
+				   .replace("?", "").replace("\"", "").replace("<", "").replace(">", "").replace("|", "")
+	
+	# Validación básica de nombre vacío
+	if new_base_name.is_empty():
+		print("Error: El nombre no puede estar vacío")
+
+		return
+	
+	# Obtener el archivo seleccionado
+	var selected_items = item_list.get_selected_items()
+	if selected_items.is_empty():
+		print("Error: No hay nivel seleccionado")
+		return
+	
+	# Obtener nombres actuales
+	var save_files = _get_save_files()
+	var old_full_name = save_files[selected_items[0]]
+	
+	# Conservar la extensión .json original
+	var new_full_name = new_base_name + ".json"
+	
+	# Verificar si el nombre cambió realmente
+	if old_full_name == new_full_name:
+		print("El nombre es el mismo")
+		return
+	
+	# Verificar si ya existe
+	if FileAccess.file_exists(SAVE_DIR + new_full_name):
+		print("Error: Ya existe un nivel con ese nombre")
+
+		return
+	
+	# Renombrar manteniendo .json
+	var dir = DirAccess.open(SAVE_DIR)
+	if dir:
+		var error = dir.rename(SAVE_DIR + old_full_name, SAVE_DIR + new_full_name)
+		if error == OK:
+			print("¡Renombrado exitoso! {old_full_name} → {new_full_name}")
+			
+			
+			
+			# Actualizar UI
+			_on_boton_cargar_pressed()  # Recargar lista
+			
+			# Actualizar en Main si está cargado
+			var main = get_node_or_null("/root/Main")
+			if main and main.has_method("update_save_file_name"):
+				main.update_save_file_name(new_full_name)
+			
+		else:
+			print("Error al renombrar:", error)
+
+	else:
+		print("Error: No se pudo abrir el directorio")
+
+
+func _on_item_list_gui_input(event) -> void:
+	
+	if (event is InputEventScreenTouch or event is InputEventMouseButton) and event.pressed:
+		print("Click")
+		var selected_items = item_list.get_selected_items()
+			
+		if not selected_items.is_empty():
+			$/root/MenuGuardados/PopUp/EditNameButton.disabled = false
+			$/root/MenuGuardados/PopUp/BorrarLevel.disabled = false
+			
+		else:
+			$/root/MenuGuardados/PopUp/EditNameButton.disabled = true
+			$/root/MenuGuardados/PopUp/BorrarLevel.disabled = true
+
+
+func _on_delete_level_button_pressed() -> void:
+	# Obtener el ítem seleccionado
+	var selected_items = item_list.get_selected_items()
+	
+	# Verificar si hay selección
+	if selected_items.is_empty():
+		print("DEBUG: No hay nivel seleccionado para eliminar")
+		return
+	
+	# Obtener lista de archivos reales (con .json)
+	var save_files = _get_save_files()
+	var file_to_delete = save_files[selected_items[0]]
+	var file_path = SAVE_DIR + file_to_delete
+	
+	# Verificar que el archivo existe
+	if not FileAccess.file_exists(file_path):
+		print("ERROR: Archivo no encontrado:", file_path)
+		return
+	
+	# Eliminar el archivo
+	var dir = DirAccess.open(SAVE_DIR)
+	if dir:
+		var error = dir.remove(file_to_delete)
+		if error == OK:
+			print("Éxito: Nivel eliminado -", file_to_delete)
+			
+			# Actualizar la lista visual
+			_on_boton_cargar_pressed()
+			
+			# Si el nivel eliminado estaba actualmente cargado
+			var main = get_node_or_null("/root/Main")
+			if main and main.has_method("get_current_save_file"):
+				if main.get_current_save_file() == file_to_delete:
+					main.set("selected_save_file", "")  # Limpiar referencia
+		else:
+			print("ERROR: No se pudo eliminar el archivo. Código:", error)
+	else:
+		print("ERROR: No se pudo abrir el directorio")

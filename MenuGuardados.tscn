@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://62jub00hfpdd"]
+[gd_scene load_steps=32 format=3 uid="uid://62jub00hfpdd"]
 
 [ext_resource type="Script" path="res://MenuGuardados.gd" id="1_ux2iq"]
 [ext_resource type="FontFile" uid="uid://cffar7b2cic6s" path="res://Comic Sans MS.ttf" id="2_7pxbt"]
@@ -17,8 +17,18 @@
 [ext_resource type="Texture2D" uid="uid://bwfban0c85u4g" path="res://Texturas/CancelarButtonCuadrado.png" id="15_dywtw"]
 [ext_resource type="Texture2D" uid="uid://cgaiy460r7k4h" path="res://Texturas/CancelarButtonCuadradoPressed.png" id="16_6577d"]
 [ext_resource type="Texture2D" uid="uid://4s5iu66vur7f" path="res://Texturas/BackgroundInput.png" id="17_kuydy"]
+[ext_resource type="Texture2D" uid="uid://cfaey2q75wwwy" path="res://Texturas/BotonEditar.png" id="17_vlqfb"]
 [ext_resource type="Theme" uid="uid://c2xopx4dryamd" path="res://InputTheme.tres" id="18_epree"]
+[ext_resource type="Texture2D" uid="uid://ca8um475br4n7" path="res://Texturas/BotonEditarPressed.png" id="18_hxhrv"]
 [ext_resource type="Texture2D" uid="uid://dfga13k8eoqjx" path="res://Texturas/PortapapelesGirado.png" id="18_on57d"]
+[ext_resource type="Texture2D" uid="uid://bvmpuptsodo6w" path="res://Texturas/BotonEditarDisabled.png" id="19_7jeva"]
+[ext_resource type="Texture2D" uid="uid://dkheug8nw2d3u" path="res://Texturas/BotonEliminarNivel.png" id="19_gdyfn"]
+[ext_resource type="Texture2D" uid="uid://b1174umvkybb6" path="res://Texturas/BotonEliminarNivelPressed.png" id="20_oom1b"]
+[ext_resource type="Texture2D" uid="uid://mkadhmpfuyji" path="res://Texturas/BotonEliminarNivelDisabled.png" id="22_t01sj"]
+[ext_resource type="Texture2D" uid="uid://bxesfey2s4p5e" path="res://Texturas/PortapapelesEditar.png" id="24_r6qnm"]
+[ext_resource type="Texture2D" uid="uid://bf8fgef2ip7pi" path="res://Texturas/EliminarAdvertencia.png" id="27_ssyii"]
+[ext_resource type="Texture2D" uid="uid://bhtbdrtxdxvh2" path="res://Texturas/BotonRegresar.png" id="28_lio85"]
+[ext_resource type="Texture2D" uid="uid://btrm6swrvtbu3" path="res://Texturas/BotonRegresarPressed.png" id="29_xvx3j"]
 
 [sub_resource type="Gradient" id="Gradient_312vu"]
 offsets = PackedFloat32Array(0.0608696)
@@ -59,21 +69,6 @@ text = "[shake][rainbow freq=1.0 sat=0.8 val=0.8][center]Bolas xdxdx[/center][/r
 "
 tab_size = 24
 text_direction = 1
-
-[node name="Label" type="Label" parent="."]
-visible = false
-modulate = Color(0, 0, 0, 1)
-layout_mode = 2
-offset_left = 40.0
-offset_top = 58.0
-offset_right = 1040.0
-offset_bottom = 258.0
-pivot_offset = Vector2(500, 100)
-theme_override_fonts/font = ExtResource("2_7pxbt")
-theme_override_font_sizes/font_size = 140
-text = "Bolas xdxd"
-horizontal_alignment = 1
-vertical_alignment = 1
 
 [node name="BotonNuevo" type="TextureButton" parent="."]
 layout_mode = 0
@@ -146,25 +141,53 @@ theme = ExtResource("11_ysey4")
 
 [node name="AceptarButton" type="TextureButton" parent="PopUp"]
 layout_mode = 0
-offset_left = 150.0
+offset_left = 38.0
 offset_top = 875.0
-offset_right = 350.0
+offset_right = 238.0
 offset_bottom = 1025.0
 pivot_offset = Vector2(100, 75)
 disabled = true
+keep_pressed_outside = true
 texture_normal = ExtResource("13_0klsn")
 texture_pressed = ExtResource("14_qv5xf")
 
 [node name="CancelarButton" type="TextureButton" parent="PopUp"]
 layout_mode = 0
-offset_left = 550.0
+offset_left = 246.0
 offset_top = 875.0
-offset_right = 750.0
+offset_right = 446.0
 offset_bottom = 1025.0
 pivot_offset = Vector2(100, 75)
 disabled = true
+keep_pressed_outside = true
 texture_normal = ExtResource("15_dywtw")
 texture_pressed = ExtResource("16_6577d")
+
+[node name="EditNameButton" type="TextureButton" parent="PopUp"]
+layout_mode = 0
+offset_left = 456.0
+offset_top = 875.0
+offset_right = 656.0
+offset_bottom = 1025.0
+pivot_offset = Vector2(100, 75)
+disabled = true
+keep_pressed_outside = true
+texture_normal = ExtResource("17_vlqfb")
+texture_pressed = ExtResource("18_hxhrv")
+texture_disabled = ExtResource("19_7jeva")
+
+[node name="BorrarLevel" type="TextureButton" parent="PopUp"]
+layout_mode = 0
+offset_left = 666.0
+offset_top = 875.0
+offset_right = 866.0
+offset_bottom = 1025.0
+pivot_offset = Vector2(100, 75)
+disabled = true
+keep_pressed_outside = true
+texture_normal = ExtResource("19_gdyfn")
+texture_pressed = ExtResource("20_oom1b")
+texture_disabled = ExtResource("22_t01sj")
 
 [node name="FondoGris" type="TextureRect" parent="."]
 visible = false
@@ -234,21 +257,141 @@ offset_bottom = 947.0
 pivot_offset = Vector2(450, 75)
 theme = ExtResource("18_epree")
 
+[node name="PopUp3" type="Control" parent="."]
+visible = false
+z_index = 5
+anchors_preset = 0
+offset_right = 1080.0
+offset_bottom = 2000.0
+pivot_offset = Vector2(540, 1000)
+
+[node name="MarcoPopUp" type="TextureRect" parent="PopUp3"]
+z_index = 1
+layout_mode = 0
+offset_left = 40.0
+offset_top = 762.0
+offset_right = 1040.0
+offset_bottom = 1162.0
+pivot_offset = Vector2(500, 200)
+texture = ExtResource("17_kuydy")
+
+[node name="Portapapeles" type="TextureRect" parent="PopUp3"]
+z_index = 2
+layout_mode = 0
+offset_left = 416.0
+offset_top = 455.0
+offset_right = 686.0
+offset_bottom = 790.0
+pivot_offset = Vector2(135, 167.5)
+texture = ExtResource("24_r6qnm")
+
+[node name="EditAceptado" type="TextureButton" parent="PopUp3"]
+z_index = 10
+layout_mode = 0
+offset_left = 242.0
+offset_top = 973.0
+offset_right = 442.0
+offset_bottom = 1123.0
+pivot_offset = Vector2(100, 75)
+texture_normal = ExtResource("13_0klsn")
+texture_pressed = ExtResource("14_qv5xf")
+
+[node name="EditCancelado" type="TextureButton" parent="PopUp3"]
+z_index = 10
+layout_mode = 0
+offset_left = 646.0
+offset_top = 974.0
+offset_right = 846.0
+offset_bottom = 1124.0
+pivot_offset = Vector2(100, 75)
+texture_normal = ExtResource("15_dywtw")
+texture_pressed = ExtResource("16_6577d")
+
+[node name="InputEdit" type="LineEdit" parent="PopUp3"]
+z_index = 10
+layout_mode = 0
+offset_left = 90.0
+offset_top = 797.0
+offset_right = 990.0
+offset_bottom = 947.0
+pivot_offset = Vector2(450, 75)
+theme = ExtResource("18_epree")
+
+[node name="PopUp4" type="Control" parent="."]
+visible = false
+z_index = 5
+anchors_preset = 0
+offset_left = 91.0
+offset_top = 400.0
+offset_right = 991.0
+offset_bottom = 1523.0
+pivot_offset = Vector2(450, 561)
+
+[node name="MarcoPopUp" type="TextureRect" parent="PopUp4"]
+layout_mode = 0
+offset_right = 900.0
+offset_bottom = 923.0
+texture = ExtResource("27_ssyii")
+
+[node name="VolverButton" type="TextureButton" parent="PopUp4"]
+layout_mode = 0
+offset_left = 518.0
+offset_top = 700.0
+offset_right = 718.0
+offset_bottom = 850.0
+pivot_offset = Vector2(100, 75)
+keep_pressed_outside = true
+texture_normal = ExtResource("28_lio85")
+texture_pressed = ExtResource("29_xvx3j")
+
+[node name="DeleteLevelButton" type="TextureButton" parent="PopUp4"]
+layout_mode = 0
+offset_left = 170.0
+offset_top = 700.0
+offset_right = 370.0
+offset_bottom = 850.0
+pivot_offset = Vector2(100, 75)
+keep_pressed_outside = true
+texture_normal = ExtResource("19_gdyfn")
+texture_pressed = ExtResource("20_oom1b")
+texture_disabled = ExtResource("22_t01sj")
+
 [connection signal="button_down" from="BotonNuevo" to="ButtonAnimations" method="_on_boton_nuevo_button_down"]
 [connection signal="button_up" from="BotonNuevo" to="ButtonAnimations" method="_on_boton_nuevo_button_up"]
 [connection signal="pressed" from="BotonNuevo" to="ButtonAnimations" method="_on_boton_nuevo_pressed"]
 [connection signal="button_down" from="BotonCargar" to="ButtonAnimations" method="_on_boton_cargar_button_down"]
 [connection signal="button_up" from="BotonCargar" to="ButtonAnimations" method="_on_boton_cargar_button_up"]
 [connection signal="pressed" from="BotonCargar" to="ButtonAnimations" method="_on_boton_cargar_pressed"]
+[connection signal="gui_input" from="PopUp/ItemList" to="." method="_on_item_list_gui_input"]
 [connection signal="button_down" from="PopUp/AceptarButton" to="ButtonAnimations" method="_on_aceptar_button_button_down"]
 [connection signal="button_up" from="PopUp/AceptarButton" to="ButtonAnimations" method="_on_aceptar_button_button_up"]
 [connection signal="pressed" from="PopUp/AceptarButton" to="." method="_on_aceptar_button_pressed"]
 [connection signal="button_down" from="PopUp/CancelarButton" to="ButtonAnimations" method="_on_cancelar_button_button_down"]
 [connection signal="button_up" from="PopUp/CancelarButton" to="ButtonAnimations" method="_on_cancelar_button_button_up"]
 [connection signal="pressed" from="PopUp/CancelarButton" to="ButtonAnimations" method="_on_cancelar_button_pressed"]
+[connection signal="button_down" from="PopUp/EditNameButton" to="ButtonAnimations" method="_on_edit_name_button_button_down"]
+[connection signal="button_up" from="PopUp/EditNameButton" to="ButtonAnimations" method="_on_edit_name_button_button_up"]
+[connection signal="pressed" from="PopUp/EditNameButton" to="ButtonAnimations" method="_on_edit_name_button_pressed"]
+[connection signal="button_down" from="PopUp/BorrarLevel" to="ButtonAnimations" method="_on_borrar_level_button_down"]
+[connection signal="button_up" from="PopUp/BorrarLevel" to="ButtonAnimations" method="_on_borrar_level_button_up"]
+[connection signal="pressed" from="PopUp/BorrarLevel" to="ButtonAnimations" method="_on_borrar_level_pressed"]
 [connection signal="button_down" from="PopUp2/NombreAceptado" to="ButtonAnimations" method="_on_nombre_aceptado_button_down"]
 [connection signal="button_up" from="PopUp2/NombreAceptado" to="ButtonAnimations" method="_on_nombre_aceptado_button_up"]
 [connection signal="pressed" from="PopUp2/NombreAceptado" to="." method="_on_nombre_aceptado_pressed"]
 [connection signal="button_down" from="PopUp2/NombreCancelado" to="ButtonAnimations" method="_on_nombre_cancelado_button_down"]
 [connection signal="button_up" from="PopUp2/NombreCancelado" to="ButtonAnimations" method="_on_nombre_cancelado_button_up"]
 [connection signal="pressed" from="PopUp2/NombreCancelado" to="ButtonAnimations" method="_on_nombre_cancelado_pressed"]
+[connection signal="button_down" from="PopUp3/EditAceptado" to="ButtonAnimations" method="_on_edit_aceptado_button_down"]
+[connection signal="button_up" from="PopUp3/EditAceptado" to="ButtonAnimations" method="_on_edit_aceptado_button_up"]
+[connection signal="pressed" from="PopUp3/EditAceptado" to="." method="_on_edit_aceptado_pressed"]
+[connection signal="pressed" from="PopUp3/EditAceptado" to="ButtonAnimations" method="_on_edit_aceptado_pressed"]
+[connection signal="button_down" from="PopUp3/EditCancelado" to="ButtonAnimations" method="_on_edit_cancelado_button_down"]
+[connection signal="button_up" from="PopUp3/EditCancelado" to="ButtonAnimations" method="_on_edit_cancelado_button_up"]
+[connection signal="pressed" from="PopUp3/EditCancelado" to="ButtonAnimations" method="_on_edit_cancelado_pressed"]
+[connection signal="button_down" from="PopUp4/VolverButton" to="ButtonAnimations" method="_on_volver_button_button_down"]
+[connection signal="button_up" from="PopUp4/VolverButton" to="ButtonAnimations" method="_on_volver_button_button_up"]
+[connection signal="pressed" from="PopUp4/VolverButton" to="ButtonAnimations" method="_on_volver_button_pressed"]
+[connection signal="button_down" from="PopUp4/DeleteLevelButton" to="ButtonAnimations" method="_on_delete_level_button_button_down"]
+[connection signal="button_up" from="PopUp4/DeleteLevelButton" to="ButtonAnimations" method="_on_delete_level_button_button_up"]
+[connection signal="pressed" from="PopUp4/DeleteLevelButton" to="." method="_on_delete_level_button_pressed"]
+[connection signal="pressed" from="PopUp4/DeleteLevelButton" to="ButtonAnimations" method="_on_delete_level_button_pressed"]

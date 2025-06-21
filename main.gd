@@ -277,6 +277,7 @@ func _alternar_congelar_descongelar():
 	if not showing_popup:
 		$UI/Opciones/BotonSelect.modulate = Color(0.25, 0.25, 0.25)
 		$UI/Opciones/BotonSelect.disabled = true
+		$UI/Opciones/ButtonColor.visible = false
 
 		var tween = create_tween()
 		tween.tween_property($UI/Opciones/BotonReiniciar, "position:x", game_state.ui_boton_reiniciar_position.x - 160, ANIMATION_DURATION2)\
@@ -1203,3 +1204,10 @@ func get_node_by_meta(meta_key: String, meta_value) -> Node:
 		if child.has_meta(meta_key) and child.get_meta(meta_key) == meta_value:
 			return child
 	return null
+
+func update_save_file_name(new_full_name: String):
+	if new_full_name.get_extension() != "json":
+		new_full_name += ".json"  # Redundancia por seguridad
+	
+	selected_save_file = new_full_name
+	print("Archivo actualizado:", new_full_name)

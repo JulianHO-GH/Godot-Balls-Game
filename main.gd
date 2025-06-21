@@ -255,6 +255,7 @@ func _alternar_seleccionar():
 					if sprite and sprite.material:
 						sprite.material.set_shader_parameter("seleccionado", false)
 				ultimo_objeto_seleccionado = null
+			$UI/Opciones/ButtonColor.visible = false
 
 		if game_state.seleccionando:
 			$UI/Opciones/BotonSelect.texture_normal = load("res://Texturas/DeseleccionarButton.png")
@@ -277,7 +278,7 @@ func _alternar_congelar_descongelar():
 	if not showing_popup:
 		$UI/Opciones/BotonSelect.modulate = Color(0.25, 0.25, 0.25)
 		$UI/Opciones/BotonSelect.disabled = true
-		$UI/Opciones/ButtonColor.visible = false
+		
 
 		var tween = create_tween()
 		tween.tween_property($UI/Opciones/BotonReiniciar, "position:x", game_state.ui_boton_reiniciar_position.x - 160, ANIMATION_DURATION2)\
@@ -299,6 +300,7 @@ func _alternar_congelar_descongelar():
 			$UI/Opciones/BotonEliminar.disabled = true
 			for bola in get_tree().get_nodes_in_group("bolas"):
 				if bola is RigidBody2D and not bola.is_deactivated:
+					
 					bola.resume_physics()
 			for button in get_tree().get_nodes_in_group("spawn_buttons"):
 				if button is BaseButton:
@@ -312,6 +314,7 @@ func _alternar_congelar_descongelar():
 			$UI/Opciones/BotonDescongelar.texture_pressed = load("res://Texturas/PlayButtonPressed.png")
 			for bola in get_tree().get_nodes_in_group("bolas"):
 				if bola is RigidBody2D and not bola.is_deactivated:
+					bola.get_node("CollisionShape2D").disabled = true
 					bola.pause_physics()
 			grid_tilemap.visible = true
 

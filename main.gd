@@ -300,11 +300,11 @@ func _alternar_congelar_descongelar():
 			$UI/Opciones/BotonEliminar.disabled = true
 			for bola in get_tree().get_nodes_in_group("bolas"):
 				if bola is RigidBody2D and not bola.is_deactivated:
-					
 					bola.resume_physics()
 			for button in get_tree().get_nodes_in_group("spawn_buttons"):
 				if button is BaseButton:
 					button.modulate = Color(0.25, 0.25, 0.25)
+
 			grid_tilemap.visible = false
 		else:
 			for button in get_tree().get_nodes_in_group("spawn_buttons"):
@@ -314,8 +314,9 @@ func _alternar_congelar_descongelar():
 			$UI/Opciones/BotonDescongelar.texture_pressed = load("res://Texturas/PlayButtonPressed.png")
 			for bola in get_tree().get_nodes_in_group("bolas"):
 				if bola is RigidBody2D and not bola.is_deactivated:
-					bola.get_node("CollisionShape2D").disabled = true
+					
 					bola.pause_physics()
+
 			grid_tilemap.visible = true
 
 		var disabled_state = game_state.descongelado

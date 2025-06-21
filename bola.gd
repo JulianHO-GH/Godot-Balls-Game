@@ -69,7 +69,6 @@ func pause_physics():
 	saved_state.angular_velocity = angular_velocity
 	# Desactivar las físicas usando freeze
 	freeze = true
-	$CollisionShape2D.disabled = true
 	
 func restart_physics(target_position: Vector2):
 	is_paused = true
@@ -78,7 +77,6 @@ func restart_physics(target_position: Vector2):
 	teleport_to = target_position
 	is_restarting = true
 	rotation = saved_state.rotation  # Actualizar la rotación visual inmediatamente
-	$CollisionShape2D.disabled = true
 	
 	
 func resume_physics():
@@ -91,7 +89,6 @@ func resume_physics():
 		angular_velocity = saved_state.angular_velocity
 	# Activar las físicas quitando freeze
 	freeze = false
-	$CollisionShape2D.disabled = false
 
 func deactivate():
 	is_deactivated = true

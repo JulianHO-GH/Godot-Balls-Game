@@ -28,6 +28,7 @@ var menu_moved_up: bool = false
 var menu_moved_right: bool = false
 var is_boton_link_visible: bool = false
 
+
 # Configuraciones de la cámara
 var camera_position: Vector2 = Vector2.ZERO
 var camera_zoom: Vector2 = Vector2(1.0, 1.0)
@@ -55,19 +56,30 @@ func generate_id() -> String:
 	return str(_id_counter)
 
 # Añadir un objeto al estado
-func add_object(scene_path: String, position: Vector2, rotation_degrees: float, texture_path: String = "", extra_data: Dictionary = {}) -> String:
-	var obj_id = str(randi())  # Generar un ID único
+# En la función add_object, añade el parámetro has_outline (por defecto true)
+func add_object(scene_path: String, position: Vector2, rotation_degrees: float, 
+			   texture_path: String = "", extra_data: Dictionary = {}, 
+			   has_outline: bool = true) -> String:
+	var obj_id = str(randi())
 	var obj_data = {
 		"id": obj_id,
 		"scene_path": scene_path,
 		"position": position,
 		"rotation_degrees": rotation_degrees,
 		"texture_path": texture_path,
-		"color": Color.WHITE,  # Color por defecto
-		"extra_data": extra_data
+		"color": Color.WHITE,
+		"extra_data": extra_data,
+		"has_outline": has_outline  # Nuevo campo
 	}
 	objects.append(obj_data)
 	return obj_id
+
+# Añade esta función para actualizar el estado del outline
+func update_object_outline(obj_id: String, has_outline: bool):
+	for obj in objects:
+		if obj.id == obj_id:
+			obj.has_outline = has_outline
+			break
 
 func update_object_color(obj_id: String, color: Color) -> void:
 	for obj in objects:

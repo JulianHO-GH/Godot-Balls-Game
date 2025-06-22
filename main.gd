@@ -23,6 +23,7 @@ var is_dragging: bool = false  # Indica si estamos arrastrando
 var selected_save_file: String = ""  # Archivo de guardado actual
 var showing_popup: bool = false #Si se está mostrando un popup
 
+
 # Constantes
 const ZOOM_MIN: float = 0.1
 const ZOOM_MAX: float = 2.0
@@ -272,6 +273,7 @@ func _alternar_seleccionar():
 			$UI/Opciones/BotonDescongelar.modulate = Color(1, 1, 1)
 			$UI/Opciones/BotonDescongelar.disabled = false
 			$UI/Opciones/BotonLink.visible = false
+			$/root/Main/UI/Opciones/CheckboxButton.visible = false
 			game_state.is_boton_link_visible = false
 
 func _alternar_congelar_descongelar():
@@ -631,14 +633,24 @@ func _input(event):
 						ultimo_objeto_seleccionado = collider
 						# Mostrar BotonLink si es un cubo o bola
 						if has_script(collider, "res://bola.gd"):
+							$/root/Main/UI/Opciones/CheckboxButton.visible = true
 							$UI/Opciones/BotonLink.visible = true
 							game_state.is_boton_link_visible = true
 							$UI/Opciones/ButtonColor.visible = false
+							var outline = ultimo_objeto_seleccionado.get_node_or_null("OutlineBola")
+							if outline.visible:
+								$/root/Main/UI/Opciones/CheckboxButton.texture_normal = load("res://Texturas/CheckBoxSelected.png")
+								$/root/Main/UI/Opciones/CheckboxButton.texture_pressed = load("res://Texturas/CheckBoxSelectedPressed.png")
+							elif not outline.visible:
+								$/root/Main/UI/Opciones/CheckboxButton.texture_normal = load("res://Texturas/CheckBoxButton.png")
+								$/root/Main/UI/Opciones/CheckboxButton.texture_pressed = load("res://Texturas/CheckBoxPressed.png")
 						elif has_script(collider, "res://cubo.gd"):
+							$/root/Main/UI/Opciones/CheckboxButton.visible = false
 							$UI/Opciones/BotonLink.visible = false
 							game_state.is_boton_link_visible = false
 							$UI/Opciones/ButtonColor.visible = true
 						else:
+							$/root/Main/UI/Opciones/CheckboxButton.visible = false
 							$UI/Opciones/BotonLink.visible = false
 							game_state.is_boton_link_visible = false
 							$UI/Opciones/ButtonColor.visible = false
@@ -800,12 +812,17 @@ func _on_permission_not_granted_by_user(permission):
 	dialog.show()
 	plugin.resendPermission()
 
-func spawn_bola(pos, rotation_degrees: float = -1.0, texture_path: String = "") -> String:
+func spawn_bola(pos, rotation_degrees: float = -1.0, texture_path: String = "", has_outline: bool = true) -> String:
 	var bola = bola_scene.instantiate()
 	bola.position = pos
 	var rot = rotation_degrees if rotation_degrees != -1.0 else game_state.get_rotation("Bola")
-	var obj_id = game_state.add_object("res://Bola.tscn", pos, rot, texture_path)
+	var obj_id = game_state.add_object("res://Bola.tscn", pos, rot, texture_path, {}, has_outline)
 	bola.set_meta("id", obj_id)
+	
+	# Configurar el outline
+	var outline = bola.get_node_or_null("OutlineBola")
+	if outline:
+		outline.visible = has_outline
 
 	var sprite = bola.get_node("Sprite2D")
 	if sprite:
@@ -819,6 +836,7 @@ func spawn_bola(pos, rotation_degrees: float = -1.0, texture_path: String = "") 
 		var target_diameter = 250.0
 		var scale = target_diameter / circle_diameter if circle_diameter > 0 else 1.0
 		sprite.scale = Vector2(scale, scale)
+
 
 	var collision_shape = bola.get_node("CollisionShape2D")
 	if collision_shape and collision_shape.shape is CircleShape2D:
@@ -1032,7 +1050,8 @@ func _save_level():
 					"position": [obj.position.x, obj.position.y],
 					"rotation_degrees": obj.rotation_degrees,
 					"texture_path": obj.texture_path,
-					"color": [obj.color.r, obj.color.g, obj.color.b, obj.color.a]  # Asegúrate de guardar el color
+					"color": [obj.color.r, obj.color.g, obj.color.b, obj.color.a],  # Asegúrate de guardar el color
+					"has_outline": obj.get("has_outline", true)
 				}
 				if obj.scene_path == "res://Teleportador.tscn":
 					for target_obj in game_state.objects:
@@ -1108,7 +1127,8 @@ func _reload(file_name: String):
 		var new_obj_id
 		
 		if scene_path == "res://Bola.tscn":
-			new_obj_id = spawn_bola(pos, rotation_degrees, texture_path)
+			var has_outline = obj_data.get("has_outline", true)  # Valor por defecto true
+			new_obj_id = spawn_bola(pos, rotation_degrees, texture_path, has_outline)
 			game_state.set_rotation("Bola", rotation_degrees)
 		elif scene_path == "res://Cubo.tscn":
 			new_obj_id = spawn_cubo(pos, rotation_degrees, texture_path)
@@ -1215,3 +1235,21 @@ func update_save_file_name(new_full_name: String):
 	
 	selected_save_file = new_full_name
 	print("Archivo actualizado:", new_full_name)
+
+
+func _on_checkbox_button_pressed() -> void:
+	var outline = ultimo_objeto_seleccionado.get_node_or_null("OutlineBola")
+	if outline:
+		var new_state = not outline.visible
+		outline.visible = new_state
+		
+		var obj_id = ultimo_objeto_seleccionado.get_meta("id", "")
+		if obj_id:
+			game_state.update_object_outline(obj_id, new_state)
+		
+		if new_state:
+			$/root/Main/UI/Opciones/CheckboxButton.texture_normal = load("res://Texturas/CheckBoxSelected.png")
+			$/root/Main/UI/Opciones/CheckboxButton.texture_pressed = load("res://Texturas/CheckBoxSelectedPressed.png")
+		else:
+			$/root/Main/UI/Opciones/CheckboxButton.texture_normal = load("res://Texturas/CheckBoxButton.png")
+			$/root/Main/UI/Opciones/CheckboxButton.texture_pressed = load("res://Texturas/CheckBoxPressed.png")

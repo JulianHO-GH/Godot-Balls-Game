@@ -1,4 +1,4 @@
-[gd_scene load_steps=62 format=3 uid="uid://cs5whshwnasdf"]
+[gd_scene load_steps=64 format=3 uid="uid://cs5whshwnasdf"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_tpxov"]
 [ext_resource type="PackedScene" uid="uid://fn1hroyr720c" path="res://bola.tscn" id="2_gxh2a"]
@@ -46,8 +46,10 @@
 [ext_resource type="Texture2D" uid="uid://b6kifff0uopjf" path="res://Texturas/ColorButton.png" id="41_hhbt4"]
 [ext_resource type="Texture2D" uid="uid://cxmy6n8oe2qkb" path="res://Texturas/DerechaButton.png" id="42_i7utl"]
 [ext_resource type="Texture2D" uid="uid://5xv21u30eqdc" path="res://Texturas/ColorButtonPressed.png" id="42_pncsj"]
+[ext_resource type="Texture2D" uid="uid://dd6mtpamcmh81" path="res://Texturas/CheckBoxSelected.png" id="43_4ae7x"]
 [ext_resource type="Texture2D" uid="uid://0qolxi3duw2a" path="res://Texturas/DerechabuttonPressed.png" id="43_gdy0i"]
 [ext_resource type="Texture2D" uid="uid://bvvcernc3iput" path="res://Texturas/GirarIzquierdaButton.png" id="44_jpqaa"]
+[ext_resource type="Texture2D" uid="uid://b4dyh74kw1122" path="res://Texturas/CheckBoxSelectedPressed.png" id="44_yhsbh"]
 [ext_resource type="Texture2D" uid="uid://bxn7kw0vm5tw7" path="res://Texturas/GirarIzquierdaButtonPressed.png" id="45_0xhtp"]
 [ext_resource type="Texture2D" uid="uid://tmtoen1yg8j7" path="res://Texturas/GirarDerechaButton.png" id="46_m356r"]
 [ext_resource type="Texture2D" uid="uid://q2cl5l6dmxjf" path="res://Texturas/GirarDerechaButtonPressed.png" id="47_1qamr"]
@@ -329,9 +331,9 @@ texture_pressed = ExtResource("31_5bv8f")
 [node name="ButtonSave" type="TextureButton" parent="UI/Opciones"]
 layout_mode = 0
 offset_left = 940.0
-offset_top = 1189.0
+offset_top = 1340.0
 offset_right = 1060.0
-offset_bottom = 1309.0
+offset_bottom = 1460.0
 pivot_offset = Vector2(60, 60)
 keep_pressed_outside = true
 texture_normal = ExtResource("30_egmyw")
@@ -340,9 +342,9 @@ texture_pressed = ExtResource("31_wan16")
 [node name="ButtonLoad" type="TextureButton" parent="UI/Opciones"]
 layout_mode = 0
 offset_left = 940.0
-offset_top = 1330.0
+offset_top = 1481.0
 offset_right = 1060.0
-offset_bottom = 1450.0
+offset_bottom = 1601.0
 pivot_offset = Vector2(60, 60)
 keep_pressed_outside = true
 texture_normal = ExtResource("32_2c5jw")
@@ -352,13 +354,25 @@ texture_pressed = ExtResource("33_0i8cd")
 visible = false
 layout_mode = 0
 offset_left = 940.0
+offset_top = 1200.0
+offset_right = 1060.0
+offset_bottom = 1320.0
+pivot_offset = Vector2(60, 60)
+keep_pressed_outside = true
+texture_normal = ExtResource("41_hhbt4")
+texture_pressed = ExtResource("42_pncsj")
+
+[node name="CheckboxButton" type="TextureButton" parent="UI/Opciones"]
+visible = false
+layout_mode = 0
+offset_left = 940.0
 offset_top = 1060.0
 offset_right = 1060.0
 offset_bottom = 1180.0
 pivot_offset = Vector2(60, 60)
 keep_pressed_outside = true
-texture_normal = ExtResource("41_hhbt4")
-texture_pressed = ExtResource("42_pncsj")
+texture_normal = ExtResource("43_4ae7x")
+texture_pressed = ExtResource("44_yhsbh")
 
 [node name="Mover" type="Control" parent="UI"]
 z_index = 1
@@ -504,6 +518,9 @@ texture = ExtResource("57_3qd5t")
 [connection signal="button_down" from="UI/Opciones/ButtonColor" to="UI/Opciones" method="_on_button_color_button_down"]
 [connection signal="button_up" from="UI/Opciones/ButtonColor" to="UI/Opciones" method="_on_button_color_button_up"]
 [connection signal="pressed" from="UI/Opciones/ButtonColor" to="." method="_on_button_color_pressed"]
+[connection signal="button_down" from="UI/Opciones/CheckboxButton" to="UI/Opciones" method="_on_checkbox_button_button_down"]
+[connection signal="button_up" from="UI/Opciones/CheckboxButton" to="UI/Opciones" method="_on_checkbox_button_button_up"]
+[connection signal="pressed" from="UI/Opciones/CheckboxButton" to="." method="_on_checkbox_button_pressed"]
 [connection signal="button_down" from="UI/Mover/BotonArriba" to="UI/Opciones" method="_on_boton_arriba_button_down"]
 [connection signal="button_up" from="UI/Mover/BotonArriba" to="UI/Opciones" method="_on_boton_arriba_button_up"]
 [connection signal="button_down" from="UI/Mover/BotonAbajo" to="UI/Opciones" method="_on_boton_abajo_button_down"]

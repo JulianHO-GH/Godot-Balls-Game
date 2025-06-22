@@ -1,5 +1,5 @@
 extends Control
-
+var checked: bool = true
 func buttonDown(path):
 	var tween1 = create_tween()
 	#path.scale = Vector2(0.5, 0.5)
@@ -220,3 +220,11 @@ func _on_texture_button_button_down() -> void:
 
 func _on_texture_button_button_up() -> void:
 	buttonUp($/root/Main/CanvasColor/TextureButton)
+
+
+func _on_checkbox_button_button_down() -> void:
+	buttonDown($/root/Main/UI/Opciones/CheckboxButton)
+
+
+func _on_checkbox_button_button_up() -> void:
+	buttonUp($/root/Main/UI/Opciones/CheckboxButton)

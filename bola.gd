@@ -94,6 +94,7 @@ func deactivate():
 	is_deactivated = true
 	$Sprite2D.visible = false
 	$CollisionShape2D.disabled = true
+	$OutlineBola.visible = false
 	linear_velocity = Vector2.ZERO
 	angular_velocity = 0.0
 	saved_state.linear_velocity = Vector2.ZERO

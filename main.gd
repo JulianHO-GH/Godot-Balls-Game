@@ -360,9 +360,13 @@ func _mover_menu():
 			.set_trans(Tween.TRANS_BOUNCE)
 
 func _reiniciar():
+	print(game_state.descongelado)
+	print(showing_popup)
 	if game_state.descongelado and not showing_popup:
+		print("reinciciar")
 		_alternar_congelar_descongelar()
-		
+	
+	if not showing_popup:
 		game_state.descongelado = false
 		$UI/Opciones/BotonDescongelar.texture_normal = load("res://Texturas/PlayButton.png")
 		$UI/Opciones/BotonEliminar.modulate = Color(1.0, 1.0, 1.0)
@@ -633,17 +637,21 @@ func _input(event):
 						ultimo_objeto_seleccionado = collider
 						# Mostrar BotonLink si es un cubo o bola
 						if has_script(collider, "res://bola.gd"):
-							$/root/Main/UI/Opciones/CheckboxButton.visible = true
+							
 							$UI/Opciones/BotonLink.visible = true
 							game_state.is_boton_link_visible = true
 							$UI/Opciones/ButtonColor.visible = false
 							var outline = ultimo_objeto_seleccionado.get_node_or_null("OutlineBola")
+							$/root/Main/UI/Opciones/CheckboxButton.texture_normal = load("res://Texturas/CheckboxButton.png")
+							$/root/Main/UI/Opciones/CheckboxButton.texture_pressed = load("res://Texturas/CheckBoxPressed.png")
+							$/root/Main/UI/Opciones/CheckboxButton.visible = true
 							if outline.visible:
 								$/root/Main/UI/Opciones/CheckboxButton.texture_normal = load("res://Texturas/CheckBoxSelected.png")
 								$/root/Main/UI/Opciones/CheckboxButton.texture_pressed = load("res://Texturas/CheckBoxSelectedPressed.png")
-							elif not outline.visible:
-								$/root/Main/UI/Opciones/CheckboxButton.texture_normal = load("res://Texturas/CheckBoxButton.png")
-								$/root/Main/UI/Opciones/CheckboxButton.texture_pressed = load("res://Texturas/CheckBoxPressed.png")
+								$/root/Main/UI/Opciones/CheckboxButton.visible = true
+							
+								
+							$/root/Main/UI/Opciones/CheckboxButton.visible = true
 						elif has_script(collider, "res://cubo.gd"):
 							$/root/Main/UI/Opciones/CheckboxButton.visible = false
 							$UI/Opciones/BotonLink.visible = false
@@ -1247,9 +1255,10 @@ func _on_checkbox_button_pressed() -> void:
 		if obj_id:
 			game_state.update_object_outline(obj_id, new_state)
 		
-		if new_state:
+		if outline.visible:
 			$/root/Main/UI/Opciones/CheckboxButton.texture_normal = load("res://Texturas/CheckBoxSelected.png")
 			$/root/Main/UI/Opciones/CheckboxButton.texture_pressed = load("res://Texturas/CheckBoxSelectedPressed.png")
 		else:
-			$/root/Main/UI/Opciones/CheckboxButton.texture_normal = load("res://Texturas/CheckBoxButton.png")
+			$/root/Main/UI/Opciones/CheckboxButton.texture_normal = load("res://Texturas/CheckboxButton.png")
 			$/root/Main/UI/Opciones/CheckboxButton.texture_pressed = load("res://Texturas/CheckBoxPressed.png")
+	$/root/Main/UI/Opciones/CheckboxButton.visible = true

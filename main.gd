@@ -1121,12 +1121,8 @@ func _reload(file_name: String):
 	if not level_data is Array:
 		print("Datos inválidos: se esperaba un array")
 		return
-	
-	var objects_by_id = {}
-	for obj_data in level_data:
-		objects_by_id[obj_data.id] = obj_data
-	
-	# Limpiar el estado actual
+
+	# Limpieza inicial
 	for node in get_tree().get_nodes_in_group("bolas") + get_tree().get_nodes_in_group("cubos") + \
 				get_tree().get_nodes_in_group("teleportadores") + get_tree().get_nodes_in_group("puntos_teletransporte") + \
 				get_tree().get_nodes_in_group("pisos") + get_tree().get_nodes_in_group("esquinas") + \
@@ -1141,62 +1137,94 @@ func _reload(file_name: String):
 	game_state.objects.clear()
 	game_state.ocupados.clear()
 	game_state.bola_initial_positions.clear()
-	
+
+	# PRIMER PASO: Precargar texturas y preparar datos
+	var objects_data = []
 	for obj_data in level_data:
+		if obj_data.scene_path == "res://Bola.tscn" and obj_data.has("texture_path") and obj_data.texture_path != "":
+			# Precargar textura única para esta bola
+			if FileAccess.file_exists(obj_data.texture_path):
+				var image = Image.new()
+				if image.load(obj_data.texture_path) == OK:
+					var texture = ImageTexture.new()
+					texture.set_image(image)
+					obj_data.texture_instance = texture  # Almacenar instancia única
+		
+		objects_data.append(obj_data)
+
+	# SEGUNDO PASO: Crear objetos con sus texturas únicas
+	for obj_data in objects_data:
 		var scene_path = obj_data.scene_path
 		var pos = Vector2(obj_data.position[0], obj_data.position[1])
 		var rotation_degrees = obj_data.rotation_degrees
-		var texture_path = obj_data.texture_path
-		var color = Color(obj_data.color[0], obj_data.color[1], obj_data.color[2], obj_data.color[3]) if obj_data.has("color") else Color.WHITE
-		var new_obj_id
-		
-		if scene_path == "res://Bola.tscn":
-			var has_outline = obj_data.get("has_outline", true)  # Valor por defecto true
-			new_obj_id = spawn_bola(pos, rotation_degrees, texture_path, has_outline)
-			game_state.set_rotation("Bola", rotation_degrees)
-		elif scene_path == "res://Cubo.tscn":
-			new_obj_id = spawn_cubo(pos, rotation_degrees, texture_path)
-			game_state.set_rotation("Cubo", rotation_degrees)
-			if new_obj_id:
-				# Asegúrate de actualizar el color después de spawnear
-				for obj in game_state.objects:
-					if obj.id == new_obj_id:
-						obj.color = color
-						break
-				# Actualizar el color visualmente
-				var cubo = get_node_by_meta("id", new_obj_id)
-				if cubo:
-					var inline_falso = cubo.get_node_or_null("Sprite2D/InlineFalso")
-					if inline_falso and inline_falso is TextureRect:
-						inline_falso.modulate = color
-		elif scene_path == "res://Teleportador.tscn":
-			var target_id = obj_data.get("target_id", "")
-			var target_data = objects_by_id.get(target_id, {})
-			var target_pos = Vector2(target_data.position[0], target_data.position[1]) if target_data.has("position") else pos + Vector2(250, 0)
-			var target_rotation_degrees = target_data.get("rotation_degrees", 0.0)
-			var target_texture_path = target_data.get("texture_path", "")
-			new_obj_id = spawn_teleportador(pos, rotation_degrees, texture_path, target_pos, target_rotation_degrees, target_texture_path)
-			game_state.set_rotation("Teleportador", rotation_degrees)
-			if target_data.has("rotation_degrees"):
-				game_state.set_rotation("PuntoTeletransporte", target_rotation_degrees)
-		elif scene_path == "res://PuntoTeletransporteIndividual.tscn":
-			continue
-		elif scene_path == "res://Piso.tscn":
-			new_obj_id = spawn_piso(pos, rotation_degrees)
-			game_state.set_rotation("Piso", rotation_degrees)
-		elif scene_path == "res://piso_esquina.tscn":
-			new_obj_id = spawn_esquina(pos, rotation_degrees)
-			game_state.set_rotation("Esquina", rotation_degrees)
-		elif scene_path == "res://esquina_rampa.tscn":
-			new_obj_id = spawn_esquinarampa(pos, rotation_degrees)
-			game_state.set_rotation("EsquinaRampa", rotation_degrees)
-		else:
-			print("Scene path desconocido: ", scene_path)
-		
+		var texture_path = obj_data.get("texture_path", "")
+		var has_outline = obj_data.get("has_outline", true)
+		var new_obj_id = ""
+
+		match scene_path:
+			"res://Bola.tscn":
+				new_obj_id = spawn_bola(pos, rotation_degrees, texture_path, has_outline)
+				game_state.set_rotation("Bola", rotation_degrees)
+				
+				# Aplicar textura precargada si existe
+				if obj_data.has("texture_instance"):
+					var bola = get_node_by_meta("id", new_obj_id)
+					if bola:
+						var sprite = bola.get_node("Sprite2D")
+						sprite.texture = obj_data.texture_instance
+						_adjust_sprite_scale(sprite)
+			
+			"res://Cubo.tscn":
+				new_obj_id = spawn_cubo(pos, rotation_degrees, texture_path)
+				game_state.set_rotation("Cubo", rotation_degrees)
+				# Actualizar color si existe
+				if obj_data.has("color"):
+					var color = Color(obj_data.color[0], obj_data.color[1], obj_data.color[2], obj_data.color[3])
+					game_state.update_object_color(new_obj_id, color)
+					var cubo = get_node_by_meta("id", new_obj_id)
+					if cubo:
+						var inline_falso = cubo.get_node_or_null("Sprite2D/InlineFalso")
+						if inline_falso:
+							inline_falso.modulate = color
+			
+			"res://Teleportador.tscn":
+				var target_id = obj_data.get("target_id", "")
+				var target_data = find_object_data(objects_data, target_id)
+				if target_data:
+					var target_pos = Vector2(target_data.position[0], target_data.position[1])
+					var target_rotation_degrees = target_data.rotation_degrees
+					var target_texture_path = target_data.get("texture_path", "")
+					new_obj_id = spawn_teleportador(pos, rotation_degrees, texture_path, target_pos, target_rotation_degrees, target_texture_path)
+					game_state.set_rotation("Teleportador", rotation_degrees)
+			
+			"res://Piso.tscn":
+				new_obj_id = spawn_piso(pos, rotation_degrees)
+				game_state.set_rotation("Piso", rotation_degrees)
+			
+			"res://piso_esquina.tscn":
+				new_obj_id = spawn_esquina(pos, rotation_degrees)
+				game_state.set_rotation("Esquina", rotation_degrees)
+			
+			"res://esquina_rampa.tscn":
+				new_obj_id = spawn_esquinarampa(pos, rotation_degrees)
+				game_state.set_rotation("EsquinaRampa", rotation_degrees)
+
 		if new_obj_id:
 			var tile_size = 250
 			var tile_pos = Vector2(floor(pos.x / tile_size), floor(pos.y / tile_size))
 			game_state.set_tile_occupied(tile_pos, true)
+
+func find_object_data(objects_data: Array, id: String) -> Dictionary:
+	for obj_data in objects_data:
+		if obj_data.id == id:
+			return obj_data
+	return {}
+
+func _adjust_sprite_scale(sprite: Sprite2D):
+	if sprite.texture:
+		var texture_size = sprite.texture.get_size()
+		var scale = 250.0 / min(texture_size.x, texture_size.y)
+		sprite.scale = Vector2(scale, scale)
 
 
 func _on_button_color_pressed() -> void:

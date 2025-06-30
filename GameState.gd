@@ -134,7 +134,9 @@ func load_image(path: String) -> Image:
 	var image = Image.new()
 	var error = image.load(path)
 	if error == OK:
-		return image.duplicate()  # Devuelve una copia nueva
+		var texture = ImageTexture.new() #Genera una copia nueva
+		texture.set_image(image)
+		return texture
 	return null
 
 # Métodos para gestionar tiles ocupados

@@ -771,6 +771,7 @@ func _on_image_request_completed(dict):
 			sepuede = false
 			
 		if sepuede:
+			# Crear máscara circular
 			for x in range(width):
 				for y in range(height):
 					var pixel_pos = Vector2(x, y)
@@ -778,32 +779,42 @@ func _on_image_request_completed(dict):
 					if distance > radius:
 						image.set_pixel(x, y, Color(0, 0, 0, 0))
 
-			var texture_path = game_state.save_image(image)
-			var image_node = image_scene.instantiate()
-			image_node.texture = ImageTexture.create_from_image(image)
-
+			# Obtener ID del objeto seleccionado
+			var obj_id = ""
+			if ultimo_objeto_seleccionado and ultimo_objeto_seleccionado.has_meta("id"):
+				obj_id = ultimo_objeto_seleccionado.get_meta("id")
+			
+			# Guardar imagen con ID único
+			var texture_path = game_state.save_image(image, obj_id)
+			
+			# Aplicar textura a la bola
 			var sprite = ultimo_objeto_seleccionado.get_node_or_null("Sprite2D")
 			if sprite:
-				sprite.texture = image_node.texture
+				# Crear nueva textura única para esta bola
+				var new_texture = ImageTexture.new()
+				new_texture.set_image(image)
+				sprite.texture = new_texture
+				
+				# Ajustar escala
 				var texture_size = sprite.texture.get_size()
 				var circle_diameter = min(texture_size.x, texture_size.y)
 				var target_diameter = 250.0
 				var scale = target_diameter / circle_diameter
 				sprite.scale = Vector2(scale, scale)
 
-				var obj_id = ultimo_objeto_seleccionado.get_meta("id", "")
+				# Actualizar en el estado del juego
 				if obj_id:
 					game_state.update_object_texture(obj_id, texture_path)
 
-				print("Circular texture assigned to Sprite2D with diameter of 250 pixels")
+				print("Textura circular asignada correctamente a la bola")
 	else:
-		
 		var dialog = get_node_or_null("AcceptDialog")
-		dialog.window_title = "Error"
-		dialog.dialog_text = "No image buffers received in dictionary"
-		dialog.ok_button_text = "Aceptar"
-		dialog.popup_centered(Vector2i(300, 150))  # Tamaño ajustado para móviles
-		print("No image buffers received in dictionary")
+		if dialog:
+			dialog.window_title = "Error"
+			dialog.dialog_text = "No se recibió ninguna imagen"
+			dialog.ok_button_text = "Aceptar"
+			dialog.popup_centered(Vector2i(300, 150))
+		print("No se recibieron datos de imagen en el diccionario")
 
 func _on_error(e):
 	var dialog = get_node("AcceptDialog")
@@ -838,7 +849,12 @@ func spawn_bola(pos, rotation_degrees: float = -1.0, texture_path: String = "", 
 		if texture_path != "":
 			var image = game_state.load_image(texture_path)
 			if image:
-				sprite.texture = ImageTexture.create_from_image(image)
+				# Guardar con ID único
+				var unique_path = game_state.save_image(image, obj_id)
+				# Crear una NUEVA instancia de ImageTexture para cada bola
+				var new_texture = ImageTexture.new()
+				new_texture.set_image(image)
+				sprite.texture = new_texture  # Usar la nueva textura única
 		var texture_size = sprite.texture.get_size() if sprite.texture else Vector2(1, 1)
 		var circle_diameter = min(texture_size.x, texture_size.y)
 		var target_diameter = 250.0

@@ -60,9 +60,9 @@ func generate_id() -> String:
 func add_object(scene_path: String, position: Vector2, rotation_degrees: float, 
 			   texture_path: String = "", extra_data: Dictionary = {}, 
 			   has_outline: bool = true) -> String:
-	var obj_id = str(randi())
+	var id = generate_id()
 	var obj_data = {
-		"id": obj_id,
+		"id": id,
 		"scene_path": scene_path,
 		"position": position,
 		"rotation_degrees": rotation_degrees,
@@ -72,7 +72,7 @@ func add_object(scene_path: String, position: Vector2, rotation_degrees: float,
 		"has_outline": has_outline  # Nuevo campo
 	}
 	objects.append(obj_data)
-	return obj_id
+	return id
 
 # Añade esta función para actualizar el estado del outline
 func update_object_outline(obj_id: String, has_outline: bool):
@@ -124,9 +124,8 @@ func get_object(id: String) -> Dictionary:
 	return {}
 
 # Guardar una imagen y devolver su ruta
-func save_image(image: Image) -> String:
-	var id = generate_id()
-	var path = IMAGE_DIR + "image_" + id + ".png"
+func save_image(image: Image, obj_id: String) -> String:
+	var path = IMAGE_DIR + "image_" + obj_id + ".png"
 	image.save_png(path)
 	return path
 
@@ -135,7 +134,7 @@ func load_image(path: String) -> Image:
 	var image = Image.new()
 	var error = image.load(path)
 	if error == OK:
-		return image
+		return image.duplicate()  # Devuelve una copia nueva
 	return null
 
 # Métodos para gestionar tiles ocupados

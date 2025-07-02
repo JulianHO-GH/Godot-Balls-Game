@@ -172,6 +172,10 @@ func _rotar_izquierda():
 		if ultimo_objeto_seleccionado is RigidBody2D:
 			ultimo_objeto_seleccionado.saved_state.rotation = deg_to_rad(ultimo_objeto_seleccionado.rotation_degrees)
 			ultimo_objeto_seleccionado.teleport(ultimo_objeto_seleccionado.position)
+		elif tipo_objeto == "Ventilador":
+			# Actualizar la zona de viento al rotar
+			ultimo_objeto_seleccionado.rotation_degrees = fposmod(ultimo_objeto_seleccionado.rotation_degrees, 360)
+			game_state.set_rotation("Ventilador", ultimo_objeto_seleccionado.rotation_degrees)
 
 func _rotar_derecha():
 	if game_state.seleccionando and ultimo_objeto_seleccionado and not showing_popup:
@@ -184,6 +188,10 @@ func _rotar_derecha():
 		if ultimo_objeto_seleccionado is RigidBody2D:
 			ultimo_objeto_seleccionado.saved_state.rotation = deg_to_rad(ultimo_objeto_seleccionado.rotation_degrees)
 			ultimo_objeto_seleccionado.teleport(ultimo_objeto_seleccionado.position)
+		elif tipo_objeto == "Ventilador":
+			# Actualizar la zona de viento al rotar
+			ultimo_objeto_seleccionado.rotation_degrees = fposmod(ultimo_objeto_seleccionado.rotation_degrees, 360)
+			game_state.set_rotation("Ventilador", ultimo_objeto_seleccionado.rotation_degrees)
 
 func _mover_objeto(direccion: Vector2):
 	if game_state.seleccionando and ultimo_objeto_seleccionado and not showing_popup:

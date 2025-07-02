@@ -8,6 +8,7 @@
 radius = 240.4
 
 [node name="Bola" type="RigidBody2D"]
+mass = 0.5
 freeze = true
 contact_monitor = true
 max_contacts_reported = 5

@@ -1,0 +1,40 @@
+[gd_scene load_steps=8 format=3 uid="uid://cwampc1rp7jgn"]
+
+[ext_resource type="Texture2D" uid="uid://drk6expw43yfo" path="res://Texturas/Ventilador1.png" id="1_oc3nq"]
+[ext_resource type="Script" path="res://ventilador.gd" id="1_yybew"]
+[ext_resource type="Texture2D" uid="uid://6dikybe3i8re" path="res://Texturas/Ventilador2.png" id="2_8uvx4"]
+[ext_resource type="Texture2D" uid="uid://c1vqy30oroxlq" path="res://Texturas/Ventilador3.png" id="3_4dp07"]
+[ext_resource type="Texture2D" uid="uid://ct2t63cd1adul" path="res://Texturas/Ventilador4.png" id="4_go0f7"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_dufwu"]
+size = Vector2(250, 250)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_p34li"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_oc3nq")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_8uvx4")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_4dp07")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_go0f7")
+}],
+"loop": true,
+"name": &"default",
+"speed": 20.0
+}]
+
+[node name="StaticBody2D" type="StaticBody2D"]
+script = ExtResource("1_yybew")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_dufwu")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_p34li")
+frame_progress = 0.928533

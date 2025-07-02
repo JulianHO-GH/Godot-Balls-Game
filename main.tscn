@@ -1,4 +1,4 @@
-[gd_scene load_steps=64 format=3 uid="uid://cs5whshwnasdf"]
+[gd_scene load_steps=66 format=3 uid="uid://cs5whshwnasdf"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_tpxov"]
 [ext_resource type="PackedScene" uid="uid://fn1hroyr720c" path="res://bola.tscn" id="2_gxh2a"]
@@ -11,6 +11,7 @@
 [ext_resource type="PackedScene" uid="uid://ckygc0pc8p57m" path="res://piso_esquina.tscn" id="6_rdbyg"]
 [ext_resource type="PackedScene" uid="uid://c3icifcstco4s" path="res://esquina_rampa.tscn" id="7_dtj3b"]
 [ext_resource type="PackedScene" uid="uid://ch1kf3dwhrur6" path="res://PuntoTeletransporteIndividual.tscn" id="8_jdxaa"]
+[ext_resource type="PackedScene" uid="uid://cwampc1rp7jgn" path="res://ventilador.tscn" id="9_47u0k"]
 [ext_resource type="Texture2D" uid="uid://coxud135l8ti0" path="res://Texturas/teleportador.png" id="9_vpaak"]
 [ext_resource type="Texture2D" uid="uid://bf0d7vgovj6y7" path="res://Texturas/EsquinaRampa.png" id="12_7imaq"]
 [ext_resource type="Texture2D" uid="uid://ddn1sw07ndnmh" path="res://Texturas/Triangulo.png" id="12_w5nhl"]
@@ -27,6 +28,7 @@
 [ext_resource type="Texture2D" uid="uid://brjxjl6ywdgio" path="res://Texturas/PlayButtonPressed.png" id="20_nka71"]
 [ext_resource type="Texture2D" uid="uid://qduxx5elwekq" path="res://Texturas/ReiniciarButton.png" id="21_iew8m"]
 [ext_resource type="Texture2D" uid="uid://d2rsr1ojovosr" path="res://Texturas/ReiniciarButtonPressed.png" id="22_swss1"]
+[ext_resource type="Texture2D" uid="uid://drk6expw43yfo" path="res://Texturas/Ventilador1.png" id="23_mqewi"]
 [ext_resource type="Texture2D" uid="uid://dwcajbsq2iuhy" path="res://Texturas/EliminarButton.png" id="25_clkci"]
 [ext_resource type="Texture2D" uid="uid://67eqldrfme4w" path="res://Texturas/EliminarButtonPressed.png" id="26_1e0vn"]
 [ext_resource type="Texture2D" uid="uid://dpt2tck8v08mq" path="res://Texturas/SeleccionarButton.png" id="27_c4j7u"]
@@ -85,6 +87,7 @@ grid_tilemap = NodePath("GridTileMap")
 esquina_scene = ExtResource("6_rdbyg")
 esquinarampa_scene = ExtResource("7_dtj3b")
 punto_teletransporte_scene = ExtResource("8_jdxaa")
+ventilador_scene = ExtResource("9_47u0k")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(540, 1000)
@@ -242,6 +245,16 @@ offset_bottom = 369.0
 pivot_offset = Vector2(60, 60)
 texture_normal = ExtResource("15_5tw84")
 texture_pressed = ExtResource("16_ygw64")
+
+[node name="BotonVentilador" type="TextureButton" parent="UI/Menu"]
+layout_mode = 0
+offset_left = 491.0
+offset_top = -252.0
+offset_right = 741.0
+offset_bottom = -2.00002
+scale = Vector2(0.9, 0.9)
+pivot_offset = Vector2(125, 125)
+texture_normal = ExtResource("23_mqewi")
 
 [node name="Opciones" type="Control" parent="UI"]
 layout_mode = 3

@@ -34,6 +34,7 @@ animations = [{
 size = Vector2(748, 248)
 
 [node name="StaticBody2D" type="StaticBody2D"]
+z_index = 2
 script = ExtResource("1_yybew")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]

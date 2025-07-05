@@ -12,3 +12,4 @@ func _on_body_entered(body):
 		
 		if main and main.game_state and main.game_state.descongelado:#Solo desactivarla si el juego está descongelado
 			body.deactivate()  # Desactivar la bola en lugar de destruirla
+			

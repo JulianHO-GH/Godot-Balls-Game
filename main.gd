@@ -73,7 +73,7 @@ func _ready():
 	$UI/Opciones/BotonZoomIn.pressed.connect(_zoom_in)
 	$UI/Opciones/BotonZoomOut.pressed.connect(_zoom_out)
 	$UI/Opciones/BotonDescongelar.pressed.connect(_alternar_congelar_descongelar)
-	$UI/Opciones/BotonReiniciar.pressed.connect(_reiniciar)
+	$UI/Opciones/BotonReiniciar.pressed.connect(_detener)
 	$UI/Opciones/BotonEliminar.pressed.connect(_eliminar)
 	$UI/Menu/BotonEsquinaRampa.pressed.connect(_seleccionar_esquinarampa)
 	$UI/Opciones/BotonSelect.pressed.connect(_alternar_seleccionar)
@@ -119,6 +119,8 @@ func _ready():
 	# Cargar el archivo de guardado seleccionado si existe
 	if selected_save_file != "":
 		_reload(selected_save_file)
+	
+	_detener()
 	
 
 func _seleccionar_esquinarampa():
@@ -374,6 +376,10 @@ func _mover_menu():
 			.set_ease(Tween.EASE_OUT)\
 			.set_trans(Tween.TRANS_BOUNCE)
 
+func _detener():
+	_reiniciar()
+	_reiniciar() #Invocarlo 2 veces funciona mejor, por algún motivo desconocido. No borrar.
+
 func _reiniciar():
 	print(game_state.descongelado)
 	print(showing_popup)
@@ -595,7 +601,6 @@ func _input(event):
 							game_state.is_boton_link_visible = false
 
 						PhysicsServer2D.set_active(true)
-						await get_tree().create_timer(0.0).timeout
 
 			elif game_state.seleccionando:
 				var space_state = get_world_2d().direct_space_state

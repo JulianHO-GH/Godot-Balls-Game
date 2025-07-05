@@ -51,6 +51,7 @@ func _init():
 	# Crear el directorio para imágenes si no existe
 	DirAccess.make_dir_recursive_absolute(IMAGE_DIR)
 
+
 # Generar un ID único para un objeto
 func generate_id() -> String:
 	_id_counter += 1

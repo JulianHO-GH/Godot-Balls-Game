@@ -1,6 +1,6 @@
 extends StaticBody2D
 
-@export var fuerza_viento: float = 1000.0
+@export var fuerza_viento: float = 2000.0
 @export var mostrar_zona_viento: bool = false
 
 func _ready():

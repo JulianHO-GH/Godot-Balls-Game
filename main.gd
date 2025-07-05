@@ -406,6 +406,12 @@ func _reiniciar():
 					bola.saved_state.angular_velocity = 0.0
 					bola.saved_state.position = target_position
 					bola.global_transform.origin = target_position
+					# Restaurar el estado del outline desde GameState.objects
+					var obj_data = game_state.get_object(obj_id)
+					if obj_data:
+						var outline = bola.get_node_or_null("OutlineBola")
+						if outline:
+							outline.visible = obj_data.get("has_outline", true)
 					bola.restart_physics(target_position)
 
 		var disabled_state = game_state.descongelado

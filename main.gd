@@ -9,6 +9,7 @@ extends Node2D
 @export var esquinarampa_scene: PackedScene
 @export var punto_teletransporte_scene: PackedScene
 @export var ventilador_scene: PackedScene
+@export var rebotador_scene: PackedScene
 
 # Instancia de GameState para gestionar datos
 var game_state = preload("res://GameState.gd").new()
@@ -82,6 +83,7 @@ func _ready():
 	$UI/Opciones/ButtonSave.pressed.connect(_save_level)
 	$UI/Opciones/ButtonLoad.pressed.connect(_on_button_load_pressed)
 	$UI/Menu/BotonVentilador.pressed.connect(_seleccionar_ventilador)
+	$UI/Menu/BotonRebotador.pressed.connect(_seleccionar_rebotador)
 
 	# Añadir botones al grupo
 	$UI/Menu/BotonBola.add_to_group("spawn_buttons")
@@ -92,6 +94,7 @@ func _ready():
 	$UI/Menu/BotonEsquinaRampa.add_to_group("spawn_buttons")
 	$UI/Menu/BotonMoverMenu.add_to_group("spawn_buttons")
 	$UI/Menu/BotonVentilador.add_to_group("spawn_buttons")
+	$UI/Menu/BotonRebotador.add_to_group("spawn_buttons")
 
 
 	# Conectar botones de mover
@@ -150,6 +153,10 @@ func _seleccionar_cubo():
 func _seleccionar_ventilador():
 	if not game_state.descongelado and not showing_popup:
 		game_state.modo = "Ventilador"
+
+func _seleccionar_rebotador():
+	if not game_state.descongelado and not showing_popup:
+		game_state.modo = "Rebotador"
 
 func _zoom_in():
 	if not showing_popup:
@@ -711,6 +718,8 @@ func _input(event):
 							obj_id = spawn_esquinarampa(spawn_pos)
 						elif game_state.modo == "Ventilador":
 							obj_id = spawn_ventilador(spawn_pos)
+						elif game_state.modo == "Rebotador":
+							obj_id = spawn_rebotador(spawn_pos)
 						if obj_id:
 							game_state.set_tile_occupied(tile_key, true)
 					else:
@@ -1065,7 +1074,19 @@ func spawn_ventilador(pos, rotation_degrees: float = -1.0) -> String:
 	add_child(ventilador)
 	
 	return obj_id
-	
+
+func spawn_rebotador(tile_pos: Vector2, rotation_degrees: float = 0.0) -> String:
+	if game_state.is_tile_occupied(tile_pos):
+		return ""
+	var rebotador = rebotador_scene.instantiate()
+	rebotador.position = tile_pos
+	rebotador.rotation_degrees = rotation_degrees
+	add_child(rebotador)
+	var obj_id = game_state.add_object(rebotador_scene.resource_path, tile_pos, rotation_degrees, "", {}, false)  # has_outline = false
+	game_state.set_tile_occupied(tile_pos, true)
+	rebotador.name = obj_id
+	return obj_id
+
 func _get_object_type(obj) -> String:
 	if obj is RigidBody2D:
 		return "Bola"
@@ -1079,6 +1100,8 @@ func _get_object_type(obj) -> String:
 			return "Piso"
 		elif scene_path == "res://ventilador.tscn":
 			return "Ventilador"
+		elif scene_path == "res://rebotador.tscn":
+			return "Rebotador"
 		return "Piso"
 	elif obj is Area2D and obj.get_script():
 		var script_path = obj.get_script().resource_path
@@ -1107,7 +1130,7 @@ func _save_level():
 		for obj in get_tree().get_nodes_in_group("bolas") + get_tree().get_nodes_in_group("cubos") + \
 				  get_tree().get_nodes_in_group("teleportadores") + get_tree().get_nodes_in_group("puntos_teletransporte") + \
 				  get_tree().get_nodes_in_group("pisos") + get_tree().get_nodes_in_group("esquinas") + \
-				  get_tree().get_nodes_in_group("esquinas_rampa") + get_tree().get_nodes_in_group("ventiladores"):
+				  get_tree().get_nodes_in_group("esquinas_rampa") + get_tree().get_nodes_in_group("ventiladores") + get_tree().get_nodes_in_group("rebotadores"):
 			var obj_id = obj.get_meta("id", "")
 			if obj_id:
 				valid_object_ids[obj_id] = true
@@ -1115,7 +1138,7 @@ func _save_level():
 		for obj in game_state.objects:
 			if obj.scene_path in ["res://Bola.tscn", "res://Cubo.tscn", "res://Teleportador.tscn", 
 								 "res://PuntoTeletransporteIndividual.tscn", "res://Piso.tscn", 
-								 "res://piso_esquina.tscn", "res://esquina_rampa.tscn", "res://ventilador.tscn"] and \
+								 "res://piso_esquina.tscn", "res://esquina_rampa.tscn", "res://ventilador.tscn", "res://rebotador.tscn"] and \
 			   valid_object_ids.has(obj.id):
 				var data = {
 					"id": obj.id,
@@ -1175,7 +1198,7 @@ func _reload(file_name: String):
 	for node in get_tree().get_nodes_in_group("bolas") + get_tree().get_nodes_in_group("cubos") + \
 				get_tree().get_nodes_in_group("teleportadores") + get_tree().get_nodes_in_group("puntos_teletransporte") + \
 				get_tree().get_nodes_in_group("pisos") + get_tree().get_nodes_in_group("esquinas") + \
-				get_tree().get_nodes_in_group("esquinas_rampa") + get_tree().get_nodes_in_group("ventiladores"):
+				get_tree().get_nodes_in_group("esquinas_rampa") + get_tree().get_nodes_in_group("ventiladores") + get_tree().get_nodes_in_group("rebotadores"):
 		node.queue_free()
 	
 	for line in game_state.teleport_lines.values():
@@ -1261,6 +1284,11 @@ func _reload(file_name: String):
 			"res://ventilador.tscn":
 				new_obj_id = spawn_ventilador(pos, rotation_degrees)
 				game_state.set_rotation("Ventilador", rotation_degrees)
+				
+			"res://rebotador.tscn":
+				new_obj_id = spawn_rebotador(pos, rotation_degrees)
+				game_state.set_rotation("Rebotador", rotation_degrees)
+				
 
 		if new_obj_id:
 			var tile_size = 250

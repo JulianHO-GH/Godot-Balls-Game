@@ -14,7 +14,8 @@ var ultimas_rotaciones: Dictionary = {
 	"Esquina": 0.0,
 	"EsquinaRampa": 0.0,
 	"PuntoTeletransporte": 0.0,
-	"Ventilador": 0.0
+	"Ventilador": 0.0,
+	"Rebotador": 0.0
 }
 
 # Lista de objetos instanciados

@@ -1075,16 +1075,19 @@ func spawn_ventilador(pos, rotation_degrees: float = -1.0) -> String:
 	
 	return obj_id
 
-func spawn_rebotador(tile_pos: Vector2, rotation_degrees: float = 0.0) -> String:
-	if game_state.is_tile_occupied(tile_pos):
-		return ""
-	var rebotador = rebotador_scene.instantiate()
-	rebotador.position = tile_pos
-	rebotador.rotation_degrees = rotation_degrees
+func spawn_rebotador(pos, rotation_degrees: float = -1.0) -> String:
+	var rebotador  = rebotador_scene.instantiate()
+	rebotador.position = pos
+	var rot = rotation_degrees if rotation_degrees != -1.0 else game_state.get_rotation("Rebotador")
+	var obj_id = game_state.add_object("res://rebotador.tscn", pos, rot)
+	rebotador.set_meta("id", obj_id)
+	rebotador.set_meta("scene_path", "res://rebotador.tscn")
+	var sprite = rebotador.get_node("Sprite2D")
+	if sprite:
+		sprite.material = material_base.duplicate()
+	rebotador.rotation_degrees = rot
+	rebotador.add_to_group("rebotadores")
 	add_child(rebotador)
-	var obj_id = game_state.add_object(rebotador_scene.resource_path, tile_pos, rotation_degrees, "", {}, false)  # has_outline = false
-	game_state.set_tile_occupied(tile_pos, true)
-	rebotador.name = obj_id
 	return obj_id
 
 func _get_object_type(obj) -> String:

@@ -8,25 +8,14 @@ func _ready():
 	
 	
 	# Conectar señales correctamente
-	$Area2D.body_entered.connect(_on_viento_body_entered)
-	$Area2D.body_exited.connect(_on_viento_body_exited)
 	$Area2D.body_shape_entered.connect(_on_viento_body_shape_entered)
 
 
-func _on_viento_body_entered(body: Node):
-	print("on_viento_body_entered1")
-
-
-func _on_viento_body_exited(body: Node):
-	pass
 
 func _on_viento_body_shape_entered(body_rid: RID, body: Node, body_shape_idx: int, area_shape_idx: int):
 	if body is RigidBody2D and not body.is_deactivated:
 		body.freeze = true
-		
-		print(body.linear_velocity)
-		
-	print("on_viento_body_shape_entered2")
+		#print(body.linear_velocity)
 
 func aplicar_fuerza_continua(body: RigidBody2D):
 	var direccion = Vector2.RIGHT.rotated(global_rotation)

@@ -102,6 +102,8 @@ func deactivate():
 	# Excluir la bola de todas las capas y máscaras de colisión
 	set_collision_layer_value(1, false)  # Desactivar la capa de colisión
 	set_collision_mask_value(1, false)   # Desactivar la máscara de colisión
+	set_collision_layer_value(7, false)  # Desactivar la capa de colisión 7 para los rebotadores
+	set_collision_mask_value(7, false)   # Desactivar la máscara de colisión 7 para los rebotadores
 
 func reactivate():
 	is_deactivated = false
@@ -110,3 +112,5 @@ func reactivate():
 	# Restaurar las capas y máscaras de colisión
 	set_collision_layer_value(1, true)  # Reactivar la capa de colisión
 	set_collision_mask_value(1, true)   # Reactivar la máscara de colisión
+	set_collision_layer_value(7, true)  # Reactivar la capa de colisión 7 para los rebotadores
+	set_collision_mask_value(7, true)   # Reactivar la máscara de colisión 7 para los rebotadores

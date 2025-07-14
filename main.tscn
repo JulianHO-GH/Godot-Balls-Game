@@ -31,7 +31,7 @@
 [ext_resource type="Texture2D" uid="uid://d2rsr1ojovosr" path="res://Texturas/ReiniciarButtonPressed.png" id="22_swss1"]
 [ext_resource type="Texture2D" uid="uid://drk6expw43yfo" path="res://Texturas/Ventilador1.png" id="23_mqewi"]
 [ext_resource type="Texture2D" uid="uid://dwcajbsq2iuhy" path="res://Texturas/EliminarButton.png" id="25_clkci"]
-[ext_resource type="Texture2D" uid="uid://2pr10ffw53xp" path="res://Texturas/brasil.png" id="25_ttoky"]
+[ext_resource type="Texture2D" uid="uid://trfqtyq1eavp" path="res://Texturas/rebotador.png" id="25_tbnmg"]
 [ext_resource type="Texture2D" uid="uid://67eqldrfme4w" path="res://Texturas/EliminarButtonPressed.png" id="26_1e0vn"]
 [ext_resource type="Texture2D" uid="uid://dpt2tck8v08mq" path="res://Texturas/SeleccionarButton.png" id="27_c4j7u"]
 [ext_resource type="Texture2D" uid="uid://082dlffynq3d" path="res://Texturas/SeleccionarButtonPressed.png" id="28_8v53c"]
@@ -265,7 +265,7 @@ offset_left = 749.0
 offset_top = -254.0
 offset_right = 999.0
 offset_bottom = -4.0
-texture_normal = ExtResource("25_ttoky")
+texture_normal = ExtResource("25_tbnmg")
 
 [node name="Opciones" type="Control" parent="UI"]
 layout_mode = 3

@@ -1,13 +1,16 @@
-[gd_scene load_steps=5 format=3 uid="uid://hmmnnunwsqdw"]
+[gd_scene load_steps=6 format=3 uid="uid://hmmnnunwsqdw"]
 
-[ext_resource type="Texture2D" uid="uid://2pr10ffw53xp" path="res://Texturas/brasil.png" id="1_3tldt"]
 [ext_resource type="Script" path="res://rebotador.gd" id="1_pjymx"]
+[ext_resource type="Texture2D" uid="uid://trfqtyq1eavp" path="res://Texturas/rebotador.png" id="2_5il1d"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_hj3ld"]
 friction = 0.0
 bounce = 1.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_xhbgc"]
+radius = 124.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_j4ld1"]
 radius = 125.0
 
 [node name="Rebotador" type="StaticBody2D"]
@@ -15,7 +18,22 @@ physics_material_override = SubResource("PhysicsMaterial_hj3ld")
 script = ExtResource("1_pjymx")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-texture = ExtResource("1_3tldt")
+texture = ExtResource("2_5il1d")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_xhbgc")
+
+[node name="Area2D" type="Area2D" parent="."]
+collision_layer = 64
+collision_mask = 64
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+shape = SubResource("CircleShape2D_j4ld1")
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 0.13
+one_shot = true
+
+[connection signal="body_shape_entered" from="Area2D" to="." method="_on_area_2d_body_shape_entered"]
+[connection signal="body_shape_exited" from="Area2D" to="." method="_on_area_2d_body_shape_exited"]
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]

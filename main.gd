@@ -49,6 +49,9 @@ var plugin
 var plugin_name = "GodotGetImage"
 @onready var image_scene = preload("res://sprite_2d.tscn")
 
+# Directorio para guardar capturas
+const SCREENSHOT_DIR: String = "user://screenshots/"
+var screenshot_counter: int = 0  # Contador para nombres únicos
 
 func _ready():
 	# Crear el directorio de guardado si no existe
@@ -124,6 +127,9 @@ func _ready():
 		_reload(selected_save_file)
 	
 	_detener()
+	
+	 # Crear el directorio de capturas si no existe
+	DirAccess.make_dir_recursive_absolute(SCREENSHOT_DIR)
 	
 
 func _seleccionar_esquinarampa():

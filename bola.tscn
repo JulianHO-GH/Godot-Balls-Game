@@ -19,6 +19,7 @@ script = ExtResource("1_p3tta")
 
 [node name="OutlineBola" type="Sprite2D" parent="."]
 z_index = 1
+scale = Vector2(1.015, 1.015)
 texture = ExtResource("2_vw3t4")
 
 [node name="Sprite2D" parent="." instance=ExtResource("2_w2rc8")]

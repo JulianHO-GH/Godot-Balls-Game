@@ -24,7 +24,7 @@ var ultimo_objeto_seleccionado = null  # Referencia al último objeto selecciona
 var is_dragging: bool = false  # Indica si estamos arrastrando
 var selected_save_file: String = ""  # Archivo de guardado actual
 var showing_popup: bool = false #Si se está mostrando un popup
-
+var dragging: bool = false
 
 # Constantes
 const ZOOM_MIN: float = 0.1
@@ -38,7 +38,7 @@ const DRAG_THRESHOLD: float = 10.0
 const CAMERA_LIMIT_LEFT: float = -5000.0
 const CAMERA_LIMIT_TOP: float = -10000.0
 const CAMERA_LIMIT_RIGHT: float = 6000.0
-const CAMERA_LIMIT_BOTTOM: float = 11000.0
+const CAMERA_LIMIT_BOTTOM: float = 36000.0
 const SAVE_DIR: String = "user://saved_levels/"
 
 # Materiales/Shaders
@@ -530,7 +530,26 @@ func _input(event):
 				if button is BaseButton and button.is_pressed():
 					touch_over_buttons = true
 					break
+	
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+		# Start dragging if the click is on the sprite.
+		if not dragging and event.pressed:
+			dragging = true
+		# Stop dragging if the button is released.
+		if dragging and not event.pressed:
+			dragging = false
 
+	if event is InputEventMouseMotion and dragging:
+		var distance_moved = (event.position - initial_touch_position).length()
+		if distance_moved > DRAG_THRESHOLD and not touch_over_buttons:
+			is_dragging = true
+			var delta = ultima_posicion_toque - event.position
+			$Camera2D.position += delta
+			$Camera2D.position.x = clamp($Camera2D.position.x, CAMERA_LIMIT_LEFT, CAMERA_LIMIT_RIGHT)
+			$Camera2D.position.y = clamp($Camera2D.position.y, CAMERA_LIMIT_TOP, CAMERA_LIMIT_BOTTOM)
+			ultima_posicion_toque = event.position
+			game_state.camera_position = $Camera2D.position
+		
 	elif event is InputEventScreenDrag and not showing_popup:
 		var distance_moved = (event.position - initial_touch_position).length()
 		if distance_moved > DRAG_THRESHOLD and not touch_over_buttons:

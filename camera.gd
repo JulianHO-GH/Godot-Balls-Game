@@ -3,11 +3,11 @@ extends Camera2D
 # Referencia al nodo principal para acceder a game_state
 @onready var main = get_node("/root/Main")
 
-# Velocidad de suavizado para el seguimiento de la cámara (ajusta según prefieras)
+# Velocidad de suavizado para el seguimiento de la cámara
 @export var smoothing_speed: float = 5.0
 
 func _physics_process(delta):
-	if main and main.game_state and main.game_state.descongelado:
+	if main and main.game_state and main.game_state.descongelado and not main.game_state.meta_alcanzada:
 		# Obtener todas las bolas activas
 		var bolas = get_tree().get_nodes_in_group("bolas")
 		var bola_mas_abajo = null
@@ -27,7 +27,6 @@ func _physics_process(delta):
 			# Actualizar la posición en game_state para mantener consistencia
 			main.game_state.camera_position = position
 	else:
-		# Cuando el juego no está descongelado, mantener la posición actual
-		# Restaurar la posición guardada en game_state si es necesario
+		# Mantener la posición actual si el juego no está descongelado o la meta fue alcanzada
 		if main and main.game_state:
 			position = main.game_state.camera_position

@@ -6,6 +6,7 @@ var ocupados: Dictionary = {}  # Tiles ocupados: Vector2 -> bool
 
 var teleport_lines: Dictionary = {}  # ID de teleportador -> Line2D
 var bola_initial_positions: Dictionary = {}  # ID de bola -> Vector2
+var meta_alcanzada: bool = false
 var ultimas_rotaciones: Dictionary = {
 	"Bola": 0.0,
 	"Piso": 0.0,
@@ -189,7 +190,8 @@ func to_dict() -> Dictionary:
 		"ui_options_position": [ui_options_position.x, ui_options_position.y],
 		"ui_boton_reiniciar_position": [ui_boton_reiniciar_position.x, ui_boton_reiniciar_position.y],
 		"ui_boton_descongelar_position": [ui_boton_descongelar_position.x, ui_boton_descongelar_position.y],
-		"ui_botones_mover_position": [ui_botones_mover_position.x, ui_botones_mover_position.y]
+		"ui_botones_mover_position": [ui_botones_mover_position.x, ui_botones_mover_position.y],
+		"meta_alcanzada": meta_alcanzada
 	}
 
 # Deserializar el estado desde un diccionario (para cargar desde JSON)
@@ -212,3 +214,4 @@ func from_dict(data: Dictionary):
 	ui_boton_reiniciar_position = Vector2(data.get("ui_boton_reiniciar_position", [0, 0])[0], data.get("ui_boton_reiniciar_position", [0, 0])[1])
 	ui_boton_descongelar_position = Vector2(data.get("ui_boton_descongelar_position", [0, 0])[0], data.get("ui_boton_descongelar_position", [0, 0])[1])
 	ui_botones_mover_position = Vector2(data.get("ui_botones_mover_position", [0, 0])[0], data.get("ui_botones_mover_position", [0, 0])[1])
+	meta_alcanzada = data.get("meta_alcanzada", false)

@@ -131,7 +131,23 @@ func _ready():
 	 # Crear el directorio de capturas si no existe
 	DirAccess.make_dir_recursive_absolute(SCREENSHOT_DIR)
 	
-
+	# Conectar la señal de Area2DMeta
+	var area_meta = $Area2DMeta
+	if area_meta:
+		area_meta.bola_alcanzo_meta.connect(_on_area_meta_bola_alcanzo_meta)
+	
+	# Configurar Area2DMeta como indestructible (opcional, para reforzar)
+	if area_meta:
+		area_meta.set_collision_layer_value(1, false)
+		area_meta.set_collision_layer_value(2, false)
+		area_meta.set_collision_layer_value(3, true)
+		area_meta.set_collision_mask_value(1, true)
+		area_meta.set_collision_mask_value(2, false)
+		area_meta.set_collision_mask_value(3, false)
+	
+func _on_area_meta_bola_alcanzo_meta():
+	game_state.meta_alcanzada = true
+	
 func _seleccionar_esquinarampa():
 	if not game_state.descongelado and not showing_popup:
 		game_state.modo = "EsquinaRampa"
@@ -402,6 +418,7 @@ func _reiniciar():
 	
 	if not showing_popup:
 		game_state.descongelado = false
+		game_state.meta_alcanzada = false # Reiniciar el estado de la meta
 		$UI/Opciones/BotonDescongelar.texture_normal = load("res://Texturas/PlayButton.png")
 		$UI/Opciones/BotonEliminar.modulate = Color(1.0, 1.0, 1.0)
 		$UI/Opciones/BotonEliminar.disabled = false

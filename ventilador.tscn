@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://cwampc1rp7jgn"]
+[gd_scene load_steps=12 format=3 uid="uid://cwampc1rp7jgn"]
 
 [ext_resource type="Texture2D" uid="uid://drk6expw43yfo" path="res://Texturas/Ventilador1.png" id="1_oc3nq"]
 [ext_resource type="Script" path="res://ventilador.gd" id="1_yybew"]
@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://c1vqy30oroxlq" path="res://Texturas/Ventilador3.png" id="3_4dp07"]
 [ext_resource type="Texture2D" uid="uid://ct2t63cd1adul" path="res://Texturas/Ventilador4.png" id="4_go0f7"]
 [ext_resource type="Texture2D" uid="uid://d6e0hs85b8sx" path="res://Texturas/viento.png" id="6_2fml5"]
+[ext_resource type="Shader" path="res://repeatWind.gdshader" id="6_foxai"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_dufwu"]
 size = Vector2(248, 248)
@@ -30,6 +31,12 @@ animations = [{
 "speed": 20.0
 }]
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_oboty"]
+shader = ExtResource("6_foxai")
+shader_parameter/speed = 1.7
+shader_parameter/fade_width = 0.5
+shader_parameter/texture = ExtResource("6_2fml5")
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ww8pn"]
 size = Vector2(748, 248)
 
@@ -42,11 +49,13 @@ shape = SubResource("RectangleShape2D_dufwu")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_p34li")
-frame_progress = 0.928533
+frame_progress = 0.238739
 
 [node name="Area2D" type="Area2D" parent="."]
 
 [node name="Sprite2D" type="Sprite2D" parent="Area2D"]
+texture_repeat = 2
+material = SubResource("ShaderMaterial_oboty")
 position = Vector2(500, 0)
 texture = ExtResource("6_2fml5")
 

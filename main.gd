@@ -624,6 +624,11 @@ func _input(event):
 								var punto_id = collider.teleport_target.get_meta("id", "")
 								if punto_id:
 									game_state.remove_object(punto_id)
+									# Eliminar la línea asociada
+									var line = game_state.teleport_lines.get(obj_id)
+									if line and is_instance_valid(line):
+										line.queue_free()
+										game_state.teleport_lines.erase(obj_id)
 								collider.teleport_target.queue_free()
 						elif collider is Area2D and collider.get_script() and collider.get_script().resource_path == "res://punto_teletransporte.gd":
 							for teleportador in get_tree().get_nodes_in_group("teleportadores"):
@@ -635,6 +640,11 @@ func _input(event):
 									var tele_id = teleportador.get_meta("id", "")
 									if tele_id:
 										game_state.remove_object(tele_id)
+										# Eliminar la línea asociada
+										var line = game_state.teleport_lines.get(tele_id)
+										if line and is_instance_valid(line):
+											line.queue_free()
+											game_state.teleport_lines.erase(tele_id)
 									teleportador.queue_free()
 									break
 

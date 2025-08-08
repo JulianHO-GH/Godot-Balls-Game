@@ -169,6 +169,9 @@ func set_rotation(tipo: String, rotation_degrees: float):
 
 func get_rotation(tipo: String) -> float:
 	return ultimas_rotaciones.get(tipo, 0.0)
+	
+
+
 
 # Serializar el estado a un diccionario (para guardar en JSON)
 func to_dict() -> Dictionary:

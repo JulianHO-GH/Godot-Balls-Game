@@ -25,6 +25,7 @@ var is_dragging: bool = false  # Indica si estamos arrastrando
 var selected_save_file: String = ""  # Archivo de guardado actual
 var showing_popup: bool = false #Si se está mostrando un popup
 var dragging: bool = false
+var ignore_initial_touch: bool = true
 
 # Constantes
 const ZOOM_MIN: float = 0.1
@@ -57,7 +58,9 @@ func _ready():
 	# Crear el directorio de guardado si no existe
 	DirAccess.make_dir_recursive_absolute(SAVE_DIR)
 	print("Directorio ", SAVE_DIR, " creado o ya existe")
-
+	
+	
+	
 	# Inicializar posiciones iniciales de la UI en GameState
 	game_state.ui_menu_position = $UI/Menu.position
 	game_state.ui_options_position = $UI/Opciones.position
@@ -128,6 +131,10 @@ func _ready():
 	
 	_detener()
 	
+	ignore_initial_touch = true
+	await get_tree().create_timer(0.5).timeout  # Ignorar toques durante 0.5 segundos
+	ignore_initial_touch = false
+	
 	 # Crear el directorio de capturas si no existe
 	DirAccess.make_dir_recursive_absolute(SCREENSHOT_DIR)
 	
@@ -144,6 +151,20 @@ func _ready():
 		area_meta.set_collision_mask_value(1, true)
 		area_meta.set_collision_mask_value(2, false)
 		area_meta.set_collision_mask_value(3, false)
+
+func play_menu_sound(audio_path: String, volume_db: float = 0.0, pitch: float = 1.0):
+	if not ResourceLoader.exists(audio_path):
+		print("Error: No se encontró el archivo de audio en ", audio_path)
+		return
+	var audio_player = AudioStreamPlayer.new()
+	audio_player.stream = load(audio_path) # Carga el archivo de audio (.wav o .ogg)
+	audio_player.volume_db = volume_db
+	audio_player.pitch_scale = pitch
+	add_child(audio_player)
+	audio_player.play()
+	audio_player.finished.connect(func():
+		audio_player.queue_free()
+	)
 	
 func _on_area_meta_bola_alcanzo_meta():
 	game_state.meta_alcanzada = true
@@ -465,8 +486,9 @@ func _reiniciar():
 
 func _eliminar():
 	if not showing_popup:
-			
+		play_menu_sound("res://sounds/pop.wav")
 		if not game_state.is_deleting and ultimo_objeto_seleccionado:
+			
 			var collider = ultimo_objeto_seleccionado
 			var obj_id = collider.get_meta("id", "")
 			
@@ -526,8 +548,11 @@ func _eliminar():
 			for button in $UI/Opciones.get_children():
 				button.modulate = Color(1.0, 1.0, 1.0)
 				button.disabled = false
+		
 
 func _input(event):
+	if ignore_initial_touch:
+		return  # Ignorar todos los eventos de entrada iniciales
 	if (event is InputEventScreenTouch or event is InputEventMouseButton) and event.pressed and not showing_popup:
 		initial_touch_position = event.position
 		ultima_posicion_toque = event.position
@@ -1170,6 +1195,7 @@ func _get_object_type(obj) -> String:
 
 func _save_level():
 	if not showing_popup:
+		play_menu_sound("res://sounds/pop.wav")
 		if selected_save_file == "":
 			print("Error: No hay un archivo de guardado seleccionado")
 			var dialog = AcceptDialog.new()
@@ -1222,6 +1248,7 @@ func _save_level():
 
 func _on_button_load_pressed():
 	if not showing_popup:
+		play_menu_sound("res://sounds/pop.wav")
 		get_tree().change_scene_to_file("res://MenuGuardados.tscn")
 	
 func _reload(file_name: String):

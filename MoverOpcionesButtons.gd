@@ -51,7 +51,20 @@ func popOut(path):
 		path.visible = false
 	)
 	
-			
+func play_menu_sound(audio_path: String, volume_db: float = 0.0, pitch: float = 1.0):
+	if not ResourceLoader.exists(audio_path):
+		print("Error: No se encontró el archivo de audio en ", audio_path)
+		return
+	var audio_player = AudioStreamPlayer.new()
+	audio_player.stream = load(audio_path) # Carga el archivo de audio (.wav o .ogg)
+	audio_player.volume_db = volume_db
+	audio_player.pitch_scale = pitch
+	add_child(audio_player)
+	audio_player.play()
+	audio_player.finished.connect(func():
+		audio_player.queue_free()
+	)
+
 func _on_boton_zoom_in_button_down() -> void:
 	buttonDown($BotonZoomIn)
 
@@ -228,3 +241,29 @@ func _on_checkbox_button_button_down() -> void:
 
 func _on_checkbox_button_button_up() -> void:
 	buttonUp($/root/Main/UI/Opciones/CheckboxButton)
+
+
+func _on_boton_zoom_in_pressed() -> void:
+	play_menu_sound("res://sounds/pop.wav", 0.7, 1.3)
+
+
+func _on_boton_zoom_out_pressed() -> void:
+	play_menu_sound("res://sounds/pop.wav", 1, 0.8)
+
+
+func _on_boton_descongelar_pressed() -> void:
+	play_menu_sound("res://sounds/pop.wav")
+
+
+func _on_boton_reiniciar_pressed() -> void:
+	play_menu_sound("res://sounds/pop.wav")
+
+
+
+
+func _on_boton_select_pressed() -> void:
+	play_menu_sound("res://sounds/pop.wav")
+
+
+func _on_boton_link_pressed() -> void:
+	play_menu_sound("res://sounds/pop.wav")

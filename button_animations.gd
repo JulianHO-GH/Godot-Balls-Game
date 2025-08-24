@@ -1,5 +1,20 @@
 extends Node
 	
+# Reproduce un sonido para interacciones del menú
+func play_menu_sound(audio_path: String, volume_db: float = 0.0, pitch: float = 1.0):
+	if not ResourceLoader.exists(audio_path):
+		print("Error: No se encontró el archivo de audio en ", audio_path)
+		return
+	var audio_player = AudioStreamPlayer.new()
+	audio_player.stream = load(audio_path) # Carga el archivo de audio (.wav o .ogg)
+	audio_player.volume_db = volume_db
+	audio_player.pitch_scale = pitch
+	add_child(audio_player)
+	audio_player.play()
+	audio_player.finished.connect(func():
+		audio_player.queue_free()
+	)
+
 func buttonDown(path):
 	var tween1 = create_tween()
 	tween1.parallel().tween_property(path, "scale", Vector2(1.1, 1.1), 0.5)\
@@ -79,10 +94,12 @@ func _on_cancelar_button_button_up() -> void:
 
 
 func _on_boton_cargar_pressed() -> void:
+	play_menu_sound("res://sounds/pop.wav")
 	popIn($/root/MenuGuardados/PopUp)
 
 
 func _on_cancelar_button_pressed() -> void:
+	play_menu_sound("res://sounds/popback.wav", 10)
 	popOut($/root/MenuGuardados/PopUp)
 
 	$/root/MenuGuardados/PopUp/EditNameButton.disabled = true
@@ -107,6 +124,7 @@ func _on_nombre_cancelado_button_up() -> void:
 
 	
 func _on_nombre_cancelado_pressed() -> void:
+	play_menu_sound("res://sounds/popback.wav", 10)
 	popOut2($/root/MenuGuardados/PopUp2)
 	
 	var tween3 = create_tween()
@@ -120,6 +138,7 @@ func _on_nombre_cancelado_pressed() -> void:
 
 
 func _on_boton_nuevo_pressed() -> void:
+	play_menu_sound("res://sounds/pop.wav")
 	$/root/MenuGuardados/PopUp2.visible = true
 	popIn($/root/MenuGuardados/PopUp2)
 	$/root/MenuGuardados/FondoGris.visible = true
@@ -148,6 +167,7 @@ func _on_edit_cancelado_button_up() -> void:
 
 
 func _on_edit_cancelado_pressed() -> void:
+	play_menu_sound("res://sounds/popback.wav", 10)
 	popOut2($/root/MenuGuardados/PopUp3)
 	var tween3 = create_tween()
 	tween3.tween_property($/root/MenuGuardados/FondoGris, "modulate:a", 0.0, 0.2)\
@@ -167,6 +187,7 @@ func _on_edit_name_button_button_up() -> void:
 
 
 func _on_edit_name_button_pressed() -> void:
+	play_menu_sound("res://sounds/pop.wav")
 	$/root/MenuGuardados/PopUp3.visible = true
 	popIn($/root/MenuGuardados/PopUp3)
 	$/root/MenuGuardados/FondoGris.visible = true
@@ -178,6 +199,7 @@ func _on_edit_name_button_pressed() -> void:
 
 
 func _on_edit_aceptado_pressed() -> void:
+	play_menu_sound("res://sounds/lapiz.wav", 9)
 	$/root/MenuGuardados/PopUp/EditNameButton.disabled = true
 	$/root/MenuGuardados/PopUp/BorrarLevel.disabled = true
 	popOut2($/root/MenuGuardados/PopUp3)
@@ -217,7 +239,7 @@ func _on_borrar_level_button_up() -> void:
 
 
 func _on_borrar_level_pressed() -> void:
-	
+	play_menu_sound("res://sounds/pop.wav")
 	$/root/MenuGuardados/PopUp4.visible = true
 	popIn($/root/MenuGuardados/PopUp4)
 	$/root/MenuGuardados/FondoGris.visible = true
@@ -229,6 +251,7 @@ func _on_borrar_level_pressed() -> void:
 
 
 func _on_volver_button_pressed() -> void:
+	play_menu_sound("res://sounds/popback.wav", 10)
 	popOut2($/root/MenuGuardados/PopUp4)
 	var tween3 = create_tween()
 	tween3.tween_property($/root/MenuGuardados/FondoGris, "modulate:a", 0.0, 0.2)\
@@ -240,6 +263,7 @@ func _on_volver_button_pressed() -> void:
 
 
 func _on_delete_level_button_pressed() -> void:
+	play_menu_sound("res://sounds/woosh.wav")
 	$/root/MenuGuardados/PopUp/EditNameButton.disabled = true
 	$/root/MenuGuardados/PopUp/BorrarLevel.disabled = true
 	popOut2($/root/MenuGuardados/PopUp4)

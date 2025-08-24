@@ -29,6 +29,20 @@ func _ready():
 	$NoSaveFilesAlert.visible = false
 
 
+func play_menu_sound(audio_path: String, volume_db: float = 0.0, pitch: float = 1.0):
+	if not ResourceLoader.exists(audio_path):
+		print("Error: No se encontró el archivo de audio en ", audio_path)
+		return
+	var audio_player = AudioStreamPlayer.new()
+	audio_player.stream = load(audio_path) # Carga el archivo de audio (.wav o .ogg)
+	audio_player.volume_db = volume_db
+	audio_player.pitch_scale = pitch
+	add_child(audio_player)
+	audio_player.play()
+	audio_player.finished.connect(func():
+		audio_player.queue_free()
+	)
+
 
 func _on_boton_cargar_pressed():
 	var save_files = _get_save_files()
@@ -89,6 +103,7 @@ func _get_save_files() -> Array:
 
 
 func _on_aceptar_button_pressed() -> void:
+	play_menu_sound("res://sounds/pop.wav")
 	# Conectar la señal de confirmación
 	var save_files = _get_save_files()
 	var selected_items = item_list.get_selected_items()
@@ -105,6 +120,7 @@ func _on_aceptar_button_pressed() -> void:
 
 
 func _on_nombre_aceptado_pressed() -> void:
+	play_menu_sound("res://sounds/pop.wav")
 	var NombreInput = $/root/MenuGuardados/PopUp2/InputNombre
 	var nombre_nivel = NombreInput.text.strip_edges()
 	

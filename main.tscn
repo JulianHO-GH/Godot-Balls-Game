@@ -1,4 +1,4 @@
-[gd_scene load_steps=74 format=3 uid="uid://cs5whshwnasdf"]
+[gd_scene load_steps=77 format=3 uid="uid://cs5whshwnasdf"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_tpxov"]
 [ext_resource type="PackedScene" uid="uid://fn1hroyr720c" path="res://bola.tscn" id="2_gxh2a"]
@@ -6,8 +6,6 @@
 [ext_resource type="PackedScene" uid="uid://biguqg3fhh22o" path="res://cubo.tscn" id="4_1h1nf"]
 [ext_resource type="Texture2D" uid="uid://nu0pfrg47ghc" path="res://Texturas/walterapachurrao.png" id="4_wxlrs"]
 [ext_resource type="PackedScene" uid="uid://cwl3fxenqioc1" path="res://teleportador.tscn" id="5_aud0n"]
-[ext_resource type="Texture2D" uid="uid://cngswnfmd4ej7" path="res://Texturas/bola5.png" id="5_eqn0a"]
-[ext_resource type="Texture2D" uid="uid://gy1mdqyd7mbt" path="res://Texturas/negro.png" id="6_q38m2"]
 [ext_resource type="PackedScene" uid="uid://ckygc0pc8p57m" path="res://piso_esquina.tscn" id="6_rdbyg"]
 [ext_resource type="PackedScene" uid="uid://c3icifcstco4s" path="res://esquina_rampa.tscn" id="7_dtj3b"]
 [ext_resource type="PackedScene" uid="uid://ch1kf3dwhrur6" path="res://PuntoTeletransporteIndividual.tscn" id="8_jdxaa"]
@@ -15,6 +13,7 @@
 [ext_resource type="Texture2D" uid="uid://coxud135l8ti0" path="res://Texturas/teleportador.png" id="9_vpaak"]
 [ext_resource type="PackedScene" uid="uid://hmmnnunwsqdw" path="res://rebotador.tscn" id="10_ec1g4"]
 [ext_resource type="Script" path="res://camera.gd" id="11_jiplq"]
+[ext_resource type="PackedScene" uid="uid://chlbts48s08y1" path="res://esquina_curva_1.tscn" id="11_jlyoq"]
 [ext_resource type="Texture2D" uid="uid://bf0d7vgovj6y7" path="res://Texturas/EsquinaRampa.png" id="12_7imaq"]
 [ext_resource type="Texture2D" uid="uid://ddn1sw07ndnmh" path="res://Texturas/Triangulo.png" id="12_w5nhl"]
 [ext_resource type="Texture2D" uid="uid://bv8jlwu4miil4" path="res://Texturas/tile.png" id="13_swg81"]
@@ -22,8 +21,10 @@
 [ext_resource type="Texture2D" uid="uid://nnwm1o56l1c5" path="res://Texturas/BajarMenuButton.png" id="15_5tw84"]
 [ext_resource type="Texture2D" uid="uid://hwdhwjgk6h18" path="res://Texturas/BajarMenuButtonPressed.png" id="16_ygw64"]
 [ext_resource type="Script" path="res://MoverOpcionesButtons.gd" id="17_if4sp"]
+[ext_resource type="Texture2D" uid="uid://drrlvluw3cbqa" path="res://Texturas/BolaInterrogacion.png" id="17_onxo0"]
 [ext_resource type="Texture2D" uid="uid://cmbub7q14asyj" path="res://Texturas/ZoomInButton.png" id="17_s82v4"]
 [ext_resource type="Texture2D" uid="uid://cs50mg3l0d6jl" path="res://Texturas/ZoomInButtonPressed.png" id="18_ofhqh"]
+[ext_resource type="Texture2D" uid="uid://dhesdvjpjrd81" path="res://Texturas/negro (1).png" id="18_omude"]
 [ext_resource type="Texture2D" uid="uid://cvk2k3u3bi72y" path="res://Texturas/PlayButton.png" id="19_m6743"]
 [ext_resource type="Texture2D" uid="uid://4erlm68ubw03" path="res://Texturas/ZoomOutButton.png" id="19_wodt4"]
 [ext_resource type="Texture2D" uid="uid://bg3ikl0vrdd4w" path="res://Texturas/ZoomOutButtonPressed.png" id="20_beuyn"]
@@ -34,8 +35,10 @@
 [ext_resource type="Texture2D" uid="uid://dwcajbsq2iuhy" path="res://Texturas/EliminarButton.png" id="25_clkci"]
 [ext_resource type="Texture2D" uid="uid://trfqtyq1eavp" path="res://Texturas/rebotador.png" id="25_tbnmg"]
 [ext_resource type="Texture2D" uid="uid://67eqldrfme4w" path="res://Texturas/EliminarButtonPressed.png" id="26_1e0vn"]
+[ext_resource type="Texture2D" uid="uid://dl2p8ixoqw5jo" path="res://Texturas/EsquinaCurvaA.png" id="27_brlv8"]
 [ext_resource type="Texture2D" uid="uid://dpt2tck8v08mq" path="res://Texturas/SeleccionarButton.png" id="27_c4j7u"]
 [ext_resource type="Texture2D" uid="uid://082dlffynq3d" path="res://Texturas/SeleccionarButtonPressed.png" id="28_8v53c"]
+[ext_resource type="Texture2D" uid="uid://bbjhx22id5ndx" path="res://Texturas/EsquinaCurvaB.png" id="28_ko8hu"]
 [ext_resource type="Texture2D" uid="uid://d1p4oxpcde7ur" path="res://Texturas/CargarImagenButton.png" id="30_8cb4l"]
 [ext_resource type="Texture2D" uid="uid://cu207oqy8r7wx" path="res://Texturas/GuardarButton.png" id="30_egmyw"]
 [ext_resource type="Texture2D" uid="uid://btwsqfcljpq22" path="res://Texturas/CargarImagenButtonPressed.png" id="31_5bv8f"]
@@ -101,6 +104,7 @@ esquinarampa_scene = ExtResource("7_dtj3b")
 punto_teletransporte_scene = ExtResource("8_jdxaa")
 ventilador_scene = ExtResource("9_47u0k")
 rebotador_scene = ExtResource("10_ec1g4")
+esquina_curva1_scene = ExtResource("11_jlyoq")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(540, 1000)
@@ -194,60 +198,66 @@ offset_bottom = 345.0
 [node name="BotonBola" type="TextureButton" parent="UI/Menu"]
 custom_minimum_size = Vector2(100, 100)
 layout_mode = 0
-offset_left = 15.0
-offset_top = 15.0
-offset_right = 531.0
-offset_bottom = 531.0
-scale = Vector2(0.4, 0.4)
-texture_normal = ExtResource("5_eqn0a")
+offset_left = 209.0
+offset_top = -5.0
+offset_right = 459.0
+offset_bottom = 245.0
+scale = Vector2(0.7, 0.7)
+pivot_offset = Vector2(125, 125)
+texture_normal = ExtResource("17_onxo0")
 
 [node name="BotonPiso" type="TextureButton" parent="UI/Menu"]
 custom_minimum_size = Vector2(100, 100)
 layout_mode = 0
-offset_left = 245.0
-offset_top = 67.0
-offset_right = 849.0
-offset_bottom = 355.0
-scale = Vector2(0.4, 0.4)
-texture_normal = ExtResource("6_q38m2")
+offset_left = 9.0
+offset_top = -5.0
+offset_right = 259.0
+offset_bottom = 245.0
+scale = Vector2(0.7, 0.7)
+pivot_offset = Vector2(125, 125)
+texture_normal = ExtResource("18_omude")
 stretch_mode = 0
 
 [node name="BotonCubo" type="TextureButton" parent="UI/Menu"]
 layout_mode = 0
-offset_left = 517.0
-offset_top = 36.0
-offset_right = 767.0
-offset_bottom = 286.0
-scale = Vector2(0.8, 0.8)
+offset_left = 410.0
+offset_top = -5.0
+offset_right = 660.0
+offset_bottom = 245.0
+scale = Vector2(0.7, 0.7)
+pivot_offset = Vector2(125, 125)
 texture_normal = ExtResource("12_w5nhl")
 stretch_mode = 0
 
 [node name="BotonTeleportador" type="TextureButton" parent="UI/Menu"]
 layout_mode = 0
-offset_left = 775.0
-offset_top = 29.0
-offset_right = 1025.0
-offset_bottom = 279.0
-scale = Vector2(0.75, 0.75)
+offset_left = 611.0
+offset_top = -5.0
+offset_right = 861.0
+offset_bottom = 245.0
+scale = Vector2(0.7, 0.7)
+pivot_offset = Vector2(125, 125)
 texture_normal = ExtResource("9_vpaak")
 
 [node name="BotonEsquina" type="TextureButton" parent="UI/Menu"]
 layout_mode = 0
-offset_left = 311.0
-offset_top = -192.0
-offset_right = 561.0
-offset_bottom = 58.0
+offset_left = 209.0
+offset_top = -255.0
+offset_right = 459.0
+offset_bottom = -5.00002
 rotation = 6.28319
-scale = Vector2(0.5, 0.5)
+scale = Vector2(0.7, 0.7)
+pivot_offset = Vector2(125, 125)
 texture_normal = ExtResource("14_5hisv")
 
 [node name="BotonEsquinaRampa" type="TextureButton" parent="UI/Menu"]
 layout_mode = 0
-offset_left = 17.0
-offset_top = -234.0
-offset_right = 267.0
-offset_bottom = 16.0
-scale = Vector2(0.8, 0.8)
+offset_left = 9.0
+offset_top = -255.0
+offset_right = 259.0
+offset_bottom = -5.00002
+scale = Vector2(0.7, 0.7)
+pivot_offset = Vector2(125, 125)
 texture_normal = ExtResource("12_7imaq")
 
 [node name="BotonMoverMenu" type="TextureButton" parent="UI/Menu"]
@@ -262,21 +272,43 @@ texture_pressed = ExtResource("16_ygw64")
 
 [node name="BotonVentilador" type="TextureButton" parent="UI/Menu"]
 layout_mode = 0
-offset_left = 491.0
-offset_top = -252.0
-offset_right = 741.0
-offset_bottom = -2.00002
-scale = Vector2(0.9, 0.9)
+offset_left = 812.001
+offset_top = -255.0
+offset_right = 1062.0
+offset_bottom = -5.00005
+scale = Vector2(0.7, 0.7)
 pivot_offset = Vector2(125, 125)
 texture_normal = ExtResource("23_mqewi")
 
 [node name="BotonRebotador" type="TextureButton" parent="UI/Menu"]
 layout_mode = 0
-offset_left = 749.0
-offset_top = -254.0
-offset_right = 999.0
-offset_bottom = -4.0
+offset_left = 812.001
+offset_top = -5.0
+offset_right = 1062.0
+offset_bottom = 245.0
+scale = Vector2(0.7, 0.7)
+pivot_offset = Vector2(125, 125)
 texture_normal = ExtResource("25_tbnmg")
+
+[node name="BotonCurvaA" type="TextureButton" parent="UI/Menu"]
+layout_mode = 0
+offset_left = 410.0
+offset_top = -255.0
+offset_right = 660.0
+offset_bottom = -5.00008
+scale = Vector2(0.7, 0.7)
+pivot_offset = Vector2(125, 125)
+texture_normal = ExtResource("27_brlv8")
+
+[node name="BotonCurvaB" type="TextureButton" parent="UI/Menu"]
+layout_mode = 0
+offset_left = 611.0
+offset_top = -255.0
+offset_right = 861.0
+offset_bottom = -5.00005
+scale = Vector2(0.7, 0.7)
+pivot_offset = Vector2(125, 125)
+texture_normal = ExtResource("28_ko8hu")
 
 [node name="Opciones" type="Control" parent="UI"]
 layout_mode = 3

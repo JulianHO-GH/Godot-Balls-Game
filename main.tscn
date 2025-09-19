@@ -1,4 +1,4 @@
-[gd_scene load_steps=77 format=3 uid="uid://cs5whshwnasdf"]
+[gd_scene load_steps=78 format=3 uid="uid://cs5whshwnasdf"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_tpxov"]
 [ext_resource type="PackedScene" uid="uid://fn1hroyr720c" path="res://bola.tscn" id="2_gxh2a"]
@@ -14,6 +14,7 @@
 [ext_resource type="PackedScene" uid="uid://hmmnnunwsqdw" path="res://rebotador.tscn" id="10_ec1g4"]
 [ext_resource type="Script" path="res://camera.gd" id="11_jiplq"]
 [ext_resource type="PackedScene" uid="uid://chlbts48s08y1" path="res://esquina_curva_1.tscn" id="11_jlyoq"]
+[ext_resource type="PackedScene" uid="uid://cpey4wdjkiuu8" path="res://esquina_curva_2.tscn" id="12_5dcny"]
 [ext_resource type="Texture2D" uid="uid://bf0d7vgovj6y7" path="res://Texturas/EsquinaRampa.png" id="12_7imaq"]
 [ext_resource type="Texture2D" uid="uid://ddn1sw07ndnmh" path="res://Texturas/Triangulo.png" id="12_w5nhl"]
 [ext_resource type="Texture2D" uid="uid://bv8jlwu4miil4" path="res://Texturas/tile.png" id="13_swg81"]
@@ -105,6 +106,7 @@ punto_teletransporte_scene = ExtResource("8_jdxaa")
 ventilador_scene = ExtResource("9_47u0k")
 rebotador_scene = ExtResource("10_ec1g4")
 esquina_curva1_scene = ExtResource("11_jlyoq")
+esquina_curva2_scene = ExtResource("12_5dcny")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(540, 1000)

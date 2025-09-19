@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3 uid="uid://cpey4wdjkiuu8"]
+
+[ext_resource type="Texture2D" uid="uid://bbjhx22id5ndx" path="res://Texturas/EsquinaCurvaB.png" id="1_v204r"]
+
+[node name="StaticBody2D" type="StaticBody2D"]
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_v204r")
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
+polygon = PackedVector2Array(-125, -72, -123, -50, -120, -32, -117, -20, -115, -13, -112, -4, -107, 8, -100, 23, -91, 37, -79, 53, -69, 64, -61, 72, -52, 80, -40, 89, -28, 97, -13, 105, 6, 113, 27, 119, 48, 123, 72, 125, -69, 125, -77, 119, -88, 110, -98, 101, -113, 84, -121, 74, -125, 69)

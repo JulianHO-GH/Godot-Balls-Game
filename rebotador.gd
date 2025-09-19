@@ -62,7 +62,7 @@ func _play_boing_sound() -> void:
 		# Reproducir el sonido
 		var audio_player = AudioStreamPlayer.new()
 		audio_player.stream = load("res://sounds/Boing.wav")
-		audio_player.volume_db = 0.0  # Ajusta el volumen si es necesario
+		audio_player.volume_db = -3  # Ajusta el volumen si es necesario
 		audio_player.pitch_scale = 1.0  # Ajusta el tono si es necesario
 		add_child(audio_player)
 		audio_player.play()

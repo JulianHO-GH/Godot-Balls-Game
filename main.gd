@@ -11,6 +11,7 @@ extends Node2D
 @export var ventilador_scene: PackedScene
 @export var rebotador_scene: PackedScene
 @export var esquina_curva1_scene: PackedScene
+@export var esquina_curva2_scene: PackedScene
 
 # Instancia de GameState para gestionar datos
 var game_state = preload("res://GameState.gd").new()
@@ -92,6 +93,7 @@ func _ready():
 	$UI/Menu/BotonVentilador.pressed.connect(_seleccionar_ventilador)
 	$UI/Menu/BotonRebotador.pressed.connect(_seleccionar_rebotador)
 	$UI/Menu/BotonCurvaA.pressed.connect(_seleccionar_curva1)
+	$UI/Menu/BotonCurvaB.pressed.connect(_seleccionar_curva2)
 
 	# Añadir botones al grupo
 	$UI/Menu/BotonBola.add_to_group("spawn_buttons")
@@ -174,6 +176,10 @@ func _on_area_meta_bola_alcanzo_meta():
 func _seleccionar_curva1():
 	if not game_state.descongelado and not showing_popup:
 		game_state.modo = "EsquinaCurva1"
+
+func _seleccionar_curva2():
+	if not game_state.descongelado and not showing_popup:
+		game_state.modo = "EsquinaCurva2"
 		
 func _seleccionar_esquinarampa():
 	if not game_state.descongelado and not showing_popup:
@@ -805,6 +811,8 @@ func _input(event):
 							obj_id = spawn_rebotador(spawn_pos)
 						elif game_state.modo =="EsquinaCurva1":
 							obj_id = spawn_curva1(spawn_pos)
+						elif game_state.modo =="EsquinaCurva2":
+							obj_id = spawn_curva2(spawn_pos)
 						if obj_id:
 							game_state.set_tile_occupied(tile_key, true)
 					else:
@@ -1126,6 +1134,21 @@ func spawn_curva1(pos, rotation_degrees: float = -1.0) -> String:
 	add_child(esquina)
 	return obj_id
 	
+func spawn_curva2(pos, rotation_degrees: float = -1.0) -> String:
+	var esquina = esquina_curva2_scene.instantiate()
+	esquina.position = pos
+	var rot = rotation_degrees if rotation_degrees != -1.0 else game_state.get_rotation("Curva2")
+	var obj_id = game_state.add_object("res://esquina_curva_2.tscn", pos, rot)
+	esquina.set_meta("id", obj_id)
+	esquina.set_meta("scene_path", "res://esquina_curva_2.tscn")
+	var sprite = esquina.get_node("Sprite2D")
+	if sprite:
+		sprite.material = material_base.duplicate()
+	esquina.rotation_degrees = rot
+	esquina.add_to_group("curvas2_group")
+	add_child(esquina)
+	return obj_id
+	
 func spawn_esquina(pos, rotation_degrees: float = -1.0) -> String:
 	var esquina = esquina_scene.instantiate()
 	esquina.position = pos
@@ -1207,6 +1230,8 @@ func _get_object_type(obj) -> String:
 			return "Rebotador"
 		elif scene_path == "res://esquina_curva_1.tscn":
 			return "Curva1"
+		elif scene_path == "res://esquina_curva_2.tscn":
+			return "Curva2"
 		return "Piso"
 	elif obj is Area2D and obj.get_script():
 		var script_path = obj.get_script().resource_path
@@ -1237,7 +1262,7 @@ func _save_level():
 				  get_tree().get_nodes_in_group("teleportadores") + get_tree().get_nodes_in_group("puntos_teletransporte") + \
 				  get_tree().get_nodes_in_group("pisos") + get_tree().get_nodes_in_group("esquinas") + \
 				  get_tree().get_nodes_in_group("esquinas_rampa") + get_tree().get_nodes_in_group("ventiladores") + get_tree().get_nodes_in_group("rebotadores") + \
-				  get_tree().get_nodes_in_group("curvas1_group"):
+				  get_tree().get_nodes_in_group("curvas1_group") + get_tree().get_nodes_in_group("curvas2_group"):
 			var obj_id = obj.get_meta("id", "")
 			if obj_id:
 				valid_object_ids[obj_id] = true
@@ -1245,7 +1270,7 @@ func _save_level():
 		for obj in game_state.objects:
 			if obj.scene_path in ["res://Bola.tscn", "res://Cubo.tscn", "res://Teleportador.tscn", 
 								 "res://PuntoTeletransporteIndividual.tscn", "res://Piso.tscn", 
-								 "res://piso_esquina.tscn", "res://esquina_rampa.tscn", "res://ventilador.tscn", "res://rebotador.tscn" , "res://esquina_curva_1.tscn"] and \
+								 "res://piso_esquina.tscn", "res://esquina_rampa.tscn", "res://ventilador.tscn", "res://rebotador.tscn" , "res://esquina_curva_1.tscn" , "res://esquina_curva_2.tscn"] and \
 			   valid_object_ids.has(obj.id):
 				var data = {
 					"id": obj.id,
@@ -1306,7 +1331,7 @@ func _reload(file_name: String):
 	for node in get_tree().get_nodes_in_group("bolas") + get_tree().get_nodes_in_group("cubos") + \
 				get_tree().get_nodes_in_group("teleportadores") + get_tree().get_nodes_in_group("puntos_teletransporte") + \
 				get_tree().get_nodes_in_group("pisos") + get_tree().get_nodes_in_group("esquinas") + \
-				get_tree().get_nodes_in_group("esquinas_rampa") + get_tree().get_nodes_in_group("ventiladores") + get_tree().get_nodes_in_group("rebotadores") + get_tree().get_nodes_in_group("curvas1_group"):
+				get_tree().get_nodes_in_group("esquinas_rampa") + get_tree().get_nodes_in_group("ventiladores") + get_tree().get_nodes_in_group("rebotadores") + get_tree().get_nodes_in_group("curvas1_group") + get_tree().get_nodes_in_group("curvas2_group"):
 		node.queue_free()
 	
 	for line in game_state.teleport_lines.values():
@@ -1388,6 +1413,10 @@ func _reload(file_name: String):
 			"res://esquina_curva_1.tscn":
 				new_obj_id = spawn_curva1(pos, rotation_degrees)
 				game_state.set_rotation("Curva1", rotation_degrees)
+				
+			"res://esquina_curva_2.tscn":
+				new_obj_id = spawn_curva2(pos, rotation_degrees)
+				game_state.set_rotation("Curva2", rotation_degrees)
 			
 			"res://esquina_rampa.tscn":
 				new_obj_id = spawn_esquinarampa(pos, rotation_degrees)

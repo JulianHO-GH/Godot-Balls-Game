@@ -84,6 +84,7 @@ func _ready():
 	$UI/Opciones/BotonDescongelar.pressed.connect(_alternar_congelar_descongelar)
 	$UI/Opciones/BotonReiniciar.pressed.connect(_detener)
 	$UI/Opciones/BotonEliminar.pressed.connect(_eliminar)
+	$UI/Opciones/PlayNOUIButton.pressed.connect(_playNOUI)
 	$UI/Menu/BotonEsquinaRampa.pressed.connect(_seleccionar_esquinarampa)
 	$UI/Opciones/BotonSelect.pressed.connect(_alternar_seleccionar)
 	$UI/Opciones/BotonLink.pressed.connect(_on_boton_link_pressed)
@@ -94,6 +95,7 @@ func _ready():
 	$UI/Menu/BotonRebotador.pressed.connect(_seleccionar_rebotador)
 	$UI/Menu/BotonCurvaA.pressed.connect(_seleccionar_curva1)
 	$UI/Menu/BotonCurvaB.pressed.connect(_seleccionar_curva2)
+	
 
 	# Añadir botones al grupo
 	$UI/Menu/BotonBola.add_to_group("spawn_buttons")
@@ -355,6 +357,31 @@ func _alternar_seleccionar():
 			$/root/Main/UI/Opciones/CheckboxButton.visible = false
 			game_state.is_boton_link_visible = false
 
+func _playNOUI():
+	
+	$UI/Opciones/PlayNOUIButton.disabled = true
+	if not showing_popup:
+
+
+		var target_y = game_state.ui_menu_position.y
+		var target_x = game_state.ui_options_position.x
+
+		target_y += -400
+		target_x -= MOVE_OFFSET
+
+		var tween = create_tween()
+		tween.tween_property($UI/Menu, "position:y", target_y, ANIMATION_DURATION)\
+			.set_ease(Tween.EASE_IN_OUT)\
+			.set_trans(Tween.TRANS_QUINT)
+
+		var tween2 = create_tween()
+		tween2.tween_property($UI/Opciones, "position:x", target_x, ANIMATION_DURATION)\
+			.set_ease(Tween.EASE_IN_OUT)\
+			.set_trans(Tween.TRANS_QUINT)
+	$TimerStart.start()
+	_alternar_congelar_descongelar()
+
+	
 func _alternar_congelar_descongelar():
 	if not showing_popup:
 		$UI/Opciones/BotonSelect.modulate = Color(0.25, 0.25, 0.25)

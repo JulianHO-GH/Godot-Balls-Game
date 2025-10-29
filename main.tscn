@@ -1,4 +1,4 @@
-[gd_scene load_steps=78 format=3 uid="uid://cs5whshwnasdf"]
+[gd_scene load_steps=81 format=3 uid="uid://cs5whshwnasdf"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_tpxov"]
 [ext_resource type="PackedScene" uid="uid://fn1hroyr720c" path="res://bola.tscn" id="2_gxh2a"]
@@ -71,6 +71,8 @@
 [ext_resource type="Texture2D" uid="uid://bo0fjplsn6rhk" path="res://Texturas/Animated/Frame1.png" id="64_jcmcm"]
 [ext_resource type="Script" path="res://area_2d_meta.gd" id="65_28iay"]
 [ext_resource type="Shader" path="res://repeat.gdshader" id="65_51t58"]
+[ext_resource type="FontFile" uid="uid://cffar7b2cic6s" path="res://Comic Sans MS.ttf" id="72_ack6f"]
+[ext_resource type="Script" path="res://timer_start.gd" id="72_irycp"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_6tccr"]
 size = Vector2(1079, 1999)
@@ -92,6 +94,8 @@ size = Vector2(10998.8, 493.25)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_ta82i"]
 shader = ExtResource("65_51t58")
+
+[sub_resource type="Theme" id="Theme_cs6ya"]
 
 [node name="Main" type="Node2D" node_paths=PackedStringArray("grid_tilemap")]
 script = ExtResource("1_tpxov")
@@ -400,9 +404,9 @@ texture_pressed = ExtResource("31_5bv8f")
 [node name="ButtonSave" type="TextureButton" parent="UI/Opciones"]
 layout_mode = 0
 offset_left = 940.0
-offset_top = 1340.0
+offset_top = 1481.0
 offset_right = 1060.0
-offset_bottom = 1460.0
+offset_bottom = 1601.0
 pivot_offset = Vector2(60, 60)
 keep_pressed_outside = true
 texture_normal = ExtResource("30_egmyw")
@@ -411,9 +415,9 @@ texture_pressed = ExtResource("31_wan16")
 [node name="ButtonLoad" type="TextureButton" parent="UI/Opciones"]
 layout_mode = 0
 offset_left = 940.0
-offset_top = 1481.0
+offset_top = 1622.0
 offset_right = 1060.0
-offset_bottom = 1601.0
+offset_bottom = 1742.0
 pivot_offset = Vector2(60, 60)
 keep_pressed_outside = true
 texture_normal = ExtResource("32_2c5jw")
@@ -442,6 +446,16 @@ pivot_offset = Vector2(60, 60)
 keep_pressed_outside = true
 texture_normal = ExtResource("43_4ae7x")
 texture_pressed = ExtResource("44_yhsbh")
+
+[node name="PlayNOUIButton" type="TextureButton" parent="UI/Opciones"]
+layout_mode = 0
+offset_left = 940.0
+offset_top = 1342.0
+offset_right = 1060.0
+offset_bottom = 1462.0
+pivot_offset = Vector2(60, 60)
+texture_normal = ExtResource("19_m6743")
+texture_pressed = ExtResource("20_nka71")
 
 [node name="Mover" type="Control" parent="UI"]
 z_index = 1
@@ -576,6 +590,27 @@ offset_right = 6000.0
 offset_bottom = 35750.0
 texture = ExtResource("64_jcmcm")
 stretch_mode = 1
+
+[node name="TimerStart" type="Timer" parent="."]
+wait_time = 4.0
+one_shot = true
+script = ExtResource("72_irycp")
+
+[node name="Label" type="Label" parent="TimerStart"]
+z_index = 5
+offset_left = 360.0
+offset_top = 540.0
+offset_right = 780.0
+offset_bottom = 960.0
+pivot_offset = Vector2(210, 210)
+theme = SubResource("Theme_cs6ya")
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.541176)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 50
+theme_override_fonts/font = ExtResource("72_ack6f")
+theme_override_font_sizes/font_size = 300
+horizontal_alignment = 1
 
 [connection signal="button_down" from="Camera2D/MaxLayer/MaxSizeAlert/OkButton" to="UI/Opciones" method="_on_ok_button_button_down"]
 [connection signal="button_up" from="Camera2D/MaxLayer/MaxSizeAlert/OkButton" to="UI/Opciones" method="_on_ok_button_button_up"]
